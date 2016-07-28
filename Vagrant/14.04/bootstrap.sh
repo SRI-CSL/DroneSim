@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-apt-get update
-apt-get upgrade
-apt-get install -y emacs24 dbus-x11
-apt-get install -y git python-pip
-
-pip install pymavlink MAVProxy
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install -y emacs24 dbus-x11
+sudo apt-get install -y git python-pip
 
 
 #java 8
@@ -19,7 +17,7 @@ sudo apt-get install -y oracle-java8-set-default
 
 
 #plambda
-pip install antlr4-python2-runtime
+sudo pip install antlr4-python2-runtime
 git clone https://github.com/SRI-CSL/PLambda
 cd PLambda
 make develop
@@ -39,7 +37,7 @@ cd ..
 apt-get install  -y  python-matplotlib python-serial python-wxgtk2.8 python-lxml
 apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect
 
-pip install pymavlink MAVProxy
+sudo pip install pymavlink MAVProxy
 sudo apt-get install -y libtool automake autoconf libexpat1-dev
 
 export PATH=$PATH:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
