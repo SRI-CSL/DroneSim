@@ -1,0 +1,43 @@
+Install vagrant:
+
+>wget https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5.dmg
+
+Be in this directory:
+
+>vagrant up
+
+The first time you do this, expect this to take 5-10 minutes.
+It will end up with some red, but as long as it is just complaining about
+
+../Tools/autotest/run_in_terminal_window.sh failing
+
+that is fine.
+
+Once up for the first time do:
+
+>vagrant ssh-config > key.cfg
+
+Now you can logon to the box:
+
+>./login
+
+Probably the first thing you need to do is:
+
+echo '. /vagrant/bash_profile' >> ~/.bashrc
+
+followed by
+
+. ~/.bashrc
+
+
+I have not installed maude, so you will need to do that.
+
+Also you should test the sitl thingy:
+
+cd ardupilot/ArduPlane
+sim_vehicle.sh --console --map --aircraft test
+
+
+
+
+
