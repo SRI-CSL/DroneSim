@@ -34,8 +34,10 @@ cd ..
 
 
 #sitl et al
-apt-get install  -y  python-matplotlib python-serial python-wxgtk2.8 python-lxml
-apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect
+sudo apt-get install  -y  python-matplotlib python-serial python-wxgtk2.8 python-lxml
+sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect libpython-all-dev
+sudo apt-get install   -y python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
+
 
 sudo pip install pymavlink MAVProxy
 sudo apt-get install -y libtool automake autoconf libexpat1-dev
