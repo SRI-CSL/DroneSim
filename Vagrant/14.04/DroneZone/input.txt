@@ -1,0 +1,29 @@
+**** turn on IOP/plambda VERBOSITY
+(user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
+(user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
+
+**** turn off IOP/plambda VERBOSITY
+(user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
+(user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
+
+
+(user (load "pyactorlib.lsp"))
+
+(user (apply squark "This is a test, ..."))
+
+(user (load "input.lsp"))
+
+
+(user (apply evalOK "user"  (* (int 3) "6")))
+
+
+
+(user (load "drone.lsp"))
+
+(user (apply evalOK  "user"  (define b0 (apply mkdrone "b0" "3" "3" "20"))))
+
+(user (apply evalOK  "user"  b0))
+
+(user (invoke b0 "mv" "E"))
+
+
