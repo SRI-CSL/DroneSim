@@ -1,4 +1,4 @@
 
-export PATH=$PATH:$HOME/jsbsim/src:$HOME/ardupilot/Tools/autotest:/usr/lib/ccache
+export IOPBINDIR=${HOME}/bin/IOP
+export PATH=$PATH:${IOPBINDIR}:${HOME}/jsbsim/src:${HOME}/ardupilot/Tools/autotest:/usr/lib/ccache
 
-export IOPBINDIR=$HOME/bin/IOP

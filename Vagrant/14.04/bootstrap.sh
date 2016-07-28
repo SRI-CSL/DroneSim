@@ -5,7 +5,6 @@ sudo apt-get upgrade
 sudo apt-get install -y emacs24 dbus-x11
 sudo apt-get install -y git python-pip
 
-
 #java 8
 sudo apt-get install -y software-properties-common python-software-properties
 echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
@@ -16,8 +15,12 @@ echo "Setting environment variables for Java 8.."
 sudo apt-get install -y oracle-java8-set-default
 
 
+#take ownership of /usr/local
+sudo chown -R vagrant:staff /usr/local/
+
+
 #plambda
-sudo pip install antlr4-python2-runtime
+pip install antlr4-python2-runtime
 git clone https://github.com/SRI-CSL/PLambda
 cd PLambda
 make develop
@@ -39,7 +42,7 @@ sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect 
 sudo apt-get install   -y python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
 
 
-sudo pip install pymavlink MAVProxy
+pip install pymavlink MAVProxy
 sudo apt-get install -y libtool automake autoconf libexpat1-dev
 
 export PATH=$PATH:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
