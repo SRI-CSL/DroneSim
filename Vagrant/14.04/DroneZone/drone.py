@@ -6,8 +6,6 @@ from pymavlink import mavutil
 
 from subprocess import *
 
-from code.sandbox import *
-
 
 dkargs = [ 'dronekit-sitl',
            'copter',
