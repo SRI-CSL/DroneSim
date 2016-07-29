@@ -20,6 +20,7 @@ sudo chown -R vagrant:staff /usr/local/
 
 
 #plambda
+sudo apt-get install ipython
 pip install antlr4-python2-runtime
 git clone https://github.com/SRI-CSL/PLambda
 cd PLambda
@@ -40,6 +41,8 @@ cd ..
 sudo apt-get install  -y  python-matplotlib python-serial python-lxml
 sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect libpython-all-dev
 sudo apt-get install   -y python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
+pip install dronekit-sitl -UI
+
 
 
 pip install pymavlink MAVProxy
