@@ -83,12 +83,12 @@ class SimpleDrone(object):
 
         if self.mavproxy is not None:
             self.mavproxy.stop()
-            sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.pid))
+            sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
             self.mavproxy = None
 
         if self.dronekit is not None:
             self.dronekit.stop()
-            sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.pid))
+            sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
 
 

@@ -13,21 +13,20 @@ x.mv(-7.163147,-34.818550,2,23)
 
 (define SimpleDrone code.drone.SimpleDrone)
 
-(define xDrone (apply SimpleDrone "xDrone"))
 
-(invoke xDrone "initialize" (float -7.162675) (float -34.817705)  (int 36) (int 10) (int 10))
+(define test ()
+  (define xDrone (apply SimpleDrone "xDrone"))
 
-(invoke  xDrone "mv" (float -7.162675) (float -34.817705) (int 2) (int 23))
+  (invoke xDrone "initialize" (float -7.162675) (float -34.817705)  (int 36) (int 10) (int 10))
 
+  (invoke  xDrone "mv" (float -7.162675) (float -34.817705) (int 2) (int 23))
 
+  (boolean True)
+  
+  )
 
+;;(invoke xDrone "exit")
 
-;;old stuff below
-
-(define mkdrone (name x y e)
-  (let ((drone (apply SimpleDrone name)))
-    (invoke drone "initialize" x y e)
-    drone))
 
 
 (import "plambda.actors.actorlib")
