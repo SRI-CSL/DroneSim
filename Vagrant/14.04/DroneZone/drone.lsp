@@ -1,6 +1,28 @@
-(import "plambda.drones.simple_drone")
+/*
 
-(define SimpleDrone plambda.drones.simple_drone.SimpleDrone)
+from code.drone import *
+x = SimpleDrone("hello")
+x.initialize(-7.162675,-34.817705,36,10,10)
+x.mv(-7.163147,-34.818550,2,23)
+
+*/
+
+
+
+(import "code.drone")
+
+(define SimpleDrone code.drone.SimpleDrone)
+
+(define xDrone (apply SimpleDrone "xDrone"))
+
+(invoke xDrone "initialize" (float -7.162675) (float -34.817705)  (int 36) (int 10) (int 10))
+
+(invoke  xDrone "mv" (float -7.162675) (float -34.817705) (int 2) (int 23))
+
+
+
+
+;;old stuff below
 
 (define mkdrone (name x y e)
   (let ((drone (apply SimpleDrone name)))

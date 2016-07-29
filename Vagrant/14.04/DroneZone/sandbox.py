@@ -56,11 +56,14 @@ class SandBox(object):
         if self.child is not None:
             self.child.wait()
 
-
-if __name__ == '__main__':
+def test():
     SandBox('dronekit', dk_argv, False).start()
     SandBox('mavproxy', mp_argv, True).start()
+    
+if __name__ == '__main__':
+    test()
 
+    
 
             
     

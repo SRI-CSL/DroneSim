@@ -48,13 +48,20 @@ class SimpleDrone(object):
 
 
     def spawn(self):
-        
-         
-        self.dronekit = Popen(dkargs, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.pid))
+        sys.stderr.write("Spawning dronekit\n")
+        self.dronekit = SandBox('dronekit', dk_argv, False)
+        self.dronekit.start()
+        sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
 
-        self.mavproxy = Popen(mpargs, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.pid))
+        sys.stderr.write("sleeping\n")
+        time.sleep(2)
+        sys.stderr.write("slept\n")
+
+        
+        sys.stderr.write("Spawning mavproxy\n")
+        self.mavproxy =  SandBox('mavproxy', mp_argv, True)
+        self.mavproxy.start()
+        sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
         
     def initialize(self, x, y, z, v, e):
@@ -64,7 +71,7 @@ class SimpleDrone(object):
         self.v = float(v)
         self.e = float(e)
 
-        #self.spawn()
+        self.spawn()
         
         self.vehicle = connect('127.0.0.1:14550', wait_ready=True)
 
@@ -75,12 +82,12 @@ class SimpleDrone(object):
     def exit(self):
 
         if self.mavproxy is not None:
-            self.mavproxy.kill()
+            self.mavproxy.stop()
             sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.pid))
             self.mavproxy = None
 
         if self.dronekit is not None:
-            self.dronekit.kill()
+            self.dronekit.stop()
             sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.pid))
             self.dronekit = None
 
@@ -116,7 +123,7 @@ class SimpleDrone(object):
         return '{0} {1} {2} {3} {4}'.format(pos[0], pos[1], pos[2], vehicle.velocity, vehicle.battery.level)
 
 
-#from drone import *
+#from code.drone import *
 #x = SimpleDrone("hello")
 #x.initialize(-7.162675,-34.817705,36,10,10)
 #x.mv(-7.163147,-34.818550,2,23)

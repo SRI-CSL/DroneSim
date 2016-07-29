@@ -10,7 +10,7 @@ sudo apt-get install -y software-properties-common python-software-properties
 echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 sudo apt-add-repository ppa:webupd8team/java -y
 sudo apt-get update
-sudo apt-get install oracle-java8-installer
+sudo apt-get install -y oracle-java8-installer
 echo "Setting environment variables for Java 8.."
 sudo apt-get install -y oracle-java8-set-default
 
@@ -20,7 +20,7 @@ sudo chown -R vagrant:staff /usr/local/
 
 
 #plambda
-sudo apt-get install ipython
+sudo apt-get -y install ipython
 pip install antlr4-python2-runtime
 git clone https://github.com/SRI-CSL/PLambda
 cd PLambda
@@ -40,7 +40,7 @@ cd ..
 #sitl et al
 sudo apt-get install  -y  python-matplotlib python-serial python-lxml
 sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect libpython-all-dev
-sudo apt-get install   -y python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
+sudo apt-get install  -y  python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
 pip install dronekit-sitl -UI
 
 
