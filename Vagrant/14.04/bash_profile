@@ -1,4 +1,8 @@
+export PYTHONPATH=/vagrant/DroneZone
 
 export IOPBINDIR=${HOME}/bin/IOP
-export PATH=$PATH:${IOPBINDIR}:${HOME}/jsbsim/src:${HOME}/ardupilot/Tools/autotest:/usr/lib/ccache
+
+export MAUDE_LIB=/vagrant/Maude
+
+export PATH=${IOPBINDIR}:${MAUDE_LIB}:${HOME}/jsbsim/src:${HOME}/ardupilot/Tools/autotest:/usr/lib/ccache:${PATH}
 

@@ -114,7 +114,7 @@ class SimpleDrone(object):
         return '{0} {1} {2} {3} {4}'.format(pos[0], pos[1], pos[2], vehicle.velocity, vehicle.battery.level)
 
 
-#from simple_drone_sitl import *
+#from drone import *
 #x = SimpleDrone("hello")
 #x.initialize(-7.162675,-34.817705,36,10,10)
 #x.mv(-7.163147,-34.818550,2,23)
