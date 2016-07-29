@@ -48,7 +48,12 @@ pip install dronekit-sitl -UI
 pip install pymavlink MAVProxy
 sudo apt-get install -y libtool automake autoconf libexpat1-dev
 
-export PATH=$PATH:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
+#setup the path
+#export PATH=$PATH:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
+echo '. /vagrant/bash_profile' >> ~/.bashrc
+. ~/.bashrc
+
+
 
 git clone git://github.com/ArduPilot/ardupilot.git
 git clone git://github.com/tridge/jsbsim.git
