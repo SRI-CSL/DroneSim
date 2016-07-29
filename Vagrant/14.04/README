@@ -21,15 +21,6 @@ Now you can logon to the box:
 
 >./login
 
-Probably the first thing you need to do is:
-
-echo '. /vagrant/bash_profile' >> ~/.bashrc
-
-followed by
-
-. ~/.bashrc
-
-
 I have not installed maude, so you will need to do that.
 Not sure how to do that programmatically.
 
