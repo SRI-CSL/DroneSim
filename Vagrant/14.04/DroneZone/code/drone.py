@@ -119,8 +119,10 @@ class SimpleDrone(object):
 
 
     def __str__(self):
-        pos = extractNumber(str(vehicle.location.local_frame))
-        return '{0} {1} {2} {3} {4}'.format(pos[0], pos[1], pos[2], vehicle.velocity, vehicle.battery.level)
+        if vehicle is not None:
+            return '{0} {1} {2}'.format(str(vehicle.location.local_frame), vehicle.velocity, vehicle.battery.level)
+        else:
+            return "vehicle is None"
 
 
 #from code.drone import *
