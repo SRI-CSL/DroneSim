@@ -115,19 +115,23 @@ class SimpleDrone(object):
         return True
 
     def __str__(self):
-        pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
-        if not pos:
-            pos = [0, 0, 0]
-        auxVel = self.vehicle.velocity
-        bat = self.vehicle.battery.level
-        dx = auxVel[0]
-        dy = auxVel[1]
-        dz = auxVel[2]
-        vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
-        dx = dx / vel
-        dy = dy / vel
-        dz = dz / vel
-        return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
+        if self.vehicle is not None:
+            pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
+            if not pos:
+                pos = [0, 0, 0]
+            auxVel = self.vehicle.velocity
+            bat = self.vehicle.battery.level
+            dx = auxVel[0]
+            dy = auxVel[1]
+            dz = auxVel[2]
+            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
+            dx = dx / vel
+            dy = dy / vel
+            dz = dz / vel
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
+        else:
+            return 'Uninitialized'
+                
 
 
 """
