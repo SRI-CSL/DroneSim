@@ -43,7 +43,10 @@ class SandBox(object):
             self.child = Popen(self.argv, stdin=PIPE, stdout=sys.stderr, stderr=sys.stderr)
         else:
             self.child = Popen(self.argv, stdin=PIPE, stdout=PIPE, stderr=sys.stderr)
-            Thread(target=echo, name='echo_of_{0}'.format(self.name), args=(self.child, )).start()
+            thread = Thread(target=echo, name='echo_of_{0}'.format(self.name), args=(self.child, ))
+            #thread needs to be a daemon so that the actor itself can die in peace.
+            thread.daemon = True 
+            thread.start()
 
 
     def stop(self):
