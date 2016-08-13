@@ -1,4 +1,6 @@
-export PYTHONPATH=/vagrant/DroneZone
+
+# DroneZone deprecated.
+export PYTHONPATH=/vagrant/Maude4/Lib/python:/vagrant/DroneZone
 
 export IOPBINDIR=${HOME}/bin/IOP
 
