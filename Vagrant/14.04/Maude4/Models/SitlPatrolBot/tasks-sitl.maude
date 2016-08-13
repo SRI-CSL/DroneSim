@@ -1,0 +1,140 @@
+fmod MODEL-TASKS is
+  inc MODEL-KNOWLEDGE .
+
+  vars id : Id .
+	var cl : Class .
+	vars  t t0 t1 t2 t3 t4 : Time .
+  vars l loc loc0 home : Loc .
+  vars senl0 senl1 : SenLoc .
+  vars gl0 gl1: GridLoc .
+  vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 : KB .
+  vars evs evs' ievs devs : EventSet .
+  var dir dir1 : Dir .
+  var act  : Action .
+	vars acts acts0 pact : ActSet .
+	var e v c x y z : FiniteFloat .
+  var alt ix iy iz ix0 iy0 iz0 : Int .
+  
+  vars locs locs0 : LocList .
+ 
+  
+**** bot processes rcvs any other events are ignored
+**** should not be any others
+  op handleS : Class Id KB EventSet -> KB .
+	eq handleS(cl,id,lkb,rcv(kb) ievs) =
+	      handleS(cl,id,addK(lkb,kb),ievs) .
+	eq handleS(cl,id,lkb,ievs) = lkb [owise] .  
+
+*** all local info
+  op getSensors : Id KB -> KB .
+  eq getSensors(id,ekb) = restrictKB(id,ekb) .
+	
+**** keeps only location and energy, updates myDir at the edge
+  op proSensors : Id KB KB -> KB .
+  ceq proSensors(id,lkb,ekb) = lkb1
+   if (atloc(id,loc) @ t1) (energy(id,e) @ t2) ekb0 := ekb
+   /\ lkb1 := addK(lkb, (atloc(id,loc) @ t1) (energy(id,e) @ t2)) .
+
+
+*** bot reads mail, reads and processes sensors to get current lkb
+*** then solves the botSCP restricted to available moves
+****   op solveScp : Id KB ActSet -> ActSet .
+
+  ceq doTask(cl,id,tick,ievs,devs,ekb,lkb) = 
+{lkb3, devs (tick @ 1) (act @ 0 ; 1),tell(id,act,lkb3)} 
+   if lkb0 := handleS(cl,id,lkb,ievs)
+   /\ lkb1 := getSensors(id,ekb)
+   /\ lkb2 := proSensors(id,lkb0,lkb1)
+   /\ {act,lkb3} := sitlAct(id,lkb2) 
+ .
+
+
+sort LocList .
+subsort Loc < LocList .
+op nil : -> LocList [ctor] .
+op _;_ : LocList LocList -> LocList [ctor assoc id: nil] .
+
+op first : LocList ~> Loc .
+op rest : LocList ~> LocList .
+eq first(loc ; locs) = loc .
+eq first(loc ; locs) = locs .
+
+op pending : Id Action -> Info .
+eq hasId(id,pending(id,act) @ t) = true .
+
+op targets : Id LocList -> Info .
+eq hasId(id,targets(id,locs) @ t) = true .
+
+op myHome : Id Loc -> PKItem .
+eq hasId(id,myHome(id,loc)) = true .
+
+op myAlt : Id Int -> PKItem .
+eq hasId(id,myAlt(id,alt)) = true .
+
+op continue : Id -> Action .
+op takeOff : Id Int -> Action .
+op land : Id -> Action .
+op stop : Id -> Action .
+op goTo : Id Loc -> Action .
+
+
+sort ActionKB .
+op `{_`,_`} : Action KB -> ActionKB .
+
+op sitlAct : Id KB -> ActionKB .
+
+ceq sitlAct(id,kb)  =
+  (if pact == none   ***** haven't started
+   then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
+   else (if (e < c)
+     then {mkMvAct(id,loc,home,v), 
+           addK(pending(id,goTo(id,home)) @ s t,kb)}
+      else (if notDone(pact,loc)
+		    then {continue(id), kb}
+				else (if pact == land(id)
+		      then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+       		else (if pact == goTo(id,home)
+            then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+            else (if locs == nil    **** done, go home
+              then {mkMvAct(id,loc,home,v), 
+                    addK(pending(id,goTo(id,home)) @ s t,kb)}
+			        else {mkMvAct(id,loc,first(locs),v), 
+                    addK((targets(id,rest(locs)) @ s t)
+                         (pending(id,goTo(id,first(locs))) @ s t),kb)}
+                fi) fi) fi) fi)  fi) fi)				
+  if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
+           myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
+          (targets(id, locs) @ t3)  (caution(id,c) @ t4) kb0 ) := kb
+   /\ pact := getPending(id,kb0)	.
+
+
+op getPending : Id KB -> ActSet . **** 0 or 1
+eq getPending(id, kb (pending(id,pact) @ t)) = pact .
+eq getPending(id, kb) = none [owise] .
+
+op notDone : Action Loc -> Bool .
+
+ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
+ if pt(ix,iy,iz) := getGridLoc(loc) .
+ceq notDone(land(id), loc)  = abs(iz) > 1 
+ if pt(ix,iy,iz) := getGridLoc(loc) .
+ceq notDone(goTo(id,loc0), loc)  = distance(loc,loc0) > 3 
+ if pt(ix,iy,iz) := getGridLoc(loc) .
+eq notDone(act,loc) = false [owise] .
+
+****            from to
+op mkMvAct : Id Loc Loc FiniteFloat -> Action .
+eq mkMvAct(id,loc,loc0,v) = mv(id,mkDir(getGridLoc(loc),getGridLoc(loc0)),v) .
+
+op mkDir : GridLoc GridLoc -> Dir .
+eq mkDir(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
+     = dir(float(ix0 - ix),float(iy0 - iy),float(iz0 - iz)) .
+
+
+  op tell : Id Action KB -> KB .
+  eq tell(id,act,(atloc(id,loc) @ t) class(id,cl) lkb) = 
+	         (atloc(id,loc) @ t) class(id,cl) .
+  eq tell(id,act,kb) = none [owise] .
+
+endfm
+

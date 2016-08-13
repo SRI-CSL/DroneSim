@@ -1,0 +1,139 @@
+mod SCENARIO is
+  inc MODEL-ACTIONS .
+  inc SOFT-AGENT-RULES .
+  --- inc SOLVE-SCP{valuation2valpatrolonly} . 
+  --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
+	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
+
+vars n : Nat .
+vars i j x y z : Int .
+vars sx sy sz dx dy dz v e c : FiniteFloat .
+var dir : Dir .
+vars wkb kb lkb ekb : KB .
+var aconf : Conf .
+var attrs : AttributeSet .
+var id : Id .
+var cl : Class .
+var l : Loc .
+var a : Int .
+var locs : LocList .
+
+op bound : Nat -> ConfElt .
+
+eq comDistance = 2 .
+
+eq senXLow = 0.0 .
+eq senYLow = 0.0 .
+eq senZLow = 0.0 .
+
+eq edgeX = 5 .
+
+eq gridStepX = 1.0 .
+eq gridStepY = 1.0 .
+eq gridStepZ = 1.0 .
+ 
+eq chargeUnit = 5.0 .
+eq maxCharge = 20.0 .
+
+eq botDelay = 1 .
+eq costMv = 1.0 .
+
+op b : Nat -> Id .
+op st : Nat -> Id .
+op eI : -> Id .
+
+op round : FiniteFloat -> Int .
+ceq round(sx) =
+  (if (sx >= 0.0)
+    then (if r:Rat < 1/2 then floor(rat(sx)) else ceiling(rat(sx)) fi)
+    else (if r:Rat < 1/2 then ceiling(rat(sx)) else floor(rat(sx)) fi)
+  fi)
+  if r:Rat := rat(sx) - floor(rat(sx)) .
+    
+op msen2grid : SenLoc -> GridLoc .
+eq msen2grid(senLoc(sx,sy,sz)) = pt(round(sx),round(sy),round(sz)) .
+
+op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
+eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
+
+op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
+             -> KB .
+eq mkBekb(n,sx,sy,sz,v,e) = 
+    (atloc(b(n),mkLoc(sx,sy,sz)) @ 0)
+    class(b(n),Bot) (energy(b(n),e) @ 0) (vel(b(n),v) @ 0) .
+
+op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> KB .
+eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) = 
+    mkBekb(n,sx,sy,sz,v,e) myAlt(b(n),a) (caution(b(n),c) @ 0)
+    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(0),locs) @ 0)
+    clock(0) .
+ 
+op mkB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> Agent .
+eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
+ [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs),
+               ckb : none, evs : (tick @ 0)] .
+ 
+ops mkE1 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
+eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)  ] .
+
+op locs1 : -> LocList .
+eq locs1 = mkLoc(10.0,0.0,10.0) .
+
+ops conf1 conf2 : -> Conf .
+****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
+eq conf1 = mkB(0,0.0,0.0,0.0,5.0,15.0,5.0,10,locs1)
+           mkE1(0,0.0,0.0,0.0,1.0,15.0) . 
+
+op asys1 : -> ASystem .
+eq asys1 = { conf1 } .
+
+op asys : Nat -> ASystem .
+eq asys(n) = { conf1 bound(n) } .
+
+*** VN: For now ingnoring direction
+op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
+***(
+eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) = 
+      addK(ekb,
+      (atloc(id,{senLoc(sx,sy,sz),sen2grid(senLoc(sx,sy,sz))}) @ s n)
+      (velocity(id,v) @ s n) (energy(id,e) @ s(n))) .
+)
+eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) = 
+      addK(ekb,
+      (atloc(id,{senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))}) @ s n)
+      (velocity(id,v) @ s n) (energy(id,e) @ s(n))) .
+
+endm
+
+***(
+mod SCENARIO-VER is
+  inc SCENARIO .
+
+  var aconf : Conf .
+  var n : Nat .
+  var ff : FiniteFloat .
+  vars id eId : Id .
+  var t : Time .
+  var kb : KB .
+
+  op monus : Nat -> Nat .
+  eq monus(s n) = n .
+  eq monus(0) = 0 .
+
+  ops criticalConf goalConf : -> ConfElt .
+  op critical : Conf -> Bool .
+
+  ceq critical([eId | (energy(id,ff) @ t) kb ] aconf) = true 
+   if equivZero(val(id,(energy(id,ff) @ t) kb)) .
+  eq critical(aconf) = false [owise] .
+  
+  eq updateConf(bound(n) aconf) =
+    if critical(aconf) then criticalConf aconf 
+    else (if (n == 0) then goalConf  
+         else bound(monus(n)) aconf fi) fi .
+
+endm
+)
+
+
+

@@ -1,0 +1,134 @@
+**** CP E synchronous
+fmod CPE-CONFIG is
+  inc SOFT-AGENTS .
+
+vars a id eid : Id .  vars cl : Class .  vars attrs : AttributeSet .
+vars ekb ekb' : KB .  vars aconf : Conf . vars t u : Time .
+vars iset : InfoSet .
+vars loc : Loc .
+**************  Agents and Configurations
+
+sort Env .
+subsort Env < ConfElt .
+op [_|_] : Id KB -> Env [ctor format (n d nt d d d)] .  *** 6 format points
+
+eq timeEffect([eid | clock(t) ekb] aconf, u)
+ = [eid | clock(t plus u) ekb] timeEffect(aconf, u) .
+eq mteX([eid | ekb]) = infty .
+
+ op getTime : Conf -> Time .
+ eq getTime([ eid | clock(t) ekb ] aconf) = t .
+
+eq envKB([eid | ekb] aconf) = ekb .
+eq envKB(aconf) = none [owise] .
+
+eq updateEnv(ekb', [eid | ekb] aconf) = [eid | addK(ekb,ekb')] aconf .
+eq updateEnv(ekb', aconf) = aconf [owise] .
+
+
+op asys2locs : ASystem -> InfoSet .
+eq asys2locs({ [eid | ekb ] aconf }) = kb2locs(ekb) .
+eq asys2locs(asys:ASystem) = none [owise] .
+op conf2locs : Conf -> InfoSet .
+eq conf2locs([eid | ekb ] aconf ) = kb2locs(ekb) .
+eq conf2locs(conf:Conf) = none [owise] .
+
+op kb2locs : KB -> InfoSet .
+op kb2locsX : KB InfoSet -> InfoSet .
+eq kb2locs(ekb) = kb2locsX(ekb,none) .
+eq kb2locsX((atloc(id,loc) @ t) ekb, iset) =
+     kb2locsX(ekb, iset atloc(id,loc)) . 
+eq kb2locsX(ekb, iset) = iset [owise] .
+
+
+endfm
+
+
+
+fmod CPE-CONFIG-TEST is
+  inc CPE-CONFIG .
+
+var id id0 id1 : Id .
+vars l0 l1 : Loc .
+vars t0 t1 : Nat .
+vars kb kb0 kb1 : KB .
+
+eq atloc(id,l0) @ t0 << atloc(id,l1) @ t1 = t0 < t1 .
+
+ops dId pId xId : -> Id .
+ops dCl pCl xCl : -> Class .
+ops loc0 loc1 loc2 : -> Loc .
+
+eq inContact(id0,id1,kb) =
+    (distance(getLoc(id0,kb),getLoc(id1,kb)) < 2) .
+		
+eq distance(loc0,loc1)		= 1 .
+eq distance(loc0,loc2)		= 2 .
+
+ops iS0 iS1 : -> InfoSet .
+ops lKB0 lKB1 : -> KB .
+
+eq iS0 = atloc(dId,loc0) atloc(pId,loc1) .
+eq iS1 = atloc(dId,loc0) atloc(pId,loc2) .
+
+eq lKB0 = tstamp(iS0,1) .
+eq lKB1 = tstamp(iS0,3) .
+
+ops evS0 evS1 : -> EventSet .
+eq evS0 = (tick @ 4) post(iS0) .
+eq evS1 = (tick @ 3) rcv(atloc(xId,loc2) @ 1) .
+
+ops ag0 ag1  ag00 ag10 : -> Agent .
+eq ag0 = [dId : dCl | lkb : lKB0, ckb : lKB0, evs : evS0 ] .
+eq ag1 = [pId : pCl | lkb : lKB0, ckb : lKB0, evs : evS1 ] .
+
+eq ag00 = [dId : dCl | lkb : lKB0, ckb : (lKB0 (atloc(xId,loc2) @ 1)), evs : (tick @ 2)] .
+eq ag10 = [pId : pCl | lkb : lKB0, ckb : lKB0, evs : (post(iS0) (tick @ 3)) ] .
+
+op eId : -> Id .
+ops env2 env4 : -> Env .
+eq env2 = [eId | lKB0 ] .
+eq env4 = [eId | tstamp(iS1,3) ] .
+
+endfm
+
+eof
+
+red lKB0 .
+*** result KB: (atloc(dId, loc0) @ 1) atloc(pId, loc1) @ 1
+
+red lKB1 .
+
+red evS0 .
+***result EventSet: post(atloc(dId, loc0) atloc(pId, loc1)) tick @ 4
+
+red addK(lKB0, atloc(dId,loc1) @ 3) .
+*** result KB: (atloc(dId, loc1) @ 3) atloc(pId, loc1) @ 1
+
+          
+red share(lKB0 (atloc(xId,loc2) @ 3),lKB1,none) .
+***  {(atloc(dId, loc0) @ 3) (atloc(pId, loc1) @ 3) atloc(xId, loc2) @ 3, atloc(xId, loc2) @ 3}
+--- {kb2',fresh} new kb2 and elements of kb1 fresh for kb2 (fresh subset kb2')
+
+red share(lKB1,lKB0 (atloc(xId,loc2) @ 3),none) .
+*** {(atloc(dId, loc0) @ 3) (atloc(pId, loc1) @ 3) atloc(xId, loc2) @ 3, (atloc(dId, loc0) @ 3) atloc(pId, loc1) @ 3}
+
+red restrictKB(dId,envKB(env2)) .  
+**** atloc(dId, loc0) @ 1
+red restrictKB(pId,envKB(env2)) .  
+
+red restrictKB(dId,envKB(env4)) .  
+red restrictKB(pId,envKB(env4)) .  
+
+red distance(getLoc(dId,restrictKB(dId,envKB(env2))), getLoc(pId,restrictKB(pId,envKB(env2)))) .
+
+red inContact(dId,pId,envKB(env2)) .
+*** true
+
+red inContact(dId, pId,envKB(env4)) .
+*** false
+
+red hasComms(env2 ag0 ag1) .
+red hasComms(env4 ag0 ag1) .
+**** false
+

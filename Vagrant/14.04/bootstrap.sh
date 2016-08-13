@@ -50,7 +50,7 @@ sudo apt-get install -y libtool automake autoconf libexpat1-dev
 
 #setup the path
 export PATH=${PATH}:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
-echo '. /vagrant/bash_profile' >> ~/.bashrc
+echo '. /vagrant/bash_profile' >> /home/vagrant/.bashrc
 
 git clone git://github.com/ArduPilot/ardupilot.git
 git clone git://github.com/tridge/jsbsim.git

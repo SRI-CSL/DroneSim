@@ -1,0 +1,387 @@
+*** In this version, actions/tasks are only annotated with delays, 
+*** not exact times. For example, task @ t means that task will be
+*** performed after t time units. 
+ 
+**** load time.maude
+
+fmod ID-SET is
+  sorts Id IdSet .
+  subsort Id < IdSet .
+  op none : -> IdSet [ctor] .
+  op __ : IdSet IdSet -> IdSet [ctor assoc comm id: none] .
+
+  var id : Id .  var ids : IdSet .
+  
+  op member : Id IdSet -> Bool .
+  eq member(id, id ids) = true .
+  eq member(id, ids) = false [owise] .
+endfm
+
+**** Knowledge data types
+fmod KNOWLEDGE is
+  pr ID-SET .
+  pr NAT-TIME-INF .
+*****  pr TIME-INF .
+  sort KB . 
+  subsort KItem < KB .
+  op none : -> KB [ctor] .
+  op __ : KB KB -> KB [ctor assoc comm id: none] .
+
+  sorts PKItem TKItem KItem .
+  subsort PKItem TKItem < KItem .  **** Persistent, Timed   
+
+  sort Class .
+  op class : Id Class -> PKItem .
+
+  sort Info .
+  op _@_ : Info Time -> TKItem .
+
+  sort InfoSet .  
+  subsort Info < InfoSet .
+  op none : -> InfoSet [ctor] .
+  op __ : InfoSet InfoSet -> InfoSet [ctor assoc comm id: none] .
+
+  op _<<_ : KItem KItem -> Bool .  ************* Knowledge PO
+  eq ki << ki' = false [owise] .
+
+  sort KBPair .
+  op {_,_} : KB KB -> KBPair [ctor] .
+
+  var id : Id .  var cl : Class .  vars ki ki' : KItem .
+  vars kb kb0 kb1 kb2 kb2' kfresh lkb lkb' rcvk : KB .
+  
+  op getClass : Id KB -> [Class] .
+  eq getClass(id, class(id,cl) kb) = cl .
+
+  --- {kb2',fresh} new kb2 and elements of kb1 fresh for kb2 (fresh subset kb2')
+  op share : KB KB KB -> KBPair .  
+  eq share(none,kb2,kb0) = {kb2,kb0} .
+ ceq share(ki kb1,kb2,kb0) = share(kb1,kb2',kb0 kfresh)
+    if {kfresh,kb2'} := freshen(ki,kb2)  [owise] .
+  
+  op freshen : KItem KB  -> KBPair .  --- {ki or none, freshened kb2}
+ ceq freshen(ki, ki' kb2) = freshen(ki,kb2)  if ki' << ki .  --- remove replaceable
+ ceq freshen(ki, ki' kb2) = {none,ki' kb2} if ki << ki' .    --- nothing to add
+  eq freshen(ki, ki  kb2) = {none,ki kb2}  .
+  eq freshen(ki ,    kb2) = {ki,ki kb2} [owise] .   --- add ki
+  
+  op addK : KB KB -> KB .   --- resolving <=
+  eq addK(lkb,none) = lkb .
+ ceq addK(lkb,ki rcvk) = addK(lkb', rcvk)
+    if {kfresh,lkb'} := freshen(ki,lkb)  .  --- kfresh allready in lkb'
+
+  ***** agent class spec must define equations for additional KITems
+  op hasId : Id KItem -> Bool .
+  eq hasId(id,class(id,cl)) = true .
+  eq hasId(id,ki) = false [owise] .
+  
+  op restrictKB : Id KB -> KB . **** info specific to id
+  eq restrictKB(id, ki kb) =
+       (if hasId(id,ki) then ki else none fi) restrictKB(id,kb) .
+  eq restrictKB(id,none) = none  .
+  
+  op restrictKBNot : Id KB -> KB .
+  eq restrictKBNot(id, ki kb) =
+       (if hasId(id,ki) then none else ki fi) restrictKBNot(id,kb) .
+  eq restrictKBNot(id,none) = none .
+endfm
+
+
+fmod CLOCK-KNOWLEDGE is
+  inc KNOWLEDGE .
+
+  var kb : KB . vars t t' : Time .
+
+  op clock : Time -> KItem [ctor] .
+  op getTime : KB -> TimeInf .
+  eq getTime(clock(t) kb) = t .
+  eq getTime(kb) = infty [owise] .
+
+  eq clock(t) << clock(t') = t lt t' .
+endfm
+
+
+**** For mobility and communication need a general notion of 
+**** location/distance.
+fmod LOCATION-KNOWLEDGE is
+  inc KNOWLEDGE .
+  pr NAT .
+
+  sort Loc .
+  op noLoc : -> Loc [ctor] .
+  op atloc : Id Loc -> Info [ctor] .
+
+  sort LocSet .
+  subsort Loc < LocSet .
+  op none : -> LocSet [ctor] .
+  op __ : LocSet LocSet -> LocSet [ctor assoc comm id: none] .
+
+  var id : Id .  var kb : KB .  var t : Time .
+  vars loc loc' : Loc .  var locs : LocSet .
+
+  ***op hasId : Id KItem -> Bool .
+  eq hasId(id, atloc(id,loc) @ t) = true .
+
+  op getLoc : Id KB -> Loc .
+  eq getLoc(id,(atloc(id,loc) @ t) kb) = loc . --- assume at most one atloc fact for id
+  eq getLoc(id,kb) = noLoc [owise] .
+  
+  op rmLoc : Id KB -> KB .
+  eq rmLoc(id,(atloc(id,loc) @ t) kb) = kb .
+  eq rmLoc(id,kb) = kb [owise] .
+
+  op distance : Loc Loc -> Nat [comm] . 
+  eq distance(loc,loc) = 0 .
+
+  op member : Loc LocSet -> Bool .
+  eq member(loc, loc locs) = true .
+  eq member(loc, locs) = false [owise] .
+endfm
+
+
+fmod EVENTS is
+  pr KNOWLEDGE .
+  sort Event EventSet . 
+  subsort Event < EventSet .
+  op none : -> EventSet .
+  op __ : EventSet EventSet -> EventSet [ctor assoc comm id: none] .
+
+*** tasks 
+  sort Task .
+  op tick : -> Task [ctor] .  --- default tasks
+
+*** actions (must be annotated by ids)
+  sorts Action ActSet .
+  subsort Action < ActSet .
+  op none : -> ActSet [ctor] .
+  op __ : ActSet ActSet -> ActSet [ctor assoc comm id: none] .
+
+*** immediate events .
+  sort IEvent .
+  subsort IEvent < Event . 
+  op rcv : KB -> IEvent [ctor] .
+  op post : InfoSet -> IEvent [ctor] .
+
+*** delayed events
+  sort DEvent .
+  subsort DEvent < Event .  
+
+  op _@_ : Task Time -> DEvent .           --- for agent todo: task @ delay
+  op _@_;_ : Action Time Time -> DEvent .  --- for the enviroment: action @ delay ; duration
+
+ ceq act @ t ; t' = none if t' == zero .   --- action with zero duration has no effect
+
+  var info : Info .  var iset : InfoSet .  vars t t' : Time .
+  var tsk : Task .  var act : Action .  var dev : DEvent .
+	var iev : IEvent .
+  var ievs evs : EventSet .
+	
+  op getTime : DEvent -> Time .
+  eq getTime(tsk @ t) = t .
+  eq getTime(act @ t ; t') = t .
+  eq getTime(dev) = zero [owise] .
+  
+  op tstamp : InfoSet Time -> KB .
+  eq tstamp(info iset, t) = (info @ t) tstamp(iset,t)  .
+  eq tstamp(none, t) = none .
+	
+	sort EventsPair .
+	op {_,_} : EventSet EventSet -> EventsPair [ctor] .
+  op splitEvents : EventSet  EventSet -> EventsPair  .
+	eq splitEvents(iev evs, ievs) = splitEvents(evs, ievs iev) .
+	eq splitEvents(evs, ievs) = {ievs,evs} [owise] .
+
+	
+endfm
+
+************* generic agent
+fmod AGENTS is
+  pr LOCATION-KNOWLEDGE .
+  pr CLOCK-KNOWLEDGE .
+  inc EVENTS .
+
+  sort Agent  .
+  op [_:_|_] : Id Class AttributeSet -> Agent [ctor format (n d d d d n++i --i d)] .  **** 14 format points
+
+  op lkb`:_ : KB -> Attribute [ctor] .
+  op ckb`:_ : KB -> Attribute [ctor] .
+  op evs`:_ : EventSet -> Attribute [ctor] .
+
+  sorts Attribute AttributeSet .
+  subsort Attribute < AttributeSet .
+  op none : -> AttributeSet  [ctor] .
+  op _,_ : AttributeSet AttributeSet -> AttributeSet [ctor assoc comm id: none format (d d ni d)] .
+  
+  op inContact : Id Id KB -> Bool .
+
+  sort KBEvents .
+  op {_,_} : KB EventSet -> KBEvents [ctor] .
+
+  sort KBEventsInfos .
+  op {_,_,_} : KB EventSet InfoSet -> KBEventsInfos [ctor] .
+
+  sort KBEventsKB .
+  op {_,_,_} : KB EventSet KB -> KBEventsKB [ctor] .
+
+  sort KBEventsKBSet .
+  subsort KBEventsKB < KBEventsKBSet .
+  op none : -> KBEventsKBSet [ctor] .
+  op __ : KBEventsKBSet KBEventsKBSet -> KBEventsKBSet [ctor assoc comm id: none] .
+
+  var cl : Class .  var id : Id .
+  vars t t' : Time .  vars lkb ekb ekb' rcvk : KB .
+  var nzt : NzTime .
+  var evs : EventSet .
+
+  *** Agents have class specific procedures for
+  *** executing scheduled tasks
+  *** doTask returns new local knowledge, events, and posts
+ ****                       ievs     devs     ekb lkb
+  --- op doTask : Class Id Task EventSet EventSet KB KB -> KBEventsInfos .
+  op doTask : Class Id Task EventSet EventSet KB KB -> KBEventsKBSet .
+
+**** to be used by doTask for soft constraint solving
+  op solveSCP : Id KB ActSet -> ActSet .
+
+  **** Agents have class specific knowledge handling rules
+  **** The agent can update its local kb.  
+  **** It may schedule a task.  
+	**** 16Jan01 no longer needed, must be done by doTask
+***(  op handle : Class Id KB KB -> KBEvents .
+  eq handle(cl,id,lkb,rcvk) = {addK(lkb,rcvk),none}  [owise] .  --- default handling
+)
+
+endfm
+
+
+************* generic conf
+fmod AGENT-CONF is
+  pr AGENTS .
+  sorts  ConfElt Conf .
+  subsorts Agent  < ConfElt < Conf .
+  op none : -> Conf .
+  op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
+
+  var aconf : Conf .    vars attrs attrs1 attrs2 : AttributeSet . 
+  vars a a1 a2 : Id .   vars cl cl1 cl2 : Class .
+  vars t t' u : Time .  var ti : TimeInf .
+  var tsk : Task .      var act : Action .
+  var iev : IEvent .    var evs : EventSet .
+  var lkb ckb1 ckb2 ckb1' ckb2' rcvk1 rcvk2 ekb ekb' : KB .
+  var nzt : NzTime .
+
+
+
+  op getAgent : Id Conf -> Conf .  *** 0 or 1 agents
+  eq getAgent(a, [a : cl | attrs] aconf) = [a : cl | attrs] .
+  eq getAgent(a, aconf) = none [owise] .
+
+  *** availalbe actions (with delay 0)
+  op effActs : Conf -> EventSet .
+  eq effActs([a : cl | evs : evs, attrs] aconf) = effActs(evs) effActs(aconf) .
+  eq effActs(aconf) = none [owise] .
+
+***!!! becuase t may count down to zero during envAct
+  op effActs : EventSet -> EventSet .
+  eq effActs((act @ t ; t') evs) 
+   =  (act @ t ; t') effActs(evs) .
+***   = (if t == zero then (act @ t ; t') else none fi) effActs(evs) .
+  eq effActs(evs) = none [owise] .
+
+  **** the global envkb 
+  **** either by collecting from agents or stored in the Env object
+  op envKB : Conf -> KB .
+  eq envKB(aconf) = none [owise] .  
+
+  *** update environments 
+  op updateEnv : KB Conf -> Conf .
+
+  op updateConf : Conf -> Conf .
+  eq updateConf(aconf) = aconf [owise] .
+
+  **** must do all comms before time passes
+  op hasComms : Conf -> Bool .
+ ceq hasComms([a1 : cl1 | ckb : ckb1, attrs1] [a2 : cl2 | ckb : ckb2, attrs2] aconf) = true
+  if inContact(a1,a2,envKB([a1 : cl1 | ckb : ckb1, attrs1] [a2 : cl2 | ckb : ckb2, attrs2] aconf)) 
+  /\ {ckb1', rcvk1} := share(ckb2,ckb1,none)   --- ckb2 to ckb1
+  /\ {ckb2', rcvk2} := share(ckb1,ckb2,none)   --- ckb1 to ckb2
+  /\ rcvk2 rcvk1 =/= none .
+
+
+  eq hasComms(aconf) = false [owise] .
+
+  *** time elapse (also update local clocks)
+  op timeEffect : Conf Time -> Conf .
+  eq timeEffect([a : cl | lkb : (lkb clock(t)), evs : evs, attrs] aconf, u) 
+   = [a : cl | lkb : (lkb clock(t plus u)), evs : timeEffect(evs,u), attrs] timeEffect(aconf, u) .
+  eq timeEffect(aconf, u) = aconf [owise] .
+
+  op timeEffect : EventSet Time -> EventSet .
+  eq timeEffect((tsk @ t) evs, u) 
+   = (tsk @ (t monus u)) timeEffect(evs,u) .
+  eq timeEffect((act @ t ; t') evs, u) 
+   = (act @ (t monus u) ; (t' monus (u monus t))) timeEffect(evs,u) .
+***(
+  if u <= t then act @ t - u; t'
+	if u > t  then act @ 0 ; t' - (u - t)
+)
+  eq timeEffect(evs, u) = evs [owise] .
+  
+  **** assume that actions are annotated with delays 
+  op mte : Conf -> TimeInf .
+  eq mte(aconf) = mteX(aconf) .
+
+**** 16feb26 folded into timestep
+****  = if hasComms(aconf) then zero else mteX(aconf) fi .
+  
+  op mteX : Conf -> TimeInf .
+  eq mteX([a : cl | evs : evs, attrs] aconf) = minimum(mte(evs),mteX(aconf)) .
+  eq mteX(aconf) = infty [owise] .
+
+  op mte : EventSet -> TimeInf .
+***  eq mte(iev evs) = zero .
+  eq mte(iev evs) = mte(evs) .
+  eq mte((tsk @ t) evs) = minimum(t,mte(evs)) .
+  eq mte((act @ t ; t') evs) = mte(evs) . --- actions are performed with timeStep
+  eq mte((none).EventSet) = infty .
+
+
+  *** doEnvAct(t, nzt,ekb,evs): 
+	**** performs actions evs for duration nzt from global time t
+  op doEnvAct : Time Time KB EventSet -> KB .
+
+  --- Perform actions simultaneously. 
+  --- Note that the behavior is not defined if there is collision.
+ ceq doEnvAct(t, nzt, ekb, evs) 
+   = doEnvAct(s(t), nzt monus 1, ekb', timeEffect(evs,1))
+   if ekb' := doUnitEnvAct(t, ekb, evs)
+   /\ okEnv(ekb') .  
+  eq doEnvAct(t, 0, ekb, evs) = ekb .
+
+**** update envkb by doing actions in evset for 1 unit dur
+**** t is the clock at current time unit
+**** ekb should not have a clock
+	op doUnitEnvAct : Time KB EventSet -> KB .
+
+  --- check if there is collision
+  op okEnv : KB -> Bool .
+
+
+
+endfm
+
+
+fmod SOFT-AGENTS is
+  pr AGENT-CONF .
+  pr NAT-TIME-INF .
+
+  *** when top level is needed
+  sort ASystem .
+  op `{_`} : Conf -> ASystem .
+  op getConf : ASystem -> Conf .
+  eq getConf({ conf:Conf }) = conf:Conf .
+
+  op envKB : ASystem -> KB .
+  eq envKB(asys:ASystem) = envKB(getConf(asys:ASystem)) .
+endfm
+
