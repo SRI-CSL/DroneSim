@@ -6,59 +6,27 @@ from pymavlink import mavutil
 import subprocess
 from pymavlink import fgFDM
 import util
+ 
 
-# (define b0 (apply mkdrone "b0" "0" "0" "0" "14" "15"))
-# (invoke b0 "mv" "-7.163147" "-34.817705" "2" "23")
-# (invoke b0 "mv" "7.163147" "-3.818550" "2" "23")
-# b0
-def get_location_metres(original_location, dNorth, dEast):
-    """
-    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the 
-    specified `original_location`. The returned LocationGlobal has the same `alt` value
-    as `original_location`.
-    The function is useful when you want to move the vehicle around specifying locations relative to 
-    the current vehicle position.
-    The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
-    For more information see:
-    http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-    """
-    earth_radius = 6378137.0 #Radius of "spherical" earth
-    #Coordinate offsets in radians
-    dLat = dNorth/earth_radius
-    dLon = dEast/(earth_radius*math.cos(math.pi*original_location.lat/180))
+from subprocess import *
 
-    #New position in decimal degrees
-    newlat = original_location.lat + (dLat * 180/math.pi)
-    newlon = original_location.lon + (dLon * 180/math.pi)
-    if type(original_location) is LocationGlobal:
-        targetlocation=LocationGlobal(newlat, newlon,original_location.alt)
-    elif type(original_location) is LocationGlobalRelative:
-        targetlocation=LocationGlobalRelative(newlat, newlon,original_location.alt)
-    else:
-        raise Exception("Invalid Location object passed")
-        
-    return targetlocation;
+from sandbox import *
+from tmpglob import *
 
+dkargs = [ 'dronekit-sitl',
+           'copter',
+           '--home=-7.162675,-34.817705,36,250' ]
 
-def get_distance_metres(aLocation1, aLocation2):
-    """
-    Returns the ground distance in metres between two LocationGlobal objects.
-    This method is an approximation, and will not be accurate over large distances and close to the 
-    earth's poles. It comes from the ArduPilot test code: 
-    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
-    """
-    dlat = aLocation2.lat - aLocation1.lat
-    dlong = aLocation2.lon - aLocation1.lon
-    return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
-
-class WindParam(object):
-
-    def __init__(self,name):
-
-        self.name = name
-        self.speed = 0.0
-        self.direction = 0.0
-        self.turbulance = 0.0
+mpargs = [ 'mavproxy.py',
+           '--master',
+           'tcp:127.0.0.1:5760',
+           '--sitl=127.0.0.1:5501',
+           '--out=127.0.0.1:14550',
+           '--out=127.0.0.1:14551',
+           '--map',
+           '--console',
+           '--aircraft',
+           'test' ]
 
 
 class SimpleDrone(object):
@@ -73,16 +41,56 @@ class SimpleDrone(object):
         self.v = 0
         self.e = 10.0
         self.vehicle = None
-        self.windParam = WindParam("newWind")
+        #self.windParam = WindParam("newWind")
         self.altitude = 5
+
+        self.dronekit = None
+        self.mavproxy = None
         
-    def initialize(self, windstr):
+    def initialize(self):
+
+        self.spawn()
 
         self.vehicle = connect('127.0.0.1:14550', wait_ready=True)
 
-        self.vehicle.wind = util.Wind(windstr)
+
+        return True
+
+    def spawn(self):
+        sys.stderr.write("Spawning dronekit\n")
+        self.dronekit = SandBox('dronekit', dk_argv, False)
+        self.dronekit.start()
+        sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
+
+        sys.stderr.write("sleeping\n")
+        time.sleep(2)
+        sys.stderr.write("slept\n")
+
+        
+        sys.stderr.write("Spawning mavproxy\n")
+        self.mavproxy =  SandBox('mavproxy', mp_argv, True)
+        self.mavproxy.start()
+        sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+
+    def exit(self):
+
+        if self.mavproxy is not None:
+            self.mavproxy.stop()
+            sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
+            self.mavproxy = None
+
+        if self.dronekit is not None:
+            self.dronekit.stop()
+            sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
+            self.dronekit = None
+
+
+
+                
+    def takeOff(self,altitude):
+        self.altitude = altitude
         while not self.vehicle.is_armable:
-            time.sleep(1)
+           time.sleep(1)
         self.vehicle.mode = VehicleMode("GUIDED")
         self.vehicle.armed = True
         while not self.vehicle.armed:
@@ -90,15 +98,15 @@ class SimpleDrone(object):
 
         self.vehicle.simple_takeoff(self.altitude)
 
-        while True:
-            print " Altitude: ", self.vehicle.location.global_relative_frame.alt
-            if self.vehicle.location.global_relative_frame.alt >= self.altitude*0.95:
-                print "Reached target altitude"
-                break
-            time.sleep(1)
 
-        return True
+        #while True:
+            #print " Altitude: ", self.vehicle.location.global_relative_frame.alt
+            #if self.vehicle.location.global_relative_frame.alt >= self.altitude*0.95:
+                #print "Reached target altitude"
+                #break
+            #time.sleep(1)
 
+ 
     def mv(self, x, y, z, v):
         # while True:
         #     print " Altitude: ", self.vehicle.location.global_relative_frame.alt
@@ -108,11 +116,14 @@ class SimpleDrone(object):
         #     time.sleep(1)
 
         currentLocation = self.vehicle.location.global_relative_frame
-        print "Current: ", currentLocation
+        sys.stderr.write('Current: {0}'.format(currentLocation))
+        #print "Current: ", currentLocation
         targetLocation = get_location_metres(currentLocation, float(y), float(x))
-        print "Target: ", targetLocation
+        sys.stderr.write('Target: {0}'.format(targetLocation))
+        #print "Target: ", targetLocation
         targetDistance = get_distance_metres(currentLocation, targetLocation)
-        print "Target Distance: ", targetDistance
+        sys.stderr.write('Target Distance: {0}'.format(targetDistance))
+        #print "Target Distance: ", targetDistance
         # gotoFunction(targetLocation)
 
 ##      self.vehicle.airspeed=float(10)
@@ -167,7 +178,26 @@ class SimpleDrone(object):
             self.vehicle.send_mavlink(msg)
             time.sleep(1)
 
+
     def __str__(self):
+        if self.vehicle is not None:
+            pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
+            if not pos:
+                pos = [0, 0, 0]
+            auxVel = self.vehicle.velocity
+            bat = self.vehicle.battery.level
+            dx = auxVel[0]
+            dy = auxVel[1]
+            dz = auxVel[2]
+            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
+            dx = dx / vel
+            dy = dy / vel
+            dz = dz / vel
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
+        else:
+            return 'Uninitialized'
+                
+    def vivek__str__(self):
         pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
         auxVel = self.vehicle.velocity
         bat = self.vehicle.battery.level
@@ -180,12 +210,22 @@ class SimpleDrone(object):
         dz = dz / vel
         return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
 
+"""
+from sitl_drone import *
+      
 x = SimpleDrone("hello")
-x.initialize("0,0,0")
-# x.initialize("10,1.57,0")
-print "Start Position: ", x.vehicle.location.local_frame
-print "Go to Destination 1"
-x.mv(-1000,0,10,3)
+x.initialize()
+x.takeOff(5)
+
+#"Start Position: "
+x.vehicle.location.local_frame
+        
+#"Go to Destination 1"
+x.mv(10,0,5,3)
+
+# cuurent location
+x.vehicle.location.local_frame
+
 time.sleep(100)
 print "Destination 1 :", x.vehicle.location.local_frame
 # print "Go to Destination 2"
@@ -221,5 +261,6 @@ print "Battery: ", x.vehicle.battery.level
 # (lat,lon) = get_location_metres(latH,lonH,y,x)
 
 
+"""
 
 

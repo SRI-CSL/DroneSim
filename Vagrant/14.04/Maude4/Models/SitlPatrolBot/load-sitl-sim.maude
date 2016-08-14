@@ -11,8 +11,8 @@ load actions
 load scenario-sitl
 
 load model-checker 
-**** load ../../Lib/imaude/ilib/load-lib
-load ../../../../imaude/ilib/load-lib
+load ../../Lib/imaude/ilib/load-lib
+**** load ../../../../imaude/ilib/load-lib
 load meta-cp-e 
 
 loop init .
