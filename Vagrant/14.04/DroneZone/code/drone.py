@@ -63,7 +63,7 @@ class SimpleDrone(object):
         self.mavproxy.start()
         sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
-        
+
     def initialize(self, x, y, z, v, e):
         self.x = float(x)
         self.y = float(y)

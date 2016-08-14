@@ -4,6 +4,7 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install -y emacs24 dbus-x11
 sudo apt-get install -y git python-pip
+sudo apt-get install -y python-dev
 
 #java 8
 sudo apt-get install -y software-properties-common python-software-properties
@@ -41,6 +42,7 @@ cd ..
 sudo apt-get install  -y  python-matplotlib python-serial python-lxml
 sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect libpython-all-dev
 sudo apt-get install  -y  python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
+
 pip install dronekit-sitl -UI
 
 
@@ -58,7 +60,14 @@ cd jsbsim
 ./autogen.sh --enable-libraries
 make
 cd ..
-cd ardupilot/ArduPlane
-sim_vehicle.sh -w
-#sim_vehicle.sh --console --map --aircraft test
+cd ardupilot
+./waf configure --board minlure
+./waf configure --board minlure
+./waf copter
+./waf list_boards
+
+
+#cd ardupilot/ArduPlane
+#sim_vehicle.py -w
+#sim_vehicle.py --console --map --aircraft test
 
