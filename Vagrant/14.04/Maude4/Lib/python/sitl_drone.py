@@ -86,11 +86,11 @@ class SimpleDrone(object):
 
 
 
-								
-    def takeOff(self,alt):
-			  self.altitude = alt
+                
+    def takeOff(self,altitude):
+        self.altitude = altitude
         while not self.vehicle.is_armable:
-            time.sleep(1)
+           time.sleep(1)
         self.vehicle.mode = VehicleMode("GUIDED")
         self.vehicle.armed = True
         while not self.vehicle.armed:
@@ -98,14 +98,14 @@ class SimpleDrone(object):
 
         self.vehicle.simple_takeoff(self.altitude)
 
-"""
-        while True:
-            print " Altitude: ", self.vehicle.location.global_relative_frame.alt
-            if self.vehicle.location.global_relative_frame.alt >= self.altitude*0.95:
-                print "Reached target altitude"
-                break
-            time.sleep(1)
-"""
+
+        #while True:
+            #print " Altitude: ", self.vehicle.location.global_relative_frame.alt
+            #if self.vehicle.location.global_relative_frame.alt >= self.altitude*0.95:
+                #print "Reached target altitude"
+                #break
+            #time.sleep(1)
+
  
     def mv(self, x, y, z, v):
         # while True:
@@ -116,11 +116,14 @@ class SimpleDrone(object):
         #     time.sleep(1)
 
         currentLocation = self.vehicle.location.global_relative_frame
-        print "Current: ", currentLocation
+        sys.stderr.write('Current: {0}'.format(currentLocation))
+        #print "Current: ", currentLocation
         targetLocation = get_location_metres(currentLocation, float(y), float(x))
-        print "Target: ", targetLocation
+        sys.stderr.write('Target: {0}'.format(targetLocation))
+        #print "Target: ", targetLocation
         targetDistance = get_distance_metres(currentLocation, targetLocation)
-        print "Target Distance: ", targetDistance
+        sys.stderr.write('Target Distance: {0}'.format(targetDistance))
+        #print "Target Distance: ", targetDistance
         # gotoFunction(targetLocation)
 
 ##      self.vehicle.airspeed=float(10)
@@ -175,7 +178,26 @@ class SimpleDrone(object):
             self.vehicle.send_mavlink(msg)
             time.sleep(1)
 
+
     def __str__(self):
+        if self.vehicle is not None:
+            pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
+            if not pos:
+                pos = [0, 0, 0]
+            auxVel = self.vehicle.velocity
+            bat = self.vehicle.battery.level
+            dx = auxVel[0]
+            dy = auxVel[1]
+            dz = auxVel[2]
+            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
+            dx = dx / vel
+            dy = dy / vel
+            dz = dz / vel
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
+        else:
+            return 'Uninitialized'
+                
+    def vivek__str__(self):
         pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
         auxVel = self.vehicle.velocity
         bat = self.vehicle.battery.level
@@ -189,12 +211,21 @@ class SimpleDrone(object):
         return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
 
 """
+from sitl_drone import *
+      
 x = SimpleDrone("hello")
-x.initialize("0,0,0")
-# x.initialize("10,1.57,0")
-print "Start Position: ", x.vehicle.location.local_frame
-print "Go to Destination 1"
-x.mv(-1000,0,10,3)
+x.initialize()
+x.takeOff(5)
+
+#"Start Position: "
+x.vehicle.location.local_frame
+        
+#"Go to Destination 1"
+x.mv(10,0,5,3)
+
+# cuurent location
+x.vehicle.location.local_frame
+
 time.sleep(100)
 print "Destination 1 :", x.vehicle.location.local_frame
 # print "Go to Destination 2"
