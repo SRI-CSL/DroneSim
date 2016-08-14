@@ -70,7 +70,7 @@ class SimpleDrone(object):
         sys.stderr.write("Spawning mavproxy\n")
         self.mavproxy =  SandBox('mavproxy', mp_argv, True)
         self.mavproxy.start()
-        sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+        #sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
     def exit(self):
 
@@ -224,7 +224,7 @@ x.vehicle.location.local_frame
 x.mv(10,0,5,3)
 
 # cuurent location
-x.vehicle.location.local_frame
+str(x.vehicle.location.local_frame)
 
 time.sleep(100)
 print "Destination 1 :", x.vehicle.location.local_frame
