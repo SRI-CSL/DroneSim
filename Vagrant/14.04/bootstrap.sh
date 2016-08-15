@@ -116,8 +116,8 @@ echo "Time to build/testing ardupilot"
 #
 #sim_vehicle.py -v ArduCopter
 #
-#Once built you should be able to launch via:
-#(may fail the first time, usually works the second time)
+#Once built you'll have to ^D to exit.
+#Then should be able to launch via:
 #
 #sim_vehicle.py -v ArduCopter --map --console
 
