@@ -113,6 +113,7 @@ echo "Time to build/testing ardupilot"
 #
 # Building bits:
 #
+#
 #sim_vehicle.py -v ArduCopter
 #
 #Once built you should be able to launch via:
