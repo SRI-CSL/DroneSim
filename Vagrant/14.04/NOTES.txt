@@ -9,9 +9,8 @@ mavproxy.py --master=tcp:127.0.0.1:5770 --sitl 127.0.0.1:5511 --out 127.0.0.1:14
 
 #  --home  (latitude, longitude, altitude, yaw)
 #
-#  don't know what the  " --out 127.0.0.1:14550 --out 127.0.0.1:14551 "  are used for, seems to exhibit
-#  identical behaviour without them. Since we are not "using multiple ground station computers or
-#  relaying the stream through an intermediate node" I suspect we could ditch them.
+#  we use the " --out 127.0.0.1:14550 " to connect from the sitl_drone.py, but am not sure what we need
+#  the second " --out 127.0.0.1:14551 " one for.
 #
 #  also I note that there is no activity on 127.0.0.1:5511 when only instance 0 is up,
 #  and the mavproxy manual states that for sitl this should usually be 127.0.0.1:5501.
