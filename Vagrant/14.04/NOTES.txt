@@ -13,9 +13,10 @@ mavproxy.py --master=tcp:127.0.0.1:5770 --sitl 127.0.0.1:5511 --out 127.0.0.1:14
 #  identical behaviour without them. Since we are not "using multiple ground station computers or
 #  relaying the stream through an intermediate node" I suspect we could ditch them.
 #
-#  also I note that there is no activity on 127.0.0.1:5511 and the mavproxy manual states
-#  that for sitl this should usually be 127.0.0.1:5501 for the first and 127.0.0.1:5511 for
-#  the second (--instance 1) pair.
+#  also I note that there is no activity on 127.0.0.1:5511 when only instance 0 is up,
+#  and the mavproxy manual states that for sitl this should usually be 127.0.0.1:5501.
+#  so after testing a bit I think it should be for the first (--instance 0) pair, and
+#  and 127.0.0.1:5511 for the second (--instance 1) pair.
 #
 #
 #  So:
