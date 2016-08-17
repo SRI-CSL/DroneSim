@@ -38,6 +38,9 @@ mpargs = [ 'mavproxy.py',
              self.ino,
              '--home=-7.162675,-34.817705,36,250' ]
 
+             #--home (latitude, longitude, altitude, yaw)
+ 
+
   the mavproxy  instance will need to listen on 5760 + 10 * self.ino
   and the out port that we connect to will also have to be adjusted.
 
@@ -51,6 +54,10 @@ mpargs = [ 'mavproxy.py',
              '--aircraft',
              'drone_{0}'.format(self.ino) ]
 
+  there is also a question of drone to actor mapping.
+  is it one-one or many one? since port numbers are a
+  global resource (not process local) we will need to be 
+  careful with the instance number.
 
 """
 
