@@ -1,0 +1,8 @@
+
+dronekit-sitl copter --instance 0 --home=-7.162675,-34.817705,36,250
+
+mavproxy.py --master=tcp:127.0.0.1:5760 --sitl 127.0.0.1:5511 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --map
+
+dronekit-sitl copter --instance 1 --home=-7.162675,-34.817705,36,250
+ 
+mavproxy.py --master=tcp:127.0.0.1:5770 --sitl 127.0.0.1:5511 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --map
