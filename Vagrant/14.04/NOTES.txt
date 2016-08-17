@@ -7,7 +7,7 @@ dronekit-sitl copter --instance 1 --home=-7.162675,-34.817705,36,250
  
 mavproxy.py --master=tcp:127.0.0.1:5770 --sitl 127.0.0.1:5511 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --map
 
-
+#  --home  (latitude, longitude, altitude, yaw)
 #
 #  don't know what the  " --out 127.0.0.1:14550 --out 127.0.0.1:14551 "  are used for, seems to exhibit
 #  identical behaviour without them. Since we are not "using multiple ground station computers or
