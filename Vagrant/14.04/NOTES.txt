@@ -1,0 +1,36 @@
+
+dronekit-sitl copter --instance 0 --home=-7.162675,-34.817705,36,250
+
+mavproxy.py --master=tcp:127.0.0.1:5760 --sitl 127.0.0.1:5511 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --map
+
+dronekit-sitl copter --instance 1 --home=-7.162675,-34.817705,36,250
+ 
+mavproxy.py --master=tcp:127.0.0.1:5770 --sitl 127.0.0.1:5511 --out 127.0.0.1:14550 --out 127.0.0.1:14551 --map
+
+#  --home  (latitude, longitude, altitude, yaw)
+#
+#  we use the " --out 127.0.0.1:14550 " to connect from the sitl_drone.py, but am not sure what we need
+#  the second " --out 127.0.0.1:14551 " one for.
+#
+#  also I note that there is no activity on 127.0.0.1:5511 when only instance 0 is up,
+#  and the mavproxy manual states that for sitl this should usually be 127.0.0.1:5501.
+#  so after testing a bit I think it should be for the first (--instance 0) pair, and
+#  and 127.0.0.1:5511 for the second (--instance 1) pair.
+#
+#  lsof -i :<portno>
+#  netstat -lptu
+#  netstat -tulpn
+#  (l for listening, p for program, t for tcp, u for udp, n for numeric)
+#
+#  So:
+
+dronekit-sitl copter --instance 0 --home=-7.162675,-34.817705,36,250
+
+mavproxy.py --master=tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501  --out 127.0.0.1:14550  --map --console  --aircraft="drone_0"
+
+dronekit-sitl copter --instance 1 --home=-7.162675,-34.817705,36,250
+ 
+mavproxy.py --master=tcp:127.0.0.1:5770 --sitl 127.0.0.1:5511 --out 127.0.0.1:14560  --map --console   --aircraft="drone_1"
+
+
+
