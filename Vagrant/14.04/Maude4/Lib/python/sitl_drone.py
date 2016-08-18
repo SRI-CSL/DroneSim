@@ -100,7 +100,7 @@ class SimpleDrone(object):
         sys.stderr.write("Spawning dronekit\n")
         self.dronekit = SandBox('dronekit', dkargs, False)
         self.dronekit.start()
-        #sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
+        sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
 
         sys.stderr.write("sleeping\n")
         time.sleep(2)
@@ -110,7 +110,7 @@ class SimpleDrone(object):
         sys.stderr.write("Spawning mavproxy\n")
         self.mavproxy =  SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()
-        #sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+        sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
     def takeOff(self,altitude):
         self.altitude = altitude
