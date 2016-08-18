@@ -66,11 +66,11 @@ class SimpleDrone(object):
     def __init__(self, name, instance_no=0):
         """Creates a drone with given name and default state.
         """
-        sys.stderr.write("SimpleDrone version 0\n")
         self.name = name
-        #hard code the instance number till maude gets its act together
+
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
+        sys.stderr.write("SimpleDrone instance {0}\n".format(self.ino))
         
         self.x = 0
         
@@ -107,9 +107,9 @@ class SimpleDrone(object):
         pipeincr = 10 * self.ino
         return [ 'mavproxy.py',
                  '--master',
-                 'tcp:127.0.0.1:{0}'.format(5760 + pipeincr),
-                 '--sitl=127.0.0.1:{0}'.format(5501 + pipeincr),
-                 '--out=127.0.0.1:{0}'.format(14550 + pipeincr),
+                 'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
+                 '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
+                 '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
                  '--aircraft',
                  'drone_{0}'.format(self.ino) ]
 

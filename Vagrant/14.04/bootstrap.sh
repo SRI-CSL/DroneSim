@@ -29,6 +29,9 @@ echo "Taking ownership of /usr/local"
 
 sudo chown -R vagrant:staff /usr/local/
 
+echo "Silencing libdc1394 complaints."
+
+sudo ln /dev/null /dev/raw1394
 
 echo "Installing PLambda"
 
