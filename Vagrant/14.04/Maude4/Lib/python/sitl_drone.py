@@ -22,6 +22,14 @@ mpargs = [ 'mavproxy.py',
            'tcp:127.0.0.1:5760',
            '--sitl=127.0.0.1:5501',
            '--out=127.0.0.1:14550',
+           '--aircraft',
+            'drone_0' ]
+
+orig_mpargs = [ 'mavproxy.py',
+           '--master',
+           'tcp:127.0.0.1:5760',
+           '--sitl=127.0.0.1:5501',
+           '--out=127.0.0.1:14550',
            '--out=127.0.0.1:14551',
            '--map',
            '--console',
@@ -40,7 +48,6 @@ mpargs = [ 'mavproxy.py',
 
              #--home (latitude, longitude, altitude, yaw)
  
-
   the mavproxy  instance will need to listen on 5760 + 10 * self.ino
   and the out port that we connect to will also have to be adjusted.
 
@@ -66,6 +73,7 @@ class SimpleDrone(object):
     def __init__(self, name):
         """Creates a drone with given name and defautl state.
         """
+        sys.stderr.write("SimpleDrone version 0")
         self.name = name
         self.x = 0
         self.y = 0
@@ -90,7 +98,7 @@ class SimpleDrone(object):
 
     def spawn(self):
         sys.stderr.write("Spawning dronekit\n")
-        self.dronekit = SandBox('dronekit', dk_argv, False)
+        self.dronekit = SandBox('dronekit', dkargs, False)
         self.dronekit.start()
         sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
 
@@ -100,23 +108,9 @@ class SimpleDrone(object):
 
         
         sys.stderr.write("Spawning mavproxy\n")
-        self.mavproxy =  SandBox('mavproxy', mp_argv, True)
+        self.mavproxy =  SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()
         #sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
-
-    def exit(self):
-
-        if self.mavproxy is not None:
-            self.mavproxy.stop()
-            sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
-            self.mavproxy = None
-
-        if self.dronekit is not None:
-            self.dronekit.stop()
-            sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
-            self.dronekit = None
-
-
 
                 
     def takeOff(self,altitude):
