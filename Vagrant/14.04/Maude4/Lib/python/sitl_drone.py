@@ -13,6 +13,9 @@ from subprocess import *
 from sandbox import *
 from tmpglob import *
 
+"""
+original hardcoded arguments:
+
 dkargs = [ 'dronekit-sitl',
            'copter',
            '--home=-7.162675,-34.817705,36,250' ]
@@ -22,60 +25,55 @@ mpargs = [ 'mavproxy.py',
            'tcp:127.0.0.1:5760',
            '--sitl=127.0.0.1:5501',
            '--out=127.0.0.1:14550',
-           '--aircraft',
-            'drone_0' ]
-
-orig_mpargs = [ 'mavproxy.py',
-           '--master',
-           'tcp:127.0.0.1:5760',
-           '--sitl=127.0.0.1:5501',
-           '--out=127.0.0.1:14550',
-           '--out=127.0.0.1:14551',
            '--map',
            '--console',
            '--aircraft',
-           'test' ]
+            'drone_0' ]
 
-"""
-  A simple drone will need an instance number: self.ino
-  We will need to pass this number 
 
-  dkargs = [ 'dronekit-sitl',
-             'copter',
-             '-instance',
-             self.ino,
-             '--home=-7.162675,-34.817705,36,250' ]
+A simple drone will need an instance number: self.ino
+We will need to pass this number 
 
-             #--home (latitude, longitude, altitude, yaw)
+dkargs = [ 'dronekit-sitl',
+           'copter',
+           '--instance',
+           '{0}'.format(self.ino),
+           '--home=-7.162675,-34.817705,36,250' ]
+           #--home (latitude, longitude, altitude, yaw)
  
-  the mavproxy  instance will need to listen on 5760 + 10 * self.ino
-  and the out port that we connect to will also have to be adjusted.
+the mavproxy  instance will need to listen on 5760 + 10 * self.ino
+and the out port that we connect to will also have to be adjusted.
 
-  mpargs = [ 'mavproxy.py',
-             '--master',
-             'tcp:127.0.0.1:{0}'.format(5760 + 10 * self.ino),
-             '--sitl=127.0.0.1:{0}'.format(5501 + 10 * self.ino),
-             '--out=127.0.0.1:{0}'.format(14550 + 10 * self.ino),
-             '--map',
-             '--console',
-             '--aircraft',
-             'drone_{0}'.format(self.ino) ]
+mpargs = [ 'mavproxy.py',
+           '--master',
+           'tcp:127.0.0.1:{0}'.format(5760 + 10 * self.ino),
+           '--sitl=127.0.0.1:{0}'.format(5501 + 10 * self.ino),
+           '--out=127.0.0.1:{0}'.format(14550 + 10 * self.ino),
+           '--map',
+           '--console',
+           '--aircraft',
+           'drone_{0}'.format(self.ino) ]
 
-  there is also a question of drone to actor mapping.
-  is it one-one or many one? since port numbers are a
-  global resource (not process local) we will need to be 
-  careful with the instance number.
+there is also a question of drone to actor mapping.
+is it one-one or many one? since port numbers are a
+global resource (not process local) we will need to be 
+careful with the instance number.
 
 """
 
 class SimpleDrone(object):
 
-    def __init__(self, name):
-        """Creates a drone with given name and defautl state.
+    def __init__(self, name, instance_no=0):
+        """Creates a drone with given name and default state.
         """
-        sys.stderr.write("SimpleDrone version 0")
         self.name = name
+
+        self.ino = instance_no
+        self.pipeincr = 10 * self.ino
+        sys.stderr.write("SimpleDrone instance {0}\n".format(self.ino))
+        
         self.x = 0
+        
         self.y = 0
         self.z = 0
         self.v = 0
@@ -91,13 +89,35 @@ class SimpleDrone(object):
 
         self.spawn()
 
-        self.vehicle = connect('127.0.0.1:14550', wait_ready=True)
-
+        self.vehicle = connect(self.sitl_ip() , wait_ready=True)
 
         return True
 
+    def sitl_ip(self):
+        return '127.0.0.1:{0}'.format(14550 + self.pipeincr)
+    
+    def drokekit_args(self):
+        return [ 'dronekit-sitl',
+                 'copter',
+                 '--instance',
+                 '{0}'.format(self.ino),
+                 '--home=-7.162675,-34.817705,36,250' ]
+
+    def mavproxy_args(self):
+        pipeincr = 10 * self.ino
+        return [ 'mavproxy.py',
+                 '--master',
+                 'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
+                 '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
+                 '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
+                 '--aircraft',
+                 'drone_{0}'.format(self.ino) ]
+
+
+    
     def spawn(self):
-        sys.stderr.write("Spawning dronekit\n")
+        dkargs = self.drokekit_args()
+        sys.stderr.write("Spawning dronekit {0}\n".format(dkargs))
         self.dronekit = SandBox('dronekit', dkargs, False)
         self.dronekit.start()
         sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
@@ -106,14 +126,15 @@ class SimpleDrone(object):
         time.sleep(2)
         sys.stderr.write("slept\n")
 
+        mpargs = self.mavproxy_args()
         
-        sys.stderr.write("Spawning mavproxy\n")
+        sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
         self.mavproxy =  SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()
         sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
     def takeOff(self,altitude):
-        self.altitude = altitude
+        self.altitude = float(altitude)
         while not self.vehicle.is_armable:
            time.sleep(1)
         self.vehicle.mode = VehicleMode("GUIDED")
