@@ -100,7 +100,7 @@ class SimpleDrone(object):
         sys.stderr.write("Spawning dronekit\n")
         self.dronekit = SandBox('dronekit', dkargs, False)
         self.dronekit.start()
-        sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
+        #sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
 
         sys.stderr.write("sleeping\n")
         time.sleep(2)
@@ -112,7 +112,6 @@ class SimpleDrone(object):
         self.mavproxy.start()
         #sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
-                
     def takeOff(self,altitude):
         self.altitude = altitude
         while not self.vehicle.is_armable:
@@ -206,6 +205,24 @@ class SimpleDrone(object):
 
 
     def __str__(self):
+        if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
+            north =  self.vehicle.location.local_frame.north
+            east =  self.vehicle.location.local_frame.east
+            alt =  -self.vehicle.location.local_frame.down
+            auxVel = self.vehicle.velocity
+            bat = self.vehicle.battery.level
+            dx = auxVel[0]
+            dy = auxVel[1]
+            dz = auxVel[2]
+            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
+            dx = dx / vel
+            dy = dy / vel
+            dz = dz / vel
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north,alt, dx, dy, dz, vel, bat)
+        else:
+            return 'Uninitialized'
+
+    def ian__str__(self):
         if self.vehicle is not None:
             pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
             if not pos:
@@ -237,6 +254,7 @@ class SimpleDrone(object):
         return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
 
 """
+x.vehicle.location.local_frame.north        
 from sitl_drone import *
       
 x = SimpleDrone("hello")
