@@ -164,13 +164,13 @@ class SimpleDrone(object):
         #     time.sleep(1)
 
         currentLocation = vh.location.global_relative_frame
-        sys.stderr.write('Current: {0}'.format(currentLocation))
+        sys.stderr.write('Current: {0}\n'.format(currentLocation))
         #print "Current: ", currentLocation
         targetLocation = get_location_metres(currentLocation, float(y), float(x))
-        sys.stderr.write('Target: {0}'.format(targetLocation))
+        sys.stderr.write('Target: {0}\n'.format(targetLocation))
         #print "Target: ", targetLocation
         targetDistance = get_distance_metres(currentLocation, targetLocation)
-        sys.stderr.write('Target Distance: {0}'.format(targetDistance))
+        sys.stderr.write('Target Distance: {0}\n'.format(targetDistance))
         #print "Target Distance: ", targetDistance
         # gotoFunction(targetLocation)
 
