@@ -96,14 +96,58 @@ op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat
 eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) = 
       addK(ekb,
       (atloc(id,{senLoc(sx,sy,sz),sen2grid(senLoc(sx,sy,sz))}) @ s n)
-      (velocity(id,v) @ s n) (energy(id,e) @ s(n))) .
+      (vel(id,v) @ s n) (energy(id,e) @ s(n))) .
 )
 eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) = 
       addK(ekb,
       (atloc(id,{senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))}) @ s n)
-      (velocity(id,v) @ s n) (energy(id,e) @ s(n))) .
+      (vel(id,v) @ s n) (energy(id,e) @ s(n))) .
 
 endm
+
+***(
+mod SCENARIO-TEST is
+inc SCENARIO .
+
+ops ekbX lkbX : -> KB .
+eq ekbX = clock(2) class(b(0),Bot) 
+(atloc(b(0), {senLoc(-3.3238765597300002e-1,               
+                    -1.5381881967200001e-2,1.01596260071e+1), 
+              pt(-1,-1,10)})@ 2)
+(energy(b(0), 8.9e+1)@ 2)
+( vel(b(0),3.1622776601700001e-2)@ 2)
+.
+
+eq lkbX = (clock(2) class(b(0),Bot)
+(atloc(b(0),{senLoc(-2.90255874395e-1,
+                2.3696256801500001e-2,2.4112732708500001e-1),
+                pt(-1,0,0)})@ 1)
+    (energy(b(0), 9.9e+1)@ 1)
+    (caution(b(0),5.0)@ 0)
+    (vel(b(0),2.9631064780100003e-1)@ 1)
+    (pending(b(0),takeOff(b(0),10))@ 1)
+    (targets(b(0),
+      {senLoc(1.0e+1,0.0,1.0e+1),pt(10,0,10)}) @ 0)  
+    myHome(b(0),{senLoc(0.0,0.0,0.0),pt(0,0,0)})
+    myAlt(b(0), 10)) .
+
+*** evs :(tick @ 0)]
+
+op lkbX2 : -> KB .
+eq lkbX2 = proSensors(b(0), lkbX, getSensors(b(0),ekbX) ) .
+
+endm
+)
+
+***(
+ievs = none
+devs = none
+red handleS(Bot,b(0),lkbX,none) == lkbX .
+red getSensors(b(0),ekbX) clock(2) == ekbX .
+red proSensors(b(0), lkbX, getSensors(b(0),ekbX) ) .
+red sitlAct(b(0),proSensors(b(0), lkbX, getSensors(b(0),ekbX) )) .
+**** not landing
+)
 
 ***(
 mod SCENARIO-VER is

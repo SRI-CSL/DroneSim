@@ -639,7 +639,7 @@ if tm(amodname,ekbT) :=
 /\ dyT := upTerm(float(string(dy)))
 /\ dzT := upTerm(float(string(dz)))
 /\ vT := upTerm(float(string(v)))
-/\ eT := upTerm(float(string(e)))  
+/\ eT := upTerm(float(rat(string(e),10)))  
 /\ res1?? := metaReduce([amodname],'updateEkb[ekbT,idT,xT,yT,zT,dxT,dyT,dzT,vT,eT,timeT])
 /\ ekbT' := (if res1?? :: ResultPair then getTerm(res1??) else ekbT fi)
 .

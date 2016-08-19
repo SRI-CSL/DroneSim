@@ -1,10 +1,14 @@
-(import "drones.simple_drone_sitl-ian")
+(import "sitl_drone")
 
-(define SimpleDrone drones.simple_drone_sitl-ian.SimpleDrone)
+(define SimpleDrone sitl_drone.SimpleDrone)
 
+;; at some stage the x y z v e will be used.
+;; currently we drop them on the floor.
+;;
 (define mkdrone (name x y z v e)
-  (let ((drone (apply SimpleDrone name)))
-    (invoke drone "initialize" x y z v e)
+  ;; the 0 is the instance number (all ports depend on it)
+  (let ((drone (apply SimpleDrone name (int 0))))
+    (invoke drone "initialize")
     drone))
 
 (import "plambda.actors.actorlib")

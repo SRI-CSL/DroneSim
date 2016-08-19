@@ -10,13 +10,15 @@ load actions
 **** load scp
 load scenario-sitl
 
+***(
 load model-checker 
-load /home/vagrant/imaude/ilib/load-lib
+**** load /home/vagrant/imaude/ilib/load-lib
 **** load ../../../../imaude/ilib/load-lib
+load ../../../../../../imaude/ilib/load-lib
 load meta-cp-e 
 
 loop init .
-
+)
 ***(
 SCENARIO
 op locs1 : -> LocList .
@@ -31,12 +33,9 @@ op asys1 : -> ASystem .
 eq asys1 = { conf1 } .
 )
 
-(seq
+***(seq
  (pyexe plambda (load "drone.lsp"))
  (pyexe plambda (define b0 (apply mkdrone "b0" "0" "0" "0" "1" "15")))
  (initAgentEset maude g2d g2d plambda SCENARIO asys1 OnePatrolBot) 
 )
 
-
-***(
-)

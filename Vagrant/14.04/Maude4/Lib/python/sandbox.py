@@ -6,20 +6,6 @@ from threading import Thread
 
 import sys
 
-mp_argv = [ 'mavproxy.py',
-            '--master',
-            'tcp:127.0.0.1:5760',
-            '--sitl=127.0.0.1:5501',
-            '--out=127.0.0.1:14550',
-            '--out=127.0.0.1:14551',
-            '--map',
-            '--console',
-            '--aircraft',
-            'test' ]
-
-
-dk_argv = [ 'dronekit-sitl',  'copter',  '--home=-7.162675,-34.817705,36,250' ]
-
 
 
 def echo(child):
@@ -63,9 +49,24 @@ class SandBox(object):
         if self.child is not None:
             return self.child.pid
 
+        
 def test():
+    mp_argv = [ 'mavproxy.py',
+                '--master',
+                'tcp:127.0.0.1:5760',
+                '--sitl=127.0.0.1:5501',
+                '--out=127.0.0.1:14550',
+                '--out=127.0.0.1:14551',
+                '--map',
+                '--console',
+                '--aircraft',
+                'test' ]
+    
+
+    dk_argv = [ 'dronekit-sitl',  'copter',  '--home=-7.162675,-34.817705,36,250' ]
     SandBox('dronekit', dk_argv, False).start()
     SandBox('mavproxy', mp_argv, True).start()
+
     
 if __name__ == '__main__':
     test()

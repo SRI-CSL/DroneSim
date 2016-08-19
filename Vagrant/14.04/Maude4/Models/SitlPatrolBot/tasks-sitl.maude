@@ -10,12 +10,12 @@ fmod MODEL-TASKS is
   vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 : KB .
   vars evs evs' ievs devs : EventSet .
   var dir dir1 : Dir .
-  var act  : Action .
+  var act act0 act1  : Action .
 	vars acts acts0 pact : ActSet .
 	var e v c x y z : FiniteFloat .
   var alt ix iy iz ix0 iy0 iz0 : Int .
   
-  vars locs locs0 : LocList .
+  vars locs locs0 locs1 : LocList .
  
   
 **** bot processes rcvs any other events are ignored
@@ -31,10 +31,7 @@ fmod MODEL-TASKS is
 	
 **** keeps only location and energy, updates myDir at the edge
   op proSensors : Id KB KB -> KB .
-  ceq proSensors(id,lkb,ekb) = lkb1
-   if (atloc(id,loc) @ t1) (energy(id,e) @ t2) ekb0 := ekb
-   /\ lkb1 := addK(lkb, (atloc(id,loc) @ t1) (energy(id,e) @ t2)) .
-
+  eq proSensors(id,lkb,ekb) = addK(lkb,restrictKB(id, ekb)) .
 
 *** bot reads mail, reads and processes sensors to get current lkb
 *** then solves the botSCP restricted to available moves
@@ -57,13 +54,15 @@ op _;_ : LocList LocList -> LocList [ctor assoc id: nil] .
 op first : LocList ~> Loc .
 op rest : LocList ~> LocList .
 eq first(loc ; locs) = loc .
-eq first(loc ; locs) = locs .
+eq rest(loc ; locs) = locs .
 
 op pending : Id Action -> Info .
 eq hasId(id,pending(id,act) @ t) = true .
+eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
 
 op targets : Id LocList -> Info .
 eq hasId(id,targets(id,locs) @ t) = true .
+eq targets(id,locs0) @ t0 << targets(id,locs1) @ t1 = t0 < t1 .
 
 op myHome : Id Loc -> PKItem .
 eq hasId(id,myHome(id,loc)) = true .
@@ -103,8 +102,8 @@ ceq sitlAct(id,kb)  =
                          (pending(id,goTo(id,first(locs))) @ s t),kb)}
                 fi) fi) fi) fi)  fi) fi)				
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
-           myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
-          (targets(id, locs) @ t3)  (caution(id,c) @ t4) kb0 ) := kb
+        myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
+      (targets(id, locs) @ t3) (caution(id,c) @ t4) kb0 ) := kb
    /\ pact := getPending(id,kb0)	.
 
 
