@@ -13,51 +13,15 @@ from subprocess import *
 from sandbox import *
 from tmpglob import *
 
+
 """
-original hardcoded arguments:
+At some stage we want to pass in the position, altitude and yaw to
+the constructor. But currently we are hardcode with
 
-dkargs = [ 'dronekit-sitl',
-           'copter',
-           '--home=-7.162675,-34.817705,36,250' ]
-
-mpargs = [ 'mavproxy.py',
-           '--master',
-           'tcp:127.0.0.1:5760',
-           '--sitl=127.0.0.1:5501',
-           '--out=127.0.0.1:14550',
-           '--map',
-           '--console',
-           '--aircraft',
-            'drone_0' ]
+7.162675, -34.817705, 36,      250
+latitude  longitude   altitude yaw
 
 
-A simple drone will need an instance number: self.ino
-We will need to pass this number 
-
-dkargs = [ 'dronekit-sitl',
-           'copter',
-           '--instance',
-           '{0}'.format(self.ino),
-           '--home=-7.162675,-34.817705,36,250' ]
-           #--home (latitude, longitude, altitude, yaw)
- 
-the mavproxy  instance will need to listen on 5760 + 10 * self.ino
-and the out port that we connect to will also have to be adjusted.
-
-mpargs = [ 'mavproxy.py',
-           '--master',
-           'tcp:127.0.0.1:{0}'.format(5760 + 10 * self.ino),
-           '--sitl=127.0.0.1:{0}'.format(5501 + 10 * self.ino),
-           '--out=127.0.0.1:{0}'.format(14550 + 10 * self.ino),
-           '--map',
-           '--console',
-           '--aircraft',
-           'drone_{0}'.format(self.ino) ]
-
-there is also a question of drone to actor mapping.
-is it one-one or many one? since port numbers are a
-global resource (not process local) we will need to be 
-careful with the instance number.
 
 """
 
