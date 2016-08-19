@@ -263,16 +263,17 @@ from sitl_drone_tests import *
       
 x = SimpleDrone("hello")
 x.initialize()
-x.takeOff(x.vehicle,5)
 
-#"Start Position: "
-x.vehicle.location.local_frame
-        
+x.takeOff(x.vehicle,5)        
 #"Go to Destination 1"
 x.mv(x.vehicle,100,0,5,3)
 
 x.takeOff(x.vehicle2,5)
 x.mv(x.vehicle2,100,0,5,3)
+
+#"Start Position: "
+x.vehicle.location.local_frame
+
 
 x.exit()
 
