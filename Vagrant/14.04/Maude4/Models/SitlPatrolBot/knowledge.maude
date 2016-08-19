@@ -63,7 +63,7 @@ fmod MODEL-KNOWLEDGE is
 **** Bot specific knowledge
   op myY : Id Nat -> Info .    **** myY is the track bot is moving along
   op myDir : Id Dir -> Info .  **** myDir is the direction the bot is heading
-  op velocity : Id FiniteFloat -> Info .  **** myDir is the direction the bot is heading
+****  op velocity : Id FiniteFloat -> Info .  **** myDir is the direction the bot is heading
   ops vEdge : Id GridLoc GridLoc -> Info .
 
   op getMyY : Id KB  -> [Nat] .  
