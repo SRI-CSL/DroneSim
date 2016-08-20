@@ -8,6 +8,7 @@
 (define mkdrone (name x y z v e)
   ;; the 0 is the instance number (all ports depend on it)
   (let ((drone (apply SimpleDrone name (int 0))))
+    (setuid drone name)
     (invoke drone "initialize")
     drone))
 
@@ -22,3 +23,24 @@
 (define evalOK (sender val)
   (apply send sender (getattr myself "name") (concat "OK " val "\n"))
   )
+
+
+(define resetSitl (idlist)
+  (for id idlist (apply resetSiltAux  id))
+  True
+  )
+
+(import "sys")
+
+(define resetSiltAux (id)
+  (let ((sitlobj (fetch id)))
+    (if (isobject sitlobj)
+	(invoke sitlobj "reset")
+      (invoke sys.stderr "write"  (concat "no object found for id: " id))
+      )
+    )
+  )
+
+(import "time")
+
+

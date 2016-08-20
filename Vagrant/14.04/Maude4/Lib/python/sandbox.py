@@ -4,8 +4,20 @@ from subprocess import Popen, PIPE, STDOUT
 
 from threading import Thread
 
-import sys
+import sys, psutil
 
+def infanticide(pid):
+    try:
+      parent = psutil.Process(pid)
+    except psutil.NoSuchProcess:
+      return
+    children = parent.children(recursive=True)
+    if debug:
+        sys.stderr.write('The children of {0} are {1}\n'.format(pid, children))
+    for p in children:
+        os.kill(p.pid, signal.SIGKILL)
+        if debug:
+            sys.stderr.write('Sent signal {1} to {0}\n'.format(p.pid, signal.SIGKILL))
 
 
 def echo(child):
@@ -37,6 +49,7 @@ class SandBox(object):
 
     def stop(self):
         if self.child is not None:
+            infanticide(self.child.pid)
             self.child.terminate()
             self.child.kill()
             self.child.wait()

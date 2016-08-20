@@ -12,12 +12,16 @@ drone0.mv(30, 30, 30, 3)
 
 str(drone0.vehicle.location.global_relative_frame)
 
+str(drone0.vehicle.location.local_frame)
+
 drone0.rtl()
 
 #does not reset the battery level.
 drone0.reset()
 
-drone0.shutdown_and_exit()
+drone0.shutdown()
+
+drone0.initialize()
 
 # -7.1626749,-34.8177048
 # -7.1624048,-34.8174353

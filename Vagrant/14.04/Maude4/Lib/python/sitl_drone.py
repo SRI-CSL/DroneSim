@@ -132,8 +132,11 @@ class SimpleDrone(object):
         return True
 
     def land(self):
-        self.send_global_velocity(0,0,0,1)
+        #self.send_global_velocity(0,0,0,1)
+        # http://python.dronekit.io/examples/guided-set-speed-yaw-demo.html
+        self.vehicle.groundspeed=5
         self.vehicle.mode = VehicleMode("LAND")
+        return True
 
     def stop(self):
         return True
@@ -141,16 +144,15 @@ class SimpleDrone(object):
     def rtl(self):
         self.vehicle.mode = VehicleMode("RTL")
 
-    # wakes up where it landed last (if it has flown) and the battery is as it was when it last landed.
     def reset(self):
-        if self.vehicle is not None:
-            self.vehicle.close()
-        self.vehicle = connect(self.sitl_ip() , wait_ready=True)
-        
+        self.shutdown()
+        self.initialize()
+        return True
 
-    def shutdown_and_exit(self):
+    def shutdown(self):
         if self.vehicle is not None:
             self.vehicle.close()
+            self.vehicle = None
         if self.mavproxy is not None:
             self.mavproxy.stop()
             if self.debug:
@@ -162,41 +164,6 @@ class SimpleDrone(object):
                 sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
         
-    def send_global_velocity(self, velocity_x, velocity_y, velocity_z, duration):
-        """
-        Move vehicle in direction based on specified velocity vectors.
-        This uses the SET_POSITION_TARGET_GLOBAL_INT command with type mask enabling only 
-        velocity components 
-        (http://dev.ardupilot.com/wiki/copter-commands-in-guided-mode/#set_position_target_global_int).
-        
-        Note that from AC3.3 the message should be re-sent every second (after about 3 seconds
-        with no message the velocity will drop back to zero). In AC3.2.1 and earlier the specified
-        velocity persists until it is canceled. The code below should work on either version 
-        (sending the message multiple times does not cause problems).
-        
-        See the above link for information on the type_mask (0=enable, 1=ignore). 
-        At time of writing, acceleration and yaw bits are ignored.
-        """
-        msg = self.vehicle.message_factory.set_position_target_global_int_encode(
-            0,       # time_boot_ms (not used)
-            0, 0,    # target system, target component
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # frame
-            0b0000111111000111, # type_mask (only speeds enabled)
-            0, # lat_int - X Position in WGS84 frame in 1e7 * meters
-            0, # lon_int - Y Position in WGS84 frame in 1e7 * meters
-            0, # alt - Altitude in meters in AMSL altitude(not WGS84 if absolute or relative)
-            # altitude above terrain if GLOBAL_TERRAIN_ALT_INT
-            velocity_x, # X velocity in NED frame in m/s
-            velocity_y, # Y velocity in NED frame in m/s
-            velocity_z, # Z velocity in NED frame in m/s
-            0, 0, 0, # afx, afy, afz acceleration (not supported yet, ignored in GCS_Mavlink)
-            0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink) 
-
-        # send command to vehicle on 1 Hz cycle
-        for x in range(0,duration):
-            self.vehicle.send_mavlink(msg)
-            time.sleep(1)
-
 
     def __str__(self):
         if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
