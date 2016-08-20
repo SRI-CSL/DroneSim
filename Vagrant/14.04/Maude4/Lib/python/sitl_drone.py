@@ -13,51 +13,15 @@ from subprocess import *
 from sandbox import *
 from tmpglob import *
 
+
 """
-original hardcoded arguments:
+At some stage we want to pass in the position, altitude and yaw to
+the constructor. But currently we are hardcode with
 
-dkargs = [ 'dronekit-sitl',
-           'copter',
-           '--home=-7.162675,-34.817705,36,250' ]
-
-mpargs = [ 'mavproxy.py',
-           '--master',
-           'tcp:127.0.0.1:5760',
-           '--sitl=127.0.0.1:5501',
-           '--out=127.0.0.1:14550',
-           '--map',
-           '--console',
-           '--aircraft',
-            'drone_0' ]
+7.162675, -34.817705, 36,      250
+latitude  longitude   altitude yaw
 
 
-A simple drone will need an instance number: self.ino
-We will need to pass this number 
-
-dkargs = [ 'dronekit-sitl',
-           'copter',
-           '--instance',
-           '{0}'.format(self.ino),
-           '--home=-7.162675,-34.817705,36,250' ]
-           #--home (latitude, longitude, altitude, yaw)
- 
-the mavproxy  instance will need to listen on 5760 + 10 * self.ino
-and the out port that we connect to will also have to be adjusted.
-
-mpargs = [ 'mavproxy.py',
-           '--master',
-           'tcp:127.0.0.1:{0}'.format(5760 + 10 * self.ino),
-           '--sitl=127.0.0.1:{0}'.format(5501 + 10 * self.ino),
-           '--out=127.0.0.1:{0}'.format(14550 + 10 * self.ino),
-           '--map',
-           '--console',
-           '--aircraft',
-           'drone_{0}'.format(self.ino) ]
-
-there is also a question of drone to actor mapping.
-is it one-one or many one? since port numbers are a
-global resource (not process local) we will need to be 
-careful with the instance number.
 
 """
 
@@ -133,7 +97,7 @@ class SimpleDrone(object):
         self.mavproxy.start()
         sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
-    def takeOff(self,altitude):
+    def takeOff(self, altitude):
         self.altitude = float(altitude)
         while not self.vehicle.is_armable:
            time.sleep(1)
@@ -144,41 +108,15 @@ class SimpleDrone(object):
 
         self.vehicle.simple_takeoff(self.altitude)
 
-
-        #while True:
-            #print " Altitude: ", self.vehicle.location.global_relative_frame.alt
-            #if self.vehicle.location.global_relative_frame.alt >= self.altitude*0.95:
-                #print "Reached target altitude"
-                #break
-            #time.sleep(1)
-
- 
     def mv(self, x, y, z, v):
-        # while True:
-        #     print " Altitude: ", self.vehicle.location.global_relative_frame.alt
-        #     if self.vehicle.location.global_relative_frame.alt >= self.altitude*0.95:
-        #         print "Reached target altitude"
-        #         break
-        #     time.sleep(1)
-
         currentLocation = self.vehicle.location.global_relative_frame
-        sys.stderr.write('Current: {0}'.format(currentLocation))
-        #print "Current: ", currentLocation
+        sys.stderr.write('Current: {0}\n'.format(currentLocation))
         targetLocation = get_location_metres(currentLocation, float(y), float(x))
-        sys.stderr.write('Target: {0}'.format(targetLocation))
-        #print "Target: ", targetLocation
+        sys.stderr.write('Target: {0}\n'.format(targetLocation))
         targetDistance = get_distance_metres(currentLocation, targetLocation)
-        sys.stderr.write('Target Distance: {0}'.format(targetDistance))
-        #print "Target Distance: ", targetDistance
-        # gotoFunction(targetLocation)
-
-##      self.vehicle.airspeed=float(10)
+        sys.stderr.write('Target Distance: {0}\n'.format(targetDistance))
         self.vehicle.airspeed=float(v)
-        # self.vehicle.simple_goto(targetLocation,groundspeed=10)
         self.vehicle.simple_goto(targetLocation)
-
-        # point = LocationGlobalRelative(float(x),float(y),float(z))
-        # self.vehicle.simple_goto(point)
         return True
 
     def charge(self, amt):
@@ -189,9 +127,32 @@ class SimpleDrone(object):
         self.send_global_velocity(0,0,0,1)
         self.vehicle.mode = VehicleMode("LAND")
 
+
     def stop(self):
         return True
 
+    def rtl(self):
+        self.vehicle.mode = VehicleMode("RTL")
+
+    # wakes up where it landed last (if it has flown) and the battery is as it was when it last landed.
+    def reset(self):
+        if self.vehicle is not None:
+            self.vehicle.close()
+        self.vehicle = connect(self.sitl_ip() , wait_ready=True)
+        
+
+    def shutdown_and_exit(self):
+        if self.vehicle is not None:
+            self.vehicle.close()
+        if self.mavproxy is not None:
+            self.mavproxy.stop()
+            sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
+            self.mavproxy = None
+        if self.dronekit is not None:
+            self.dronekit.stop()
+            sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
+            self.dronekit = None
+        
     def send_global_velocity(self,velocity_x, velocity_y, velocity_z, duration):
         """
         Move vehicle in direction based on specified velocity vectors.
@@ -242,40 +203,10 @@ class SimpleDrone(object):
             dx = dx / vel
             dy = dy / vel
             dz = dz / vel
-            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north,alt, dx, dy, dz, vel, bat)
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
 
-    def ian__str__(self):
-        if self.vehicle is not None:
-            pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
-            if not pos:
-                pos = [0, 0, 0]
-            auxVel = self.vehicle.velocity
-            bat = self.vehicle.battery.level
-            dx = auxVel[0]
-            dy = auxVel[1]
-            dz = auxVel[2]
-            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
-            dx = dx / vel
-            dy = dy / vel
-            dz = dz / vel
-            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
-        else:
-            return 'Uninitialized'
-                
-    def vivek__str__(self):
-        pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
-        auxVel = self.vehicle.velocity
-        bat = self.vehicle.battery.level
-        dx = auxVel[0]
-        dy = auxVel[1]
-        dz = auxVel[2]
-        vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
-        dx = dx / vel
-        dy = dy / vel
-        dz = dz / vel
-        return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
 
 """
 x.vehicle.location.local_frame.north        

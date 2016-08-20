@@ -39,6 +39,7 @@ class SandBox(object):
         if self.child is not None:
             self.child.terminate()
             self.child.kill()
+            self.child.wait()
             
 
     def wait(self):
