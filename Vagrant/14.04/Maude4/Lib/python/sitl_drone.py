@@ -26,24 +26,25 @@ latitude  longitude   altitude yaw
 
 class SimpleDrone(object):
 
-    def __init__(self, name, instance_no=0):
+    def __init__(self, name, instance_no=0, debug=True):
         """Creates a drone with given name and default state.
         """
         self.name = name
-
+        self.debug = debug
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
-        sys.stderr.write("SimpleDrone instance {0}\n".format(self.ino))
+
+        if self.debug:
+            sys.stderr.write("SimpleDrone instance {0}\n".format(self.ino))
         
         self.x = 0
-        
         self.y = 0
         self.z = 0
         self.v = 0
         self.e = 10.0
-        self.vehicle = None
-        #self.windParam = WindParam("newWind")
         self.altitude = 5
+        
+        self.vehicle = None
 
         self.dronekit = None
         self.mavproxy = None
@@ -79,21 +80,27 @@ class SimpleDrone(object):
     
     def spawn(self):
         dkargs = self.drokekit_args()
-        sys.stderr.write("Spawning dronekit {0}\n".format(dkargs))
+        if self.debug:
+            sys.stderr.write("Spawning dronekit {0}\n".format(dkargs))
         self.dronekit = SandBox('dronekit', dkargs, False)
         self.dronekit.start()
-        sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
+        if self.debug:
+            sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
+            sys.stderr.write("sleeping\n")
 
-        sys.stderr.write("sleeping\n")
         time.sleep(2)
-        sys.stderr.write("slept\n")
+        if self.debug:
+            sys.stderr.write("slept\n")
 
         mpargs = self.mavproxy_args()
         
-        sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
+            
+        if self.debug:
+            sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
         self.mavproxy =  SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()
-        sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+        if self.debug:
+            sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
     def takeOff(self, altitude):
         self.altitude = float(altitude)
@@ -108,11 +115,14 @@ class SimpleDrone(object):
 
     def mv(self, x, y, z, v):
         currentLocation = self.vehicle.location.global_relative_frame
-        sys.stderr.write('Current: {0}\n'.format(currentLocation))
+        if self.debug:
+            sys.stderr.write('Current: {0}\n'.format(currentLocation))
         targetLocation = get_location_metres(currentLocation, float(y), float(x))
-        sys.stderr.write('Target: {0}\n'.format(targetLocation))
+        if self.debug:
+            sys.stderr.write('Target: {0}\n'.format(targetLocation))
         targetDistance = get_distance_metres(currentLocation, targetLocation)
-        sys.stderr.write('Target Distance: {0}\n'.format(targetDistance))
+        if self.debug:
+            sys.stderr.write('Target Distance: {0}\n'.format(targetDistance))
         self.vehicle.airspeed=float(v)
         self.vehicle.simple_goto(targetLocation)
         return True
@@ -124,7 +134,6 @@ class SimpleDrone(object):
     def land(self):
         self.send_global_velocity(0,0,0,1)
         self.vehicle.mode = VehicleMode("LAND")
-
 
     def stop(self):
         return True
@@ -144,14 +153,16 @@ class SimpleDrone(object):
             self.vehicle.close()
         if self.mavproxy is not None:
             self.mavproxy.stop()
-            sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
+            if self.debug:
+                sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
             self.mavproxy = None
         if self.dronekit is not None:
             self.dronekit.stop()
-            sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
+            if self.debug:
+                sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
         
-    def send_global_velocity(self,velocity_x, velocity_y, velocity_z, duration):
+    def send_global_velocity(self, velocity_x, velocity_y, velocity_z, duration):
         """
         Move vehicle in direction based on specified velocity vectors.
         This uses the SET_POSITION_TARGET_GLOBAL_INT command with type mask enabling only 
