@@ -74,17 +74,6 @@ echo "Cloning jsbsim"
 
 git clone git://github.com/tridge/jsbsim.git
 
-echo "Cloning ardupilot"
-
-git clone git://github.com/ArduPilot/ardupilot.git
-
-
-echo "Prepping the jsbsim build"
-
-export PATH=${PATH}:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
-echo '. /vagrant/bash_profile' >> /home/vagrant/.bashrc
-
-
 echo "Building jsbsim"
 
 cd jsbsim
@@ -101,6 +90,16 @@ cd ..
 # so from here on, you may have to do this stuff by hand if it fails.
 #
 #
+echo "Cloning ardupilot"
+
+git clone git://github.com/ArduPilot/ardupilot.git
+
+
+echo "Prepping the ardupilot build"
+
+export PATH=${PATH}:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
+echo '. /vagrant/bash_profile' >> /home/vagrant/.bashrc
+
 
 echo "Configuring ardupilot"
 cd ardupilot

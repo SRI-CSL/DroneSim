@@ -1,5 +1,4 @@
 from dronekit import connect, VehicleMode, LocationGlobalRelative, LocationGlobal, Command
-#from subprocess import call, Popen, check_output
 import time, math, sys, os, re
 import argparse
 from pymavlink import mavutil
@@ -68,7 +67,6 @@ class SimpleDrone(object):
                  '--home=-7.162675,-34.817705,36,250' ]
 
     def mavproxy_args(self):
-        pipeincr = 10 * self.ino
         return [ 'mavproxy.py',
                  '--master',
                  'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
