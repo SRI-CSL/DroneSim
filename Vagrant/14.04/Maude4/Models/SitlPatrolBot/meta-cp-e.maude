@@ -59,7 +59,7 @@ vars es0 es es' es'' es1 : ESet .
 vars InQ OutQ outQ toks toks' rids args : QidList .
 vars q modname initname aname amodname mname g2dname g2dvname pyname sname
       maudename id reqid  gname scaleq dsizeq 
-			act dir x y z dx dy dz v e idchar amt
+			act dir x y z dx dy dz v e idchar amt  status
 			rid sysOp nq : Qid .
 vars mod agentMod amod module : Module .
 vars ?string str idstr argstr 
@@ -151,10 +151,7 @@ eq term2String(mod,t)
 op initAgentEset : ESet Qid Qid Qid Qid Qid Qid Qid -> ESet .
 ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
                      amodname,initname,sname) =
-   addEntry( addEntry( addEntry( 
-     addEntry( addEntry( addEntry( addEntry(
-     addEntry( addEntry( addEntry(
-      addEntry( addEntry( addEntry(
+     addEntry(addEntry( addEntry( addEntry(
       addEntry( addEntry( addEntry(
        addEntry( addEntry( addEntry(
         addEntry(es, 
@@ -165,17 +162,7 @@ ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
                 'qval, 'agentModName, ql(amodname)),
  							  'sval, 'globalCounter,sv("0")),
                 'qval, 'sname, ql(sname)),
-****!!!! why all gx's								
-                'sval, 'senXLow, sv(gx)),
-                'sval, 'senYLow, sv(gx)),
-                'sval, 'senZLow, sv(gx)),
-                'sval, 'gridStepX, sv(gx)),
-                'sval, 'gridStepY, sv(gx)),
-                'sval, 'gridStepZ, sv(gx)),
-                'sval, 'edgeX, sv(gx)),
-                'sval, 'maxCharge, sv(maxC)),
-                'sval, 'chargeUnit, sv(chargeU)),
-                'sval, 'costMv, sv(costMv)),
+                'qval, 'simStatus, ql('init)),
                 'tval, 'agentConf, tm(amodname,aconfT)),
                 'tval, 'envKB, tm(amodname,ekbT)),
                 'tval, 'time, tm(amodname,timeT))
@@ -183,52 +170,12 @@ ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
   res?? := metaReduce([amodname],mkConst(initname,'ASystem))
  /\ aconfT := 
      (if res?? :: ResultPair then getTerm(res??) else '`{_`}['none.Conf] fi) 
- /\ res1?? := metaReduce([amodname],mkConst('senXLow,'FiniteFloat)) 
- /\ sxT := (if res1?? :: ResultPair then getTerm(res1??) else '0.0.FiniteFloat fi)
- /\ sx := string(getName(sxT))
- /\ res2?? := metaReduce([amodname],mkConst('senYLow,'FiniteFloat)) 
- /\ syT := (if res2?? :: ResultPair then getTerm(res2??) else '0.0.FiniteFloat fi)
- /\ sy := string(getName(syT))
- /\ res3?? := metaReduce([amodname],mkConst('senZLow,'FiniteFloat)) 
- /\ szT := (if res3?? :: ResultPair then getTerm(res3??) else '0.0.FiniteFloat fi)
- /\ sz := string(getName(szT))
- /\ res4?? := metaReduce([amodname],mkConst('gridStepX,'FiniteFloat)) 
- /\ gxT := (if res4?? :: ResultPair then getTerm(res4??) else '0.0.FiniteFloat fi)
- /\ gx := string(getName(gxT))
- /\ res5?? := metaReduce([amodname],mkConst('gridStepY,'FiniteFloat)) 
- /\ gyT := (if res5?? :: ResultPair then getTerm(res5??) else '0.0.FiniteFloat fi)
- /\ gy := string(getName(gyT))
- /\ res6?? := metaReduce([amodname],mkConst('gridStepZ,'FiniteFloat)) 
- /\ gzT := (if res6?? :: ResultPair then getTerm(res6??) else '0.0.FiniteFloat fi)
- /\ gz := string(getName(gzT))
- /\ res7?? := metaReduce([amodname],mkConst('edgeX,'Nat))
- /\ edgeXT := (if res7?? :: ResultPair then getTerm(res7??) else '0.Nat fi)
- /\ edgeX := string(natT2nat(edgeXT),10)
- *** /\ gx := "5"
-*** /\ gy := "3"
- /\ res8?? := metaReduce([amodname],mkConst('maxCharge,'FiniteFloat)) 
- /\ maxCT := 
- (if res8?? :: ResultPair then getTerm(res8??) else '0.0.FiniteFloat fi)
- /\ maxC := string(getName(maxCT))
- /\ res9?? := metaReduce([amodname],mkConst('chargeUnit,'FiniteFloat)) 
- /\ chargeUT := 
- (if res9?? :: ResultPair then getTerm(res9??) else '0.0.FiniteFloat fi)
- /\ chargeU := string(getName(chargeUT))
- /\ res10?? := metaReduce([amodname],mkConst('costMv,'FiniteFloat)) 
- /\ costMvT := 
- (if res10?? :: ResultPair then getTerm(res10??) else '0.0.FiniteFloat fi)
- /\ costMv := string(getName(costMvT))
  /\ res11?? := metaReduce([amodname],'envKB[aconfT])
  /\ ekbT := (if res11?? :: ResultPair then getTerm(res11??) else 'none.KB fi)
  /\ res12?? := metaReduce([amodname],'getTime['getConf[aconfT]])
  /\ timeT :=  (if res12?? :: ResultPair 
 	              then getTerm(res12??) 
 								else 'infty.TimeInf fi)
-***( 
- /\ maxC := "20"
- /\ chargeU := "5"
- /\ costMv := "1"
-)
 .
  
 eq isReq('initAgentEset) = true .
@@ -450,7 +397,7 @@ if n := rat(string(nq),10)
 
 ***********************************************************************
 ***********************************************************************
-
+***** quit if simStatus = ql(Stop) or countdown 
  eq isReq('doSimRound) = true .
  eq enabled(wait4s,req('doSimRound,ql(pyname nq toks),reqQ)) = 
     not(waiting4(wait4s,pyname)) .
@@ -468,8 +415,9 @@ crl[doSimRound]:
        es,
        log), outQ  ] 
 if n := rat(string(nq),10)
+/\ ql(status) := getVal(es,'qval,'simStatus, ql('unknown))
 /\ reqQ0 :=
-    (if ( n :: Nat and n > 0 ) 
+    (if ( n :: Nat and n > 0 and status =/= 'stop) 
     then req('rewTilDone, ql('doTask),
 		         req('doActs, ql(nil),
             	  req('doSimRound, ql(pyname qid(string(sd(n,1),10)) ),
@@ -590,7 +538,8 @@ eq id2IdT(idstr) = 'unk.Id [owise] .
  eq isReq('doUnitAct) = true .
  eq enabled(wait4s,req('doUnitAct,ql(id act toks),reqQ)) = 
     not(waiting4(wait4s,id)) .
- 
+
+**** if act is stop update  simStatus in es to be stop
  crl[doUnitAct]:
     [nil,
      st(processing(req('doUnitAct, ql(id act toks),reqQ')), 
@@ -602,10 +551,14 @@ eq id2IdT(idstr) = 'unk.Id [owise] .
 		     (wait4s !
 				  wait4(id,nil, req('odUnitAct, ql(nil), 
 					                req('logreq,ql('doUnitAct id act toks),reqQ')) )),
-          reqQ, es,log),
+          reqQ, es',log),
       outQ  pyname '\n mname '\n toks' maudePrompt ]
  if mname := getMaudeName(es)
  /\ pyname := getPyName(es)
+ /\ es' := (if (act == 'stop) 
+            then addEntry(es,'qval,'simStatus,ql('stop))
+            else es
+            fi )
  /\ str := mkActStr(pyname,mname,id,act,toks) 
  /\ toks' := str2toks(str) .
 

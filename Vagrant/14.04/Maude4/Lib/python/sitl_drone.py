@@ -189,6 +189,9 @@ class SimpleDrone(object):
         self.send_global_velocity(0,0,0,1)
         self.vehicle.mode = VehicleMode("LAND")
 
+    def stop(self):
+        return True
+
     def send_global_velocity(self,velocity_x, velocity_y, velocity_z, duration):
         """
         Move vehicle in direction based on specified velocity vectors.

@@ -34,6 +34,7 @@
 **** use doSimRound to step n units
 (show val tval agentConf)
 (doSimRound plambda 1)
+(show val qval simStatus)
 
 *** what is going on
 (show control)

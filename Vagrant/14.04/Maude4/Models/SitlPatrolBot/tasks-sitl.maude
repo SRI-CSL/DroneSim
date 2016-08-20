@@ -86,8 +86,9 @@ ceq sitlAct(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
    else (if (e < c)
-     then {mkMvAct(id,loc,home,v), 
-           addK(pending(id,goTo(id,home)) @ s t,kb)}
+     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+           **** {mkMvAct(id,loc,home,v), 
+           ****  addK(pending(id,goTo(id,home)) @ s t,kb)}
       else (if notDone(pact,loc)
 		    then {continue(id), kb}
 				else (if pact == land(id)
@@ -107,6 +108,13 @@ ceq sitlAct(id,kb)  =
    /\ pact := getPending(id,kb0)	.
 
 
+***(
+pending acts:
+ land(id)
+ takeOff(id,alt)
+ goTo(id,loc)
+ stop(id)
+)
 op getPending : Id KB -> ActSet . **** 0 or 1
 eq getPending(id, kb (pending(id,pact) @ t)) = pact .
 eq getPending(id, kb) = none [owise] .
@@ -115,10 +123,11 @@ op notDone : Action Loc -> Bool .
 
 ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
  if pt(ix,iy,iz) := getGridLoc(loc) .
-ceq notDone(land(id), loc)  = abs(iz) > 1 
+ceq notDone(land(id), loc)  = abs(iz) > 2 
  if pt(ix,iy,iz) := getGridLoc(loc) .
-ceq notDone(goTo(id,loc0), loc)  = distance(loc,loc0) > 3 
- if pt(ix,iy,iz) := getGridLoc(loc) .
+ceq notDone(goTo(id,loc0), loc)  =  abs(ix0 - ix) + abs(iy0 - iy) > 2
+ if pt(ix,iy,iz)    := getGridLoc(loc)
+ /\ pt(ix0,iy0,iz0) := getGridLoc(loc0) .
 eq notDone(act,loc) = false [owise] .
 
 ****            from to
