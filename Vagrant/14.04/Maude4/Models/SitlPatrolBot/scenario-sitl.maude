@@ -13,6 +13,7 @@ vars wkb kb lkb ekb : KB .
 var aconf : Conf .
 var attrs : AttributeSet .
 var id : Id .
+var ids : IdSet .
 var cl : Class .
 var l : Loc .
 var a : Int .
@@ -103,6 +104,14 @@ eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) =
       (atloc(id,{senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))}) @ s n)
       (vel(id,v) @ s n) (energy(id,e) @ s(n))) .
 
+
+op getIds : ASystem -> IdSet .
+eq getIds({ aconf }) = getIdsX(aconf, none)  .
+
+op getIdsX : Conf IdSet -> IdSet .
+eq getIdsX(aconf, ids) = ids [owise] .
+eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
+
 endm
 
 ***(
@@ -139,17 +148,16 @@ eq lkbX2 = proSensors(b(0), lkbX, getSensors(b(0),ekbX) ) .
 endm
 )
 
-***(
-ievs = none
-devs = none
-red handleS(Bot,b(0),lkbX,none) == lkbX .
-red getSensors(b(0),ekbX) clock(2) == ekbX .
-red proSensors(b(0), lkbX, getSensors(b(0),ekbX) ) .
-red sitlAct(b(0),proSensors(b(0), lkbX, getSensors(b(0),ekbX) )) .
-**** not landing
-)
 
 ***(
+**** for sitl -- can randomly pause -- running down battery
+**** critical if stop and not home  meaning stopped with battery low
+**** or critical if battery low
+
+**** need to add rand counter to asys
+**** op getObs : ASystem -> Bool .   **** ekb loc is home
+**** op upDateRand : ASystem Nat -> ASystem .
+
 mod SCENARIO-VER is
   inc SCENARIO .
 
