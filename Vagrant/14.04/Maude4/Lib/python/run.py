@@ -16,8 +16,11 @@ str(drone0.vehicle.location.local_frame)
 
 drone0.rtl()
 
-#does not reset the battery level.
+#essentially 
+
 drone0.reset()
+
+#consists of:
 
 drone0.shutdown()
 
