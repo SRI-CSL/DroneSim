@@ -1,0 +1,322 @@
+****************************************************************
+***(initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400 GenericApprox .25 .25) 
+**** set maudeName, g2dName, g2dVName agentModName, globalCounter
+****     initConf, randIx, randInc, statsName 
+****     agentConf set by doRun
+****   init g2d and start analysis
+
+****************************************************************
+op initAgentEsetStats : ESet Qid Qid Qid  Qid Qid Qid Qid -> ESet .
+ceq initAgentEsetStats(es,maudename,g2dname,g2dvname,
+                     amodname,initname,sname,randinc) =
+     addEntry( addEntry( addEntry(
+      addEntry( addEntry( addEntry(
+       addEntry(  addEntry( 
+        addEntry(es, 
+                'qval, 'maudeName, ql(maudename)), 
+                'qval, 'g2dName, ql(g2dname)), 
+                'qval, 'g2dVName, ql(g2dvname)),
+                'qval, 'agentModName, ql(amodname)),
+ 							  'sval, 'globalCounter,sv("0")),
+                'qval, 'statsName, ql(sname)),
+								'tval, 'randIx, tm(amodname, '0.Zero)),
+								'tval, 'randInc, 
+								       tm(amodname, qid2NatT(randinc))),
+                'tval, 'initConf, tm(amodname,aconfT))   ---- ASystem
+ if res?? := metaReduce([amodname],mkConst(initname,'ASystem))
+ /\ aconfT := (if res?? :: ResultPair 
+               then getTerm(res??)
+							 else '`{_`}['none.Conf] fi) 
+.
+
+eq isReq('initAgentEsetStats) = true .
+eq enabled(wait4s,
+           req('initAgentEsetStats, 
+					       ql(maudename g2dname g2dvname amodname 
+             	 	  initname sname randinc statsOp toks),reqQ)) = true .
+
+
+**** also initializes g2d actor
+crl[initAgentEsetStats]:
+   [nil, 
+    st(processing(req('initAgentEsetStats, 
+                      ql(mname g2dname g2dvname amodname  
+											initname sname randinc statsOp toks),
+                       reqQ')),
+       wait4s,reqQ,es,log),
+     outQ]
+   =>
+   [nil, 
+    st(ready, 
+       (wait4s !
+  			 wait4(sname,nil, req('graphreq,ql(g2dvname),nil)) !
+         wait4(g2dvname,sname,
+               req('logreq,ql('initStats g2dvname sname),reqQ'))), 
+  		reqQ,
+			es',
+    	log), 
+  		outQ  g2dvname '\n mname '\n toks' maudePrompt ]
+ if es' := initAgentEsetStats(es,mname,g2dname,g2dvname, amodname, 
+                                 initname,sname,randinc)
+ /\ str := mkInitStatsExp([amodname],mname,g2dvname, sname, statsOp,toks)
+**** /\ ?string := withAck(str, mname,g2dvname) 
+ /\ toks' := str2toks(str) .
+
+
+op initStatsTemplate : -> String [ctor] .
+eq initStatsTemplate =
+"(let ((statsObj %createSOExp))\n\
+   (sinvoke \"g2d.util.ActorMsg\" \"send\" %maudename %g2dname \"OK\")\n\
+   (apply doStats %sname)\n\
+)"  .
+
+op mkInitStatsExp : Module Qid Qid  Qid Qid QidList -> String .
+ceq mkInitStatsExp(mod, maudename, g2dname, sname, statsOp,toks) =
+ fillTemplate(initStatsTemplate,bindings)
+if createSOExp := mkSOExp(statsOp,sname,toks) 
+/\ bindings := (
+    ("%maudename" :~ sqquote(maudename)), 
+    ("%g2dname" :~ sqquote(g2dname)), 
+    ("%sname" :~ sqquote(sname)), 
+    ("%createSOExp" :~ createSOExp)) .
+
+**** BlackboxApprox
+op mkSOExp : Qid Qid QidList -> String .
+eq mkSOExp(statsOp,sname, toks) =
+  (if (statsOp == 'GenericApprox) 
+	 then mkGenericApproxSOExp(sname,toks)
+	 else (if (statsOp == 'BlackboxApprox)
+	       then mkBlackboxApproxSOExp(sname,toks) 
+	 else (if (statsOp == 'QAApprox)
+	       then mkQAApproxSOExp(sname,toks) 
+       	 else "(apply mkDefaultStatsObject)"
+	 fi) fi) fi) .
+
+
+op genericApproxTemplate : -> String [ctor] .
+eq genericApproxTemplate =
+"(object (\"g2d.stats.GenericApprox\" %sname (double %epsilon) (double %delta)))" .
+
+op mkGenericApproxSOExp : Qid QidList -> String .
+eq mkGenericApproxSOExp(sname,epsilon delta toks) =
+   fillTemplate(genericApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							 ("%epsilon" :~ string(epsilon)),
+                ("%delta" :~ string(delta)) )) .
+
+eq mkGenericApproxSOExp(sname,toks) =
+   fillTemplate(genericApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							  ("%epsilon" :~ ".25"),
+                ("%delta" :~ ".25") )) [owise] .
+
+
+op blackboxApproxTemplate : -> String [ctor] .
+eq blackboxApproxTemplate =
+"(object (\"g2d.stats.BlackboxApprox\" %sname (double %threshold) (int  %rounds)))" .
+****    threshold .75     rounds 30
+
+op mkBlackboxApproxSOExp : Qid QidList -> String .
+eq mkBlackboxApproxSOExp(sname,threshold rounds toks) =
+   fillTemplate(blackboxApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							  ("%threshold" :~ string(threshold)),
+                ("%rounds" :~ string(rounds)) )) .
+
+eq mkBlackboxApproxSOExp(sname,toks) =
+   fillTemplate(blackboxApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							  ("%threshold" :~ ".75"),
+                ("%rounds" :~ "30") )) [owise] .
+
+
+***(
+  ;; alpha: error bound, delta: confidence interval, pval: pvalue for JB test
+  ;; minsize: minimum rounds, maxsize: maximum rounds, rate: % of sample (=rounds) increase  
+  (object ("g2d.stats.QAApprox" "qaApprox"  (double 0.25) (double 0.35) (double 0.75) (int 20) (int 1000) (double 0.45)))
+)
+
+op mkQAApproxTemplate : -> String [ctor] .
+eq mkQAApproxTemplate =
+"(object (\"g2d.stats.QAApprox\" %sname (double %alpha) (double %delta) (double %pval) (int  %minrounds) (int  %maxrounds) (double %rate)))" .
+
+
+op mkQAApproxSOExp : Qid QidList -> String .
+eq mkQAApproxSOExp(sname,alpha delta pval minrounds maxrounds rate toks) =
+   fillTemplate(mkQAApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							  ("%alpha" :~ string(alpha)),
+							  ("%delta" :~ string(delta)),
+							  ("%pval" :~ string(pval)),
+							  ("%minrounds" :~ string(minrounds)),
+							  ("%maxrounds" :~ string(maxrounds)),
+                ("%rate" :~ string(rate)) )) .
+
+eq mkQAApproxSOExp(sname,toks) =
+   fillTemplate(mkQAApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							  ("%alpha" :~ ".25"),
+							  ("%delta" :~ ".25"),
+							  ("%pval" :~ ".05"),
+							  ("%minrounds" :~ "20"),
+							  ("%maxrounds" :~ "1000"),
+                ("%rate" :~ ".5") ))  [owise] .
+
+
+
+***********************************************************************
+***********************************************************************
+***********************************************************************
+
+***********************************************************************
+***** (doRun Patrol g2d)
+**** doRun--set agentConf, rewrite til done, update randix, send result
+***********************************************************************
+
+ eq isReq('doRun) = true .
+ eq enabled(wait4s,req('doRun,ql(sname g2dvname toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[doRun]:
+   [nil,
+    st(processing(req('doRun, ql(sname g2dvname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready, wait4s,(reqQ reqQ0), es',log), 
+		outQ  ] 
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'initConf, tm(amodname,'`{_`}['none.Conf]))
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ res?? := metaReduce([amodname], 'upDateRand[aconfT,nT])
+/\ aconfT0 := (if res?? :: ResultPair
+               then getTerm(res??)
+							 else aconfT fi)
+/\ es' := addEntry(es,'tval,'agentConf,tm(amodname,aconfT0))
+***** reset simStatus ql(init)
+/\ pyname := getPyName(es)
+/\ reqQ0 := req('resetSitl(pyname), 
+             req('doSimRound, ql(pyname '1000),
+              req('runOd,ql(g2dvname sname),
+		           reqQ'))) .
+
+ eq isReq('runOd) = true .
+ eq enabled(wait4s,req('runOd,ql(g2dvname sname toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[runOd]:
+   [nil,
+    st(processing(req('runOd, ql(g2dvname sname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+      (wait4s ! 
+       wait4(g2dvname,sname,
+             req('logreq,ql('runOd g2dvname sname),reqQ'))), 
+       reqQ ,
+       es',
+       log), 
+    		outQ  g2dvname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getObs[aconfT])
+/\ bT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+							 else 'false.Bool fi)
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ tm(amodname, xT) := getVal(es,'tval, 'randInc, tm(amodname,'0.Zero))
+/\ res1?? := metaReduce([amodname], '_+_[nT,xT])
+/\ nT1 := (if res1?? :: ResultPair 
+           then getTerm(res1??) else nT fi)							 
+/\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ str := mkRunReplyExp(sname, bT)
+*** /\ ?string := withAck(str, mname,g2dvname) 
+/\ toks' := str2toks(str) .
+
+op runReplyTemplate : -> String .
+eq runReplyTemplate = "(apply runResult %sname (double %obs))" .
+
+op mkRunReplyExp : Qid Term -> String .
+eq mkRunReplyExp(sname, bT) =
+  fillTemplate(runReplyTemplate, 
+	            (("%sname" :~ sqquote(sname)), 
+               ("%obs" :~ (if bT == 'true.Bool then "1" else "0" fi)) ))
+			  .
+
+
+********************************************************************************
+***** reseting SITL
+********************************************************************************
+
+op idsT2idsQ : Qid Term -> QidList .
+op idTL2idsQ : Qid TermList -> QidList .
+eq idsT2idsQ(amodname,__[tl]) = idTL2idsQ(amodname,tl) .
+eq idsT2idsQ(amodname,t) = 
+     if (hasSort([amodname],t,'Id)) then idT2id(t) else nil fi .
+eq idsT2idsQ(amodname,'none.IdSet) = nil .
+eq idTL2idsQ(amodname,empty) = nil .
+eq idTL2idsQ(amodname,(t,tl)) = idT2id(t) idTL2idsQ(amodname,tl) .
+
+ eq isReq('resetSitl) = true .
+ eq enabled(wait4s,req('resetSitl,ql(pyname toks),reqQ)) = 
+    not(waiting4(wait4s,pyname)) .
+
+crl[resetSitl]:
+   [nil,
+    st(processing(req('resetSitl, ql(pyname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+      (wait4s ! 
+       wait4(pyname,ids,
+             req('logreq,ql('resetSitl pyname ids),reqQ'))), 
+       reqQ ,
+       es',
+       log), 
+    		outQ  pyname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getIds[aconfT])
+/\ idsT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+							 else 'none.IdSet fi)
+
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ str := mkResetSitlExp(amodname,pyname,mname,idsT)
+/\ toks' := str2toks(str) .
+               
+               
+
+op resetSitlTemplate : -> String .
+eq resetSitlTemplate  =
+"(seq 
+  (apply resetSitl (mklist %idlist))\
+  (apply send %mname %pyname \"OK\"))\
+)"
+.
+
+op listTemplate : -> String .
+eq listTemplate = "(mklist %elts)"
+
+op mkResetSitlExp : Qid Qid Qid Term -> String .
+ceq mkResetSitlExp(amodname,pyname,mname,idsT) =
+  fillTemplate(resetSitlTemplate,bindings)
+if  ids := idsT2idsQ(amodname,idsT)
+/\  bindings := 
+   (("%pyname" :~ sqquote(pyname)),
+	  ("%mname" :~ sqquote(mname)),
+	  ("%idlist" :~ qids2lstr(ids,"")) ) .
+
+
+op qids2lstr : QidList String -> String .
+eq qids2lstr(nil,str) = str .
+eq qids2lstr(q ql,str) = qids2lstr(ql,str + " " + sqquote(q)) . 
