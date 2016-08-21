@@ -474,7 +474,11 @@ eq actTemplate  =
 .
 
 op contTemplate : -> String .
-eq contTemplate  = "(apply send %mname %dname (concat %id \"\"))" .
+eq contTemplate  = 
+"(seq \
+  (apply time.sleep (int 1))\
+  (apply send %mname %dname (concat %id \"\"))\
+)" .
 
 ***(
 takeOff(id,alt)
