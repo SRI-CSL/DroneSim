@@ -65,6 +65,7 @@ class SimpleDrone(object):
                  'copter',
                  '--instance',
                  '{0}'.format(self.ino),
+                 '--speedup=3',                 
                  '--home=-7.162675,-34.817705,36,250' ]
 
     def mavproxy_args(self):
