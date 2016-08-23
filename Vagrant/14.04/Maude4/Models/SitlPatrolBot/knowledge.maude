@@ -11,7 +11,7 @@ fmod MODEL-KNOWLEDGE is
   vars gl0 gl1 gl2 gl3 : GridLoc .
   vars ekb ekb0 ekb1 kb  lkb kb1 lkb0  :  KB .
   var dir dir0 dir1 : Dir .
-  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v : FiniteFloat .
+  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz : FiniteFloat .
 	
 *** parameters
   --- ops gridX gridY gridZ : -> Nat .
@@ -26,11 +26,12 @@ fmod MODEL-KNOWLEDGE is
 
   op comDistance : -> Nat .
 
+
   op chargeUnit : -> FiniteFloat .
   op maxCharge : -> FiniteFloat .      --- stop charging when full
  
   op botDelay : -> Nat .
-  op costMv : -> FiniteFloat . 
+  op costMv : -> FiniteFloat .
 
 *** class
   op Bot : -> Class .
@@ -52,7 +53,6 @@ fmod MODEL-KNOWLEDGE is
   op equiv : Loc Loc -> Bool .
   eq equiv({senl0,gl0},{senl1,gl0}) = true .
   eq equiv(l0,l1) = false [owise] .
-
 
  op getSenLoc : Loc -> SenLoc .
  eq getSenLoc({senl0,gl0}) = senl0 .
@@ -85,6 +85,8 @@ fmod MODEL-KNOWLEDGE is
   op getCaution : Id KB -> FiniteFloat .
   eq getCaution(id, (caution(id,e) @ t) lkb ) = e .
   eq getCaution(id,lkb ) = 1.0 [owise] .
+
+  op rand : Id Nat -> Info .
 
   op vel : Id FiniteFloat -> Info .  **** myVel is the absolute velocity
   eq hasId(id,vel(id,ff) @ t) = true .
@@ -137,6 +139,16 @@ fmod MODEL-KNOWLEDGE is
   op senMove : SenLoc Dir FiniteFloat -> SenLoc .
   eq senMove(senLoc(ffx,ffy,ffz),dir(ffx0,ffy0,ffz0),v) = 
        senLoc(ffx + ffx0 * v,ffy + ffy0 * v,ffz + ffz0 * v) .
+       
+  op round : FiniteFloat -> Int .
+  ceq round(sx) =
+    (if (sx >= 0.0)
+      then (if r:Rat < 1/2 then floor(rat(sx)) else ceiling(rat(sx)) fi)
+      else (if r:Rat < 1/2 then ceiling(rat(sx)) else floor(rat(sx)) fi)
+    fi)
+    if r:Rat := rat(sx) - floor(rat(sx)) .
+    op msen2grid : SenLoc -> GridLoc .
+    eq msen2grid(senLoc(sx,sy,sz)) = pt(round(sx),round(sy),round(sz)) .
 
   op doMv : Loc Dir FiniteFloat -> Loc .
   ceq doMv({senl0,gl0},dir,v) = {senl1,gl1}
@@ -164,6 +176,7 @@ fmod MODEL-KNOWLEDGE is
   eq (energy(id,e0) @ t0) << (energy(id,e1) @ t1) =  t0 < t1 .
   eq (caution(id,e0) @ t0) << (caution(id,e1) @ t1) =  t0 < t1 .
   eq vel(id,ff0) @ t0 << vel(id,ff1) @ t1 = t0 < t1 .
+  eq rand(id,r1:Nat) @ t0 << rand(id,r2:Nat) @ t1 = t0 < t1 .
 
   op atVEdge : Loc -> Bool .
   eq atVEdge({senl0,pt(x,y,z)}) =  ((x == 0) or (s x == edgeX))  . 
