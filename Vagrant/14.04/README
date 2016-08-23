@@ -7,11 +7,9 @@ Be in this directory:
 >vagrant up
 
 The first time you do this, expect this to take 5-10 minutes.
-It will end up with some red, but as long as it is just complaining about
+It should end up saying
 
-../Tools/autotest/run_in_terminal_window.sh failing
-
-that is fine.
+"Time to build/testing ardupilot"
 
 Once up for the first time do:
 
@@ -21,13 +19,16 @@ Now you can logon to the box:
 
 >./login
 
-I have not installed maude, so you will need to do that.
-Not sure how to do that programmatically.
+Once logged in for the first time, you will need to finish the
+build of the arducopter:
 
-Also you should test the sitl thingy:
+sim_vehicle.py -v ArduCopter
 
-cd ardupilot/ArduPlane
-sim_vehicle.sh --console --map --aircraft test
+Once built you'll have to ^D to exit.
+Then should be able to launch via:
+
+sim_vehicle.py -v ArduCopter --map --console
+
 
 
 
