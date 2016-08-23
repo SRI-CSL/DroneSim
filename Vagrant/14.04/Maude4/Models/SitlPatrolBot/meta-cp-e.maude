@@ -466,7 +466,6 @@ eq mkActStr('charge, nil) = "charge 5"  .
 )
 
 op actTemplate : -> String .
-***(
 **** fetch object named id, not by definition
 eq actTemplate  =
 "(seq \
@@ -474,7 +473,8 @@ eq actTemplate  =
   (apply send %mname %dname (concat %id \"\"))\
 )"
 .
-)
+***(
+
 eq actTemplate  =
 "(let ((dobj (fetch \"%id\")))\
    (if (isobject dobj)\
@@ -483,17 +483,17 @@ eq actTemplate  =
     (apply send %mname %dname (concat \"unknown id: \" \"%id\")))\
 )"
 .
+)
 
 op contTemplate : -> String .
 
-***(
 eq contTemplate  = 
 "(seq \
   (apply time.sleep (int 1))\
   (apply send %mname %dname (concat %id \"\"))\
 )" .
-)
 
+***(
 eq contTemplate  =
 "(let ((dobj (fetch \"%id\")))\
   (apply time.sleep (int 1))\
@@ -502,6 +502,7 @@ eq contTemplate  =
     (apply send %mname %dname (concat \"unknown id: \" \"%id\")))\
 )"
 .
+)
 
 ***(
 takeOff(id,alt)
