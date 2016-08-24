@@ -16,8 +16,8 @@ load model-checker
 load ../../../../../../imaude/ilib/load-lib
 load meta-cp-e 
 
-***(
 loop init .
+***(
 )
 ***(
 SCENARIO
