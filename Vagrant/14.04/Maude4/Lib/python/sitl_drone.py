@@ -25,17 +25,41 @@ latitude  longitude   altitude yaw
 """
 
 class SimpleDrone(object):
+    """
+    plambda lesson:
 
-    def __init__(self, name, instance_no=0, debug=True):
+    after 
+
+    (import "sitl_drone")
+
+    can make a drone like so:
+
+    (apply sitl_drone.SimpleDrone  "drone_0")
+
+    and get the defaults for instance_no, debug, and speedup.
+
+    or:
+    
+    (let ((largs (mklist "drone_0"))
+          (dargs (mkdict "instance_no" (int 666) "debug" (boolean False) "speedup" (int 6))))
+       (kwapply sitl_drone.SimpleDrone largs dargs))
+
+    and get a customized drone whose battery will run out quicker.
+    kw stands for keyword.
+
+    """
+
+    def __init__(self, name, instance_no=0, debug=True, speedup=3):
         """Creates a drone with given name and default state.
         """
         self.name = name
         self.debug = debug
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
+        self.speedup = speedup
 
         if self.debug:
-            sys.stderr.write("SimpleDrone instance {0}\n".format(self.ino))
+            sys.stderr.write("SimpleDrone with name {0} and instance number {1}\n".format(self.name, self.ino))
         
         self.x = 0
         self.y = 0
@@ -65,7 +89,7 @@ class SimpleDrone(object):
                  'copter',
                  '--instance',
                  '{0}'.format(self.ino),
-                 '--speedup=3',                 
+                 '--speedup={0}'.format(self.speedup),                 
                  '--home=-7.162675,-34.817705,36,250' ]
 
     def mavproxy_args(self):
@@ -75,7 +99,7 @@ class SimpleDrone(object):
                  '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
                  '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
                  '--aircraft',
-                 'drone_{0}'.format(self.ino) ]
+                 '/tmp/drone_{0}'.format(self.ino) ]
 
 
     
@@ -135,7 +159,7 @@ class SimpleDrone(object):
     def land(self):
         #self.send_global_velocity(0,0,0,1)
         # http://python.dronekit.io/examples/guided-set-speed-yaw-demo.html
-        self.vehicle.groundspeed=5
+        self.vehicle.groundspeed=0
         self.vehicle.mode = VehicleMode("LAND")
         return True
 
