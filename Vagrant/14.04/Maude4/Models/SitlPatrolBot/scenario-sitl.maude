@@ -5,7 +5,7 @@ mod SCENARIO is
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
 
-vars n : Nat .
+vars n n': Nat .
 vars i j x y z : Int .
 vars sx sy sz dx dy dz v e c : FiniteFloat .
 var dir : Dir .
@@ -128,6 +128,26 @@ eq getIds({ aconf }) = getIdsX(aconf, none)  .
 op getIdsX : Conf IdSet -> IdSet .
 eq getIdsX(aconf, ids) = ids [owise] .
 eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
+
+
+op upDateRand : ASystem Nat -> ASystem .
+eq upDateRand({[ b(0) : Bot | lkb: lkb, attrs] aconf}, n) 
+             {[b(0) : Bot | lkb: upDateRandKB(lkb,n), attrs] aconf} .
+
+op upDateRandKB  : KB Nat -> KB .
+eq upDateRandKB((rand(id,n') @ t) lkb,n) = (rand(id,n' + n) @ t) lkb .
+eq upDateRandKB(lkb,n) = lkb [owise] .
+
+;;;true if landed at home 
+;;; false owise
+op getObs : ASystem -> Bool .
+op getObsKB : KB KB -> Bool .
+eq getObs({[ b(0) : Bot | lkb: lkb, attrs] [eid | ekb ] aconf }) =
+   getObsKB(lkb,ekb)  .
+eq getObsKB(lkb (pending(b(0),stop(b(0)) @  t) myHome(b(0),home) , 
+             atloc(b(0),loc) @ t0 ekb) = distance(home,loc) < 4 .
+eq getObs({ aconf }) = false [owise] .
+
 
 endm
 

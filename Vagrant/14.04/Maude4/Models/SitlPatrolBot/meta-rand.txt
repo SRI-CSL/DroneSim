@@ -5,43 +5,39 @@
 ****     agentConf set by doRun
 ****   init g2d and start analysis
 
+
+
+(seq
+(loadg2dlib g2d ../../Lib/imaude/jlib/jl-util.lsp)
+(loadg2dlib g2d stats-funs.lsp)
+**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400 GenericApprox .25 .25)
+**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400  BlackboxApprox .75 30)
+(initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400  QAApprox .25 .35 .05 20 1000 .45)
+**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys2w Patrol 400 GenericApprox .25 .25)
+)
+
 ****************************************************************
-op initAgentEsetStats : ESet Qid Qid Qid  Qid Qid Qid Qid -> ESet .
-ceq initAgentEsetStats(es,maudename,g2dname,g2dvname,
-                     amodname,initname,sname,randinc) =
-     addEntry( addEntry( addEntry(
-      addEntry( addEntry( addEntry(
-       addEntry(  addEntry( 
+op initAgentEsetStats : ESet Qid Qid Qid  -> ESet .
+eq augAgentEsetStats(es,amodname statsname,randinc) =
+       addEntry(  addEntry(  
         addEntry(es, 
-                'qval, 'maudeName, ql(maudename)), 
-                'qval, 'g2dName, ql(g2dname)), 
-                'qval, 'g2dVName, ql(g2dvname)),
-                'qval, 'agentModName, ql(amodname)),
- 							  'sval, 'globalCounter,sv("0")),
-                'qval, 'statsName, ql(sname)),
+                'qval, 'statsName, ql(statsname)),
 								'tval, 'randIx, tm(amodname, '0.Zero)),
-								'tval, 'randInc, 
-								       tm(amodname, qid2NatT(randinc))),
-                'tval, 'initConf, tm(amodname,aconfT))   ---- ASystem
- if res?? := metaReduce([amodname],mkConst(initname,'ASystem))
- /\ aconfT := (if res?? :: ResultPair 
-               then getTerm(res??)
-							 else '`{_`}['none.Conf] fi) 
-.
+								'tval, 'randInc, tm(amodname, qid2NatT(randinc))) .
 
-eq isReq('initAgentEsetStats) = true .
+
+eq isReq('augAgentEsetStats) = true .
 eq enabled(wait4s,
-           req('initAgentEsetStats, 
-					       ql(maudename g2dname g2dvname amodname 
-             	 	  initname sname randinc statsOp toks),reqQ)) = true .
+           req('augAgentEsetStats, 
+					       ql(statsname randinc statsOp toks),reqQ)) = true .
 
 
-**** also initializes g2d actor
-crl[initAgentEsetStats]:
+
+**** this starts the stats rounds going!
+crl[augAgentEsetStats]:
    [nil, 
-    st(processing(req('initAgentEsetStats, 
-                      ql(mname g2dname g2dvname amodname  
-											initname sname randinc statsOp toks),
+    st(processing(req('augAgentEsetStats, 
+                      ql(statsname randinc statsOp toks),
                        reqQ')),
        wait4s,reqQ,es,log),
      outQ]
@@ -49,17 +45,18 @@ crl[initAgentEsetStats]:
    [nil, 
     st(ready, 
        (wait4s !
-  			 wait4(sname,nil, req('graphreq,ql(g2dvname),nil)) !
-         wait4(g2dvname,sname,
-               req('logreq,ql('initStats g2dvname sname),reqQ'))), 
+  			 wait4(statsname,nil, req('graphreq,ql(g2dvname),nil)) !
+         wait4(g2dvname,statsname,
+               req('logreq,ql('initStats g2dvname statsname),reqQ'))), 
   		reqQ,
 			es',
     	log), 
   		outQ  g2dvname '\n mname '\n toks' maudePrompt ]
- if es' := initAgentEsetStats(es,mname,g2dname,g2dvname, amodname, 
-                                 initname,sname,randinc)
- /\ str := mkInitStatsExp([amodname],mname,g2dvname, sname, statsOp,toks)
-**** /\ ?string := withAck(str, mname,g2dvname) 
+ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) .
+ /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+ /\ ql(mname) := getVal(es,'qval, 'maudeName, ql('g2d)) 
+ /\ es' := augAgentEsetStats(es, amodname, statsname randinc)
+ /\ str := mkInitStatsExp([amodname],mname,g2dvname, statsname, statsOp,toks)
  /\ toks' := str2toks(str) .
 
 
