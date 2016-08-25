@@ -36,6 +36,9 @@
 (doSimRound plambda 1)
 (show val qval simStatus)
 
+**** initialize stats runs
+(augAgentEsetStats Patrol 400 GenericApprox .25 .25)
+
 *** what is going on
 (show control)
 (show requests)
