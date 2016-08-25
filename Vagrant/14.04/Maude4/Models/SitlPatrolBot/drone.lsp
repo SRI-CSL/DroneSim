@@ -24,6 +24,9 @@
   (apply send sender (getattr myself "name") (concat "OK " val "\n"))
   )
 
+(define console ()
+  (setattr plambda.actors.pyactor.Main "launchConsole" (boolean True))
+  )
 
 (define resetSitl (idlist)
   (for id idlist (apply resetSiltAux  id))
