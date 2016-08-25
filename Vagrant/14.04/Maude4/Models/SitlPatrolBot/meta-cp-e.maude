@@ -56,18 +56,22 @@ var ee? : Entry? .
 vars log log'  : Log .
 vars es0 es es' es'' es1 : ESet .
 
-vars InQ OutQ outQ toks toks' rids args : QidList .
+vars InQ OutQ outQ toks toks' rids args ql : QidList .
 vars q modname initname aname amodname mname g2dname g2dvname pyname sname
       maudename id reqid  gname scaleq dsizeq 
 			act dir x y z dx dy dz v e idchar amt  status
-			rid sysOp nq : Qid .
+			rid sysOp nq statsname statsOp randinc
+      epsilon delta threshold rounds alpha pval minrounds maxrounds rate 
+      : Qid .
 vars mod agentMod amod module : Module .
-vars ?string str idstr argstr 
+vars ?string str idstr argstr createSOExp
       dsize scale gx gy gz maxC chargeU costMv edgeX sx sy sz  : String .
-vars t t' t0 idT idterm sxT syT szT vT xT yT zT dxT dyT dzT gxT gyT gzT eT nT actT oneT
+vars t t' t0 idT idterm sxT syT szT vT xT yT zT dxT dyT dzT 
+     gxT gyT gzT eT nT actT oneT
       timeT timeT1 mteT nztT nztT1 actsT actsT1 ekbT ekbT' delayT durT
       aconfT aconfT0 aconfT1 aconfT2 aconfT' confT sconfT edgeXT
-			idLocsT	maxCT chargeUT costMvT : Term .
+			idLocsT	maxCT chargeUT costMvT 
+      bT nT1 idsT : Term .
 var tl idLocTL actTL : TermList .
 vars res? res?? res1? res1?? res0? 
      res0?? res2?? res3?? res4?? res5?? res6?? res7??
@@ -139,6 +143,11 @@ eq term2String(mod,t)
     if res?? := metaReduce(module,t)
     /\ t' := (if res?? :: ResultPair then getTerm(res??) else t fi)  .
 
+
+op qid2NatT :  Qid -> Term .
+ceq qid2NatT(q) =
+ (if hasSort(['MY-META-CNV],t0,'Nat) then t0 else '0.Zero fi)
+ if t0 :=  upTerm(rat(string(q),10)) .
 
 
 **********************************************************************
@@ -221,8 +230,8 @@ crl[initAgentEset]:
 ***********************************************************************
 
 ****************************************************************
-op initAgentEsetStats : ESet Qid Qid Qid  -> ESet .
-eq augAgentEsetStats(es,amodname statsname,randinc) =
+op augAgentEsetStats : ESet Qid Qid Qid  -> ESet .
+eq augAgentEsetStats(es,amodname, statsname,randinc) =
        addEntry(  addEntry(  
         addEntry(es, 
                 'qval, 'statsName, ql(statsname)),
@@ -256,10 +265,10 @@ crl[augAgentEsetStats]:
 			es',
     	log), 
   		outQ  g2dvname '\n mname '\n toks' maudePrompt ]
- if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) .
+ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
  /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
  /\ ql(mname) := getVal(es,'qval, 'maudeName, ql('g2d)) 
- /\ es' := augAgentEsetStats(es, amodname, statsname randinc)
+ /\ es' := augAgentEsetStats(es, amodname, statsname, randinc)
  /\ str := mkInitStatsExp([amodname],mname,g2dvname, statsname, statsOp,toks)
  /\ toks' := str2toks(str) .
 
@@ -1008,6 +1017,158 @@ passtime in actsT
 ***********************************************************************
 ***** begin top level stats round
 ***********************************************************************
+***********************************************************************
+***** (doRun Patrol g2d)
+**** doRun--set agentConf, rewrite til done, update randix, send result
+***********************************************************************
+
+ eq isReq('doRun) = true .
+ eq enabled(wait4s,req('doRun,ql(sname g2dvname toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[doRun]:
+   [nil,
+    st(processing(req('doRun, ql(sname g2dvname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready, wait4s,(reqQ reqQ0), es',log), 
+		outQ  ] 
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'initConf, tm(amodname,'`{_`}['none.Conf]))
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ res?? := metaReduce([amodname], 'upDateRand[aconfT,nT])
+/\ aconfT0 := (if res?? :: ResultPair
+               then getTerm(res??)
+							 else aconfT fi)
+***** reset agentConf and simStatus ql(init)
+/\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
+                    'qval, 'simStatus, ql('init))
+/\ pyname := getPyName(es)
+/\ reqQ0 := req('resetSitl, ql(pyname), 
+             req('doSimRound, ql(pyname '1000),
+              req('runOd,ql(g2dvname sname),
+		           reqQ'))) .
+
+ eq isReq('runOd) = true .
+ eq enabled(wait4s,req('runOd,ql(g2dvname sname toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[runOd]:
+   [nil,
+    st(processing(req('runOd, ql(g2dvname sname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+      (wait4s ! 
+       wait4(g2dvname,sname,
+             req('logreq,ql('runOd g2dvname sname),reqQ'))), 
+       reqQ ,
+       es',
+       log), 
+    		outQ  g2dvname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getObs[aconfT])
+/\ bT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+							 else 'false.Bool fi)
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ tm(amodname, xT) := getVal(es,'tval, 'randInc, tm(amodname,'0.Zero))
+/\ res1?? := metaReduce([amodname], '_+_[nT,xT])
+/\ nT1 := (if res1?? :: ResultPair 
+           then getTerm(res1??) else nT fi)							 
+/\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ str := mkRunReplyExp(sname, bT)
+/\ toks' := str2toks(str) .
+
+op runReplyTemplate : -> String .
+eq runReplyTemplate = "(apply runResult %sname (double %obs))" .
+
+op mkRunReplyExp : Qid Term -> String .
+eq mkRunReplyExp(sname, bT) =
+  fillTemplate(runReplyTemplate, 
+	            (("%sname" :~ sqquote(sname)), 
+               ("%obs" :~ (if bT == 'true.Bool then "1" else "0" fi)) ))
+			  .
+
+
+********************************************************************************
+***** reseting SITL
+********************************************************************************
+
+op idsT2idsQ : Qid Term -> QidList .
+op idTL2idsQ : Qid TermList -> QidList .
+eq idsT2idsQ(amodname,'__[tl]) = idTL2idsQ(amodname,tl) .
+eq idsT2idsQ(amodname,t) = 
+     if (hasSort([amodname],t,'Id)) then idT2id(t) else nil fi .
+eq idsT2idsQ(amodname,'none.IdSet) = nil .
+eq idTL2idsQ(amodname,empty) = nil .
+eq idTL2idsQ(amodname,(t,tl)) = idT2id(t) idTL2idsQ(amodname,tl) .
+
+op qids2lstr : QidList String -> String .
+eq qids2lstr(nil,str) = str .
+eq qids2lstr(q ql,str) = qids2lstr(ql,str + " " + sqquote(q)) . 
+
+ eq isReq('resetSitl) = true .
+ eq enabled(wait4s,req('resetSitl,ql(pyname toks),reqQ)) = 
+    not(waiting4(wait4s,pyname)) .
+
+crl[resetSitl]:
+   [nil,
+    st(processing(req('resetSitl, ql(pyname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+      (wait4s ! 
+       wait4(pyname,nil,
+             req('logreq,ql('resetSitl pyname),reqQ'))), 
+       reqQ ,
+       es,
+       log), 
+    		outQ  pyname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getIds[aconfT])
+/\ idsT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+							 else 'none.IdSet fi)
+
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ str := mkResetSitlExp(amodname,pyname,mname,idsT)
+/\ toks' := str2toks(str) .
+               
+               
+
+op resetSitlTemplate : -> String .
+eq resetSitlTemplate  =
+"(seq \
+  (apply resetSitl (mklist %idlist))\
+  (apply send %mname %pyname \"OK\")\
+)"
+.
+
+op listTemplate : -> String .
+eq listTemplate = "(mklist %elts)" .
+
+op mkResetSitlExp : Qid Qid Qid Term -> String .
+ceq mkResetSitlExp(amodname,pyname,mname,idsT) =
+  fillTemplate(resetSitlTemplate,bindings)
+if  bindings := 
+   (("%pyname" :~ sqquote(pyname)),
+	  ("%mname" :~ sqquote(mname)),
+	  ("%idlist" :~ qids2lstr(idsT2idsQ(amodname,idsT),"")) ) .
+
+
 ***********************************************************************
 ***** end top level stats round
 ***********************************************************************

@@ -163,7 +163,7 @@ ceq sitlAct(id,kb)  =
 	
 ***** set in SCENARIO  
   op windThresh : -> Nat .
-  
+
   op windEffect : Loc Nat -> Loc .
   eq windEffect(loc, j) = 
   	  (if  random(j) < windThresh

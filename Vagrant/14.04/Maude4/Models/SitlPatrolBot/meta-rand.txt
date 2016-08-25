@@ -191,8 +191,9 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
 /\ aconfT0 := (if res?? :: ResultPair
                then getTerm(res??)
 							 else aconfT fi)
-/\ es' := addEntry(es,'tval,'agentConf,tm(amodname,aconfT0))
-***** reset simStatus ql(init)
+***** reset agentConf and simStatus ql(init)
+/\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0))
+                    'qval 'simStatus ql('init))
 /\ pyname := getPyName(es)
 /\ reqQ0 := req('resetSitl(pyname), 
              req('doSimRound, ql(pyname '1000),
@@ -233,7 +234,6 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
 /\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
 /\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
 /\ str := mkRunReplyExp(sname, bT)
-*** /\ ?string := withAck(str, mname,g2dvname) 
 /\ toks' := str2toks(str) .
 
 op runReplyTemplate : -> String .
@@ -259,6 +259,10 @@ eq idsT2idsQ(amodname,t) =
 eq idsT2idsQ(amodname,'none.IdSet) = nil .
 eq idTL2idsQ(amodname,empty) = nil .
 eq idTL2idsQ(amodname,(t,tl)) = idT2id(t) idTL2idsQ(amodname,tl) .
+
+op qids2lstr : QidList String -> String .
+eq qids2lstr(nil,str) = str .
+eq qids2lstr(q ql,str) = qids2lstr(ql,str + " " + sqquote(q)) . 
 
  eq isReq('resetSitl) = true .
  eq enabled(wait4s,req('resetSitl,ql(pyname toks),reqQ)) = 
@@ -314,6 +318,3 @@ if  ids := idsT2idsQ(amodname,idsT)
 	  ("%idlist" :~ qids2lstr(ids,"")) ) .
 
 
-op qids2lstr : QidList String -> String .
-eq qids2lstr(nil,str) = str .
-eq qids2lstr(q ql,str) = qids2lstr(ql,str + " " + sqquote(q)) . 
