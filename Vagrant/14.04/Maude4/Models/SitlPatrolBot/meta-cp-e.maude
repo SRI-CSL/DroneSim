@@ -232,8 +232,10 @@ crl[initAgentEset]:
 ****************************************************************
 op augAgentEsetStats : ESet Qid Qid Qid  -> ESet .
 eq augAgentEsetStats(es,amodname, statsname,randinc) =
-       addEntry(  addEntry(  
+       addEntry(  addEntry(   addEntry(  
         addEntry(es, 
+                'tval, 'initConf,
+                   getVal(es,'tval,'agentConf, tm(amodname,'none.ASystem))),
                 'qval, 'statsName, ql(statsname)),
 								'tval, 'randIx, tm(amodname, '0.Zero)),
 								'tval, 'randInc, tm(amodname, qid2NatT(randinc))) .
