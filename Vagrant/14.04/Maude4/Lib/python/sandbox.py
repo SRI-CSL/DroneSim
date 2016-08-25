@@ -4,7 +4,9 @@ from subprocess import Popen, PIPE, STDOUT
 
 from threading import Thread
 
-import sys, psutil
+import os, sys, psutil, signal
+
+debug = False
 
 def infanticide(pid):
     try:

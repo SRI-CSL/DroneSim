@@ -27,7 +27,7 @@
 
 (define resetSitl (idlist)
   (for id idlist (apply resetSiltAux  id))
-  True
+  (boolean True)
   )
 
 (import "sys")
