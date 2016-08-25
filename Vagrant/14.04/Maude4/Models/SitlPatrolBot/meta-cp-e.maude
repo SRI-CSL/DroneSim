@@ -208,7 +208,7 @@ crl[initAgentEset]:
        wait4s, 
 	****	(wait4s !  wait4(g2dvname,gname,
   ****               req('logreq,ql('initGrid g2dvname gname),reqQ')) ), 
-  		reqQ,
+  		reqQ',
 			es',
     	log), 
   		outQ  ]   ****  g2dvname '\n mname '\n toks' maudePrompt
@@ -245,7 +245,6 @@ eq isReq('augAgentEsetStats) = true .
 eq enabled(wait4s,
            req('augAgentEsetStats, 
 					       ql(statsname randinc statsOp toks),reqQ)) = true .
-
 
 
 **** this starts the stats rounds going!
