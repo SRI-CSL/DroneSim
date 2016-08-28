@@ -49,7 +49,7 @@ class SimpleDrone(object):
 
     """
 
-    def __init__(self, name, instance_no=0, debug=True, speedup=3):
+    def __init__(self, name, instance_no=0, debug=False, speedup=3):
         """Creates a drone with given name and default state.
         """
         self.name = name
@@ -93,13 +93,17 @@ class SimpleDrone(object):
                  '--home=-7.162675,-34.817705,36,250' ]
 
     def mavproxy_args(self):
-        return [ 'mavproxy.py',
-                 '--master',
-                 'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
-                 '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
-                 '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
-                 '--aircraft',
-                 '/tmp/drone_{0}'.format(self.ino) ]
+        mpargs = [ 'mavproxy.py',
+                   '--master',
+                   'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
+                   '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
+                   '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
+                   '--aircraft',
+                   '/tmp/drone_{0}'.format(self.ino) ]
+        if self.debug:
+            mpargs.extend(['--map', '--console'])
+        return mpargs
+    
 
 
     
