@@ -203,9 +203,10 @@ class SimpleDrone(object):
             dy = auxVel[1]
             dz = auxVel[2]
             vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
-            dx = dx / vel
-            dy = dy / vel
-            dz = dz / vel
+            if vel != 0:
+                dx = dx / vel
+                dy = dy / vel
+                dz = dz / vel
             return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
