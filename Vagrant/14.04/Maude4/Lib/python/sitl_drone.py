@@ -93,17 +93,6 @@ class SimpleDrone(object):
                  '--home=-7.162675,-34.817705,36,250' ]
 
     def mavproxy_args(self):
-<<<<<<< HEAD
-        return [ 'mavproxy.py',
-                 '--master',
-                 'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
-                 '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
-                 '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
-                 '--aircraft',
-                 '--map',
-                 '--console',
-                 '/tmp/drone_{0}'.format(self.ino) ]
-=======
         mpargs = [ 'mavproxy.py',
                    '--master',
                    'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
@@ -115,9 +104,6 @@ class SimpleDrone(object):
             mpargs.extend(['--map', '--console'])
         return mpargs
     
->>>>>>> f241dca5a6222748737da473b9664f69228839f1
-
-
     
     def spawn(self):
         dkargs = self.drokekit_args()
