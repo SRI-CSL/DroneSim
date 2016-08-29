@@ -6,7 +6,7 @@ fmod MODEL-TASKS is
   vars id : Id .
 	var cl : Class .
 	vars  t t0 t1 t2 t3 t4 t5 : Time .
-  vars l loc loc0 home locR homeXY : Loc .
+  vars l loc loc0 home locR loc1 loc2 : Loc .
   vars senl0 senl1 senlR senlD : SenLoc .
   vars gl0 gl1 : GridLoc .
   vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 : KB .
@@ -14,7 +14,7 @@ fmod MODEL-TASKS is
   var dir dir1 : Dir .
   var act act0 act1  : Action .
 	vars acts acts0 pact : ActSet .
-	var e v c x y z sx sy sz sx0 sy0 sz0 : FiniteFloat .
+	var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 : FiniteFloat .
   var alt ix iy iz ix0 iy0 iz0 : Int .
   var r j n : Nat .
   
@@ -86,9 +86,73 @@ op goTo : Id Loc -> Action .
 sort ActionKB .
 op `{_`,_`} : Action KB -> ActionKB .
 
-op sitlAct : Id KB -> ActionKB .
 
-ceq sitlAct(id,kb)  =
+op sitlAct : Id KB -> ActionKB .
+op sitlActSimple : Id KB -> ActionKB .
+op sitlActIncremental : Id KB -> ActionKB .
+
+*** Simple strategy is to simply to issue goto 
+*** instructions to the drone and only reason
+*** about whether it is good to go. 
+*** The wind effect moves the drone to some direction 
+*** from the intended position
+
+eq sitlAct(id,kb) = sitlActSimple(id,kb) .
+
+ceq sitlActSimple(id,kb)  =
+  (if pact == none   ***** haven't started
+   then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
+   else (if (e < stopSimulation)
+     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+       else (if pact == land(id)
+          then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+          else (if notDone(pact,loc) and e > c
+            then (if locR =/= loc --- Wind in the middle of performing an action
+                  then {mkMvAct(id,loc,locR,v), 
+                    addK((rand(id,s s r) @ s t) 
+                      --- Add interference on the target location
+                    (pending(id,goTo(id,addLoc(getLoc(pact),locR,loc))) @ s t) 
+                    (targets(id,getLoc(pact) ; locs, locs1) @ s t),kb)}
+                   else {continue(id), kb} fi)
+              else (if pact == goTo(id,home)
+                then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+                 else (if e < c 
+                   then {mkMvAct(id,loc,home,v), 
+                         addK(pending(id,goTo(id,home)) @ s t,kb)}
+                    else (if locs == nil    **** done, go home
+                      then {mkMvAct(id,loc,first(locs1),v),
+                            addK((pending(id,goTo(id,first(locs1))) @ s t)
+                             (targets(id,rest(locs1), first(locs1)) @ s t),kb)}
+                       else (if  locR =/= loc  **** there is wind
+                        then {mkMvAct(id,loc,locR,v), 
+                              addK((rand(id,s s r) @ s t) 
+                              (pending(id,goTo(id,locR)) @ s t),kb)}
+                          else {mkMvAct(id,loc,first(locs),v), 
+                               addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
+                               (rand(id,s s r) @ s t)
+                               (pending(id,goTo(id,first(locs))) @ s t),kb)}
+                    fi ) fi) fi) fi) fi)  fi) fi) fi)        
+  if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
+        myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
+      (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
+      (rand(id,r) @ t5) kb0 ) := kb
+   /\ pact := getPending(id,kb0)  
+   /\ locR := windEffect(loc,r)
+.
+
+op addLoc : Loc Loc Loc -> Loc .
+op addLoc$ : SenLoc SenLoc SenLoc -> Loc .
+eq addLoc(loc0,loc1,loc2) = addLoc$(getSenLoc(loc0),getSenLoc(loc1),getSenLoc(loc2)) .
+ceq addLoc$(senLoc(sx1,sy1,sz1),senLoc(sx2,sy2,sz2),senLoc(sx3,sy3,sz3)) = {senl0,msen2grid(senl0)}
+ if senl0 := senLoc(sx1 + sx2 - sx3,sy1 + sy2 - sy3, sz1 + sz2 - sz3) .
+
+
+*** The Incremental strategy is an approximation of what a more realistic
+*** drone would do trying to fly towards the target location.
+*** Winds do not modify the final destination, but rather force the drone
+*** to move at some direction before heading to the target location
+
+ceq sitlActIncremental(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
    else (if (e < stopSimulation)
@@ -127,6 +191,8 @@ ceq sitlAct(id,kb)  =
    /\ pact := getPending(id,kb0)  
    /\ locR := windEffect(loc,r)
 .
+
+
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
