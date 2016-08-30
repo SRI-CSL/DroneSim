@@ -1,3 +1,8 @@
+**** use doSimRound to step n units
+(show val tval agentConf)
+(doSimRound plambda 1)
+(show val qval simStatus)
+
 **** turn on IOP/plambda VERBOSITY
 (user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
 (user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
@@ -33,11 +38,6 @@
 (doActs )
 (show val tval agentConf)
 **** doTask again ...
-
-**** use doSimRound to step n units
-(show val tval agentConf)
-(doSimRound plambda 1)
-(show val qval simStatus)
 
 **** initialize stats runs
 (augAgentEsetStats Patrol 400 GenericApprox .25 .25)

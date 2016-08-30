@@ -54,8 +54,8 @@ eq mkBekb(n,sx,sy,sz,v,e) =
 op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> KB .
 eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) = 
     mkBekb(n,sx,sy,sz,v,e) myAlt(b(n),a) (caution(b(n),c) @ 0)
-    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(0),locs,nil) @ 0) (rand(b(0),0) @ 0)
-    clock(0) .
+    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(0),locs,nil) @ 0) 
+    (rand(b(0),0) @ 0)(visited(b(0),nil) @ 0) clock(0) .
  
 op mkB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> Agent .
 eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
@@ -67,7 +67,7 @@ eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)  ] .
 
 ops locs1 : -> LocList .
 eq locs1 = mkLoc(50.0,-50.0,5.0) ; mkLoc(50.0,50.0,5.0)
-           ; mkLoc(50.0,-50.0,5.0) ; mkLoc(-50.0,-50.0,5.0) .
+           ; mkLoc(-50.0,50.0,5.0) ; mkLoc(-50.0,-50.0,5.0) .
 
 --- energy parameter is not yet useful
 ops conf1 conf2 conf3 conf4 : -> Conf .
@@ -112,7 +112,8 @@ eq upDateRandKB((rand(id,n') @ t) lkb,n) = (rand(id,n' + n) @ t) lkb .
 eq upDateRandKB(lkb,n) = lkb [owise] .
 
 ****
-eq windThresh = rand.25 .
+--- eq windThresh = rand.25 .
+eq windThresh = 0 .
 eq stopSimulation = 5.0 .
 
 **** true if landed at home 
@@ -123,8 +124,12 @@ op getObsKB : KB KB -> Bool .
 eq getObs({[ b(0) : Bot | lkb : lkb, attrs] [eid | ekb ] aconf }) =
    getObsKB(lkb,ekb)  .
 eq getObsKB(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home) , 
-            ( atloc(b(0),loc) @ t0) ekb) = distance(home,loc) < 4 .
+            ( atloc(b(0),loc) @ t0) ekb) = distance(home,loc) < 6 .
 eq getObs({ aconf }) = false [owise] .
+
+op getObsVisited : ASystem -> Nat .
+eq getObsVisited({[ b(0) : Bot | lkb : ((visited(b(0),locs) @ t0) lkb), attrs] [eid | ekb ] aconf }) 
+ = len(locs).
 
 endm
 
