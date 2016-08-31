@@ -111,16 +111,16 @@ ceq sitlActSimple(id,kb)  =
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
    else (if (e < stopSimulation) --- Force to land whenever the energy is too low
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-       else (if pact == land(id) --- if landing, then stop
-          then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-          else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
-            then (if locR =/= loc --- Wind in the middle of performing an action
-                  then {mkMvAct(id,loc,locR,v), 
+       else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
+         then (if locR =/= loc --- Wind in the middle of performing an action
+               then {mkMvAct(id,loc,locR,v), 
                     addK((rand(id,s s r) @ s t) 
                       --- Add interference on the target location
                     (pending(id,goTo(id,addLoc(getLoc(pact),locR,loc))) @ s t) 
                     (targets(id,getLoc(pact) ; locs, locs1) @ s t),kb)}
                    else {continue(id), kb} fi)
+           else (if pact == land(id) --- if landing, then stop
+            then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
               else (if pact == goTo(id,home)
                 then {land(id), addK(pending(id,land(id)) @ s t,kb)}
                  else (if e < c 
