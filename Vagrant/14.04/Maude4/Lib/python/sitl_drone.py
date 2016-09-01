@@ -99,8 +99,8 @@ class SimpleDrone(object):
                    '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
                    '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
                    '--aircraft',
-                   '--console',
                    '--map',           
+                   '--console',
                    '/tmp/drone_{0}'.format(self.ino) ]
         if self.debug:
             mpargs.extend(['--map', '--console'])
