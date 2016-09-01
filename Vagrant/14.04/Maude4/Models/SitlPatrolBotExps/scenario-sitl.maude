@@ -36,7 +36,7 @@ eq chargeUnit = 5.0 .
 eq maxCharge = 20.0 .
 
 eq botDelay = 1 .
-eq costMv(v) = 1.0 . --- consumes x percent battery per meter
+eq costMv(v) = 0.06 . --- consumes x percent battery per meter
 
 ***(
 Performed one experiment with dronekit copter at velocity 5m/s
