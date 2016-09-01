@@ -154,7 +154,11 @@ fmod MODEL-KNOWLEDGE is
   op distanceFF : Loc Loc -> FiniteFloat .
   eq distanceFF({senl0,pt(x0,y0,z0)},{senl1,pt(x1,y1,z1)}) = 
     float((abs(x0 - x1))) * gridStepX + float(abs(y0 - y1)) * gridStepY + float(abs(z0 - z1)) * gridStepZ .
-  
+
+  eq distance({senl0,pt(x0,y0,z0)},{senl1,pt(x1,y1,z1)}) = 
+    abs(x0 - x1) + abs(y0 - y1) + abs(z0 - z1) .
+
+
   --- location occupied if there is a bot at the location
   op occupied : Loc KB -> Bool .
   op occupied : GridLoc KB -> Bool .
