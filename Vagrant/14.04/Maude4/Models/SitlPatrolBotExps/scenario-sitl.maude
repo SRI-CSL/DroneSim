@@ -1,5 +1,5 @@
 mod SCENARIO is
-  inc MODEL-ACTIONS .
+  inc MODEL-TASKS .
   inc SOFT-AGENT-RULES .
   --- inc SOLVE-SCP{valuation2valpatrolonly} . 
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
@@ -36,7 +36,24 @@ eq chargeUnit = 5.0 .
 eq maxCharge = 20.0 .
 
 eq botDelay = 1 .
-eq costMv = 1.0 .
+eq costMv(v) = 0.06 . --- consumes x percent battery per meter
+
+***(
+Performed one experiment with dronekit copter at velocity 5m/s
+and altitude 5m
+
+Takeoff : 100% -> 97%
+70m  : 96% -> 91%
+100m : 91% -> 85%
+100m : 84% -> 78%
+100m : 77% -> 71%
+100m : 70% -> 65%
+70m : 64% -> 59%
+Landing/Disarm : 58% -> 55%
+
+
+
+)
 
 op b : Nat -> Id .
 op st : Nat -> Id .

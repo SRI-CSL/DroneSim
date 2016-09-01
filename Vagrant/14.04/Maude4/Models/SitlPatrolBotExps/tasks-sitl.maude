@@ -1,7 +1,7 @@
 fmod MODEL-TASKS is
   inc MODEL-KNOWLEDGE .
 	inc RANDOM .
-  
+  inc SOLVE-SCP{valuation2valpatrolenergy} . 
 
   vars id : Id .
 	var cl : Class .
@@ -9,13 +9,13 @@ fmod MODEL-TASKS is
   vars l loc loc0 home locR loc1 loc2 : Loc .
   vars senl0 senl1 senlR senlD : SenLoc .
   vars gl0 gl1 : GridLoc .
-  vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 : KB .
+  vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 : KB .
   vars evs evs' ievs devs : EventSet . 
   var dir dir1 : Dir .
   var act act0 act1  : Action .
 	vars acts acts0 pact : ActSet .
 	var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 : FiniteFloat .
-  var alt ix iy iz ix0 iy0 iz0 : Int .
+  vars alt ix iy iz ix0 iy0 iz0 : Int .
   var r j n : Nat .
   
   vars locs locs0 locs1 locs2 locs3 : LocList .
@@ -48,48 +48,6 @@ fmod MODEL-TASKS is
    /\ {act,lkb3} := sitlAct(id,lkb2) 
  .
 
-
-sort LocList .
-subsort Loc < LocList .
-op nil : -> LocList [ctor] .
-op _;_ : LocList LocList -> LocList [ctor assoc id: nil] .
-
-op first : LocList ~> Loc .
-op rest : LocList ~> LocList .
-eq first(loc ; locs) = loc .
-eq rest(loc ; locs) = locs .
-op len : LocList -> Nat .
-eq len(nil) = 0 .
-eq len(loc ; locs) = s (len(locs)) .
-
-op pending : Id Action -> Info .
-eq hasId(id,pending(id,act) @ t) = true .
-eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
-
-op getLoc : Action -> Loc .
-eq getLoc(goTo(id,loc)) = loc .
-eq getLoc(act) = nil [owise] .
-
-op targets : Id LocList LocList -> Info .
-eq hasId(id,targets(id,locs,locs1) @ t) = true .
-eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
-
-op visited : Id LocList -> Info .
-eq hasId(id,visited(id,locs) @ t) = true .
-eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
-
-op myHome : Id Loc -> PKItem .
-eq hasId(id,myHome(id,loc)) = true .
-
-op myAlt : Id Int -> PKItem .
-eq hasId(id,myAlt(id,alt)) = true .
-
-op continue : Id -> Action .
-op takeOff : Id Int -> Action .
-op land : Id -> Action .
-op stop : Id -> Action .
-op goTo : Id Loc -> Action .
-
 sort ActionKB .
 op `{_`,_`} : Action KB -> ActionKB .
 
@@ -97,6 +55,7 @@ op `{_`,_`} : Action KB -> ActionKB .
 op sitlAct : Id KB -> ActionKB .
 op sitlActSimple : Id KB -> ActionKB .
 op sitlActIncremental : Id KB -> ActionKB .
+op sitlActSCP : Id KB -> ActionKB .
 
 *** Simple strategy is to simply to issue goto 
 *** instructions to the drone and only reason
@@ -160,21 +119,22 @@ ceq addLoc$(senLoc(sx1,sy1,sz1),senLoc(sx2,sy2,sz2),senLoc(sx3,sy3,sz3)) = {senl
 *** drone would do trying to fly towards the target location.
 *** Winds do not modify the final destination, but rather force the drone
 *** to move at some direction before heading to the target location
-
 ceq sitlActIncremental(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
    else (if (e < stopSimulation)
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-       else (if pact == land(id)
-          then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-          else (if notDone(pact,loc)
-            then (if locR =/= loc --- Wind in the middle of performing an action
-                  then {mkMvAct(id,loc,locR,v), 
+       else (if notDone(pact,loc)
+         then (if locR =/= loc --- Wind in the middle of performing an action
+               then {mkMvAct(id,loc,locR,v), 
                     addK((rand(id,s s r) @ s t) 
                     (pending(id,goTo(id,locR)) @ s t)
                     (targets(id,getLoc(pact) ; locs, locs1) @ s t),kb)}
-                   else {continue(id), kb} fi)
+                 else {continue(id), kb} fi)
+         else (if pact == land(id)
+          then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+           else (if pact == land(id)
+            then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
               else (if pact == goTo(id,home)
                 then {land(id), addK(pending(id,land(id)) @ s t,kb)}
                  else (if e < c 
@@ -192,7 +152,7 @@ ceq sitlActIncremental(id,kb)  =
                                addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
                                (rand(id,s s r) @ s t)
                                (pending(id,goTo(id,first(locs))) @ s t),kb)}
-                    fi ) fi) fi) fi) fi)  fi) fi) fi)        
+                    fi ) fi) fi) fi) fi)  fi) fi) fi) fi)       
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
         myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
@@ -201,7 +161,16 @@ ceq sitlActIncremental(id,kb)  =
    /\ locR := windEffect(loc,r)
 .
 
-
+ceq sitlActSCP(id,kb) = {act1,kb1}
+ if (class(id,cl)) (pending(id,goTo(id,locR)) @ t)
+    (atloc(id,loc) @ t0) (vel(id,v) @ t1) kb0 := kb
+ /\ act acts := solveSCP(id,kb,myActs(cl,id,kb)) 
+ /\ goTo(id,loc1) := act 
+ /\ act1 := if loc1 == locR then continue(id) 
+            else mkMvAct(id,loc,loc1,v) fi 
+ /\ kb1 := if loc1 == locR then kb 
+           else (pending(id,goTo(id,loc1)) @ t) kb fi
+ . 
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .

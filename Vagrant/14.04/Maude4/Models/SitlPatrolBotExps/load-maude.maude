@@ -6,7 +6,7 @@ load ../../Lib/cp-e-config
 load ../../Lib/cp-e-rules
 load knowledge
 load tasks-sitl
-load actions
+--- load actions
 **** load scp
 load scenario-sitl
 
