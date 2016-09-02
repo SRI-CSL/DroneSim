@@ -5,8 +5,8 @@ load ../../Lib/soft-agents
 load ../../Lib/cp-e-config
 load ../../Lib/cp-e-rules
 load knowledge
+load scp
 load tasks-sitl
 --- load actions
-**** load scp
 load scenario-sitl
 
