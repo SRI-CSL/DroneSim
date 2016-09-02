@@ -71,8 +71,8 @@ ceq sitlActSimple(id,kb)  =
    else (if (e < stopSimulation) --- Force to land whenever the energy is too low
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
        else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
-         then (if locR =/= loc --- Wind in the middle of performing an action
-               then {mkMvAct(id,loc,locR,v), 
+         then (if locR =/= loc and getLoc(pact) =/= nil --- Wind in the middle of performing an action and in goTo mode.
+               then {mkMvAct(id,loc,addLoc(getLoc(pact),locR,loc),v), 
                     addK((rand(id,s s r) @ s t) 
                       --- Add interference on the target location
                     (pending(id,goTo(id,addLoc(getLoc(pact),locR,loc))) @ s t) 
@@ -90,18 +90,14 @@ ceq sitlActSimple(id,kb)  =
                             addK((pending(id,goTo(id,first(locs1))) @ s t)
                              (targets(id,rest(locs1), first(locs1)) @ s t)
                              (visited(id,locs2 ; getLoc(pact)) @ s t),kb)}
-                       else (if  locR =/= loc  **** there is wind
-                        then {mkMvAct(id,loc,locR,v), 
-                              addK((rand(id,s s r) @ s t) 
-                              (pending(id,goTo(id,locR)) @ s t),kb)}
-                          else {mkMvAct(id,loc,first(locs),v), 
+                       else {mkMvAct(id,loc,first(locs),v), 
                                addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
                                (rand(id,s s r) @ s t)
                                (pending(id,goTo(id,first(locs))) @ s t)
                                (visited(id,locs2 ; getLoc(pact)) @ s t),kb)}
-                    fi ) fi) fi) fi) fi)  fi) fi) fi)        
+                    fi ) fi) fi) fi) fi)  fi) fi)        
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
-        myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
+        myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
       (rand(id,r) @ t5) (visited(id,locs2) @ t6) kb0 ) := kb
    /\ pact := getPending(id,kb0)  
@@ -154,7 +150,7 @@ ceq sitlActIncremental(id,kb)  =
                                (pending(id,goTo(id,first(locs))) @ s t),kb)}
                     fi ) fi) fi) fi) fi)  fi) fi) fi) fi)       
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
-        myAlt(id,alt) myHome(id,home) (vel(id,v) @ t2) 
+        myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
       (rand(id,r) @ t5) kb0 ) := kb
    /\ pact := getPending(id,kb0)  
@@ -163,7 +159,7 @@ ceq sitlActIncremental(id,kb)  =
 
 ceq sitlActSCP(id,kb) = {act1,kb1}
  if (class(id,cl)) (pending(id,goTo(id,locR)) @ t)
-    (atloc(id,loc) @ t0) (vel(id,v) @ t1) kb0 := kb
+    (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) kb0 := kb
  /\ act acts := solveSCP(id,kb,myActs(cl,id,kb)) 
  /\ goTo(id,loc1) := act 
  /\ act1 := if loc1 == locR then continue(id) 

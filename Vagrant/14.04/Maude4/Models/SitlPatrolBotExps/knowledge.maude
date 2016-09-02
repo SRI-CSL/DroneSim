@@ -137,12 +137,17 @@ fmod MODEL-KNOWLEDGE is
 
   op rand : Id Nat -> Info .
 
+  **** This is the target velocity is the absolute velocity
+  op targetVel : Id FiniteFloat -> Info .  
+  eq hasId(id,targetVel(id,ff) @ t) = true .
+
+  op getVel : Id KB -> FiniteFloat .
+  eq getVel(id, (targetVel(id,v) @ t) lkb ) = v .
+  eq getVel(id,lkb) = 0.0 [owise] .
+
   op vel : Id FiniteFloat -> Info .  **** myVel is the absolute velocity
   eq hasId(id,vel(id,ff) @ t) = true .
 
-  op getVel : Id KB -> FiniteFloat .
-  eq getVel(id, (vel(id,v) @ t) lkb ) = v .
-  eq getVel(id,lkb) = 0.0 [owise] .
 
 ******** bot  actions
   op continue : Id -> Action .
@@ -222,6 +227,7 @@ fmod MODEL-KNOWLEDGE is
   eq (energy(id,e0) @ t0) << (energy(id,e1) @ t1) =  t0 < t1 .
   eq (caution(id,e0) @ t0) << (caution(id,e1) @ t1) =  t0 < t1 .
   eq vel(id,ff0) @ t0 << vel(id,ff1) @ t1 = t0 < t1 .
+  eq targetVel(id,ff0) @ t0 << targetVel(id,ff1) @ t1 = t0 < t1 .
   eq rand(id,r1:Nat) @ t0 << rand(id,r2:Nat) @ t1 = t0 < t1 .
   eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
   eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
