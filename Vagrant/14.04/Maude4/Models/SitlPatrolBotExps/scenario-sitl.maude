@@ -129,8 +129,8 @@ eq upDateRandKB((rand(id,n') @ t) lkb,n) = (rand(id,n' + n) @ t) lkb .
 eq upDateRandKB(lkb,n) = lkb [owise] .
 
 ****
---- eq windThresh = rand.25 .
-eq windThresh = 0 .
+eq windThresh = rand.25 .
+--- eq windThresh = 0 .
 eq stopSimulation = 5.0 .
 
 **** true if landed at home 

@@ -27,6 +27,7 @@ fmod MODEL-KNOWLEDGE is
   --- eq gridStepZ = floor((senZHigh - senZLow) / float(gridZ)) . 
 
   op comDistance : -> Nat .
+  op periodicity : -> Nat .
 
   op chargeUnit : -> FiniteFloat .
   op maxCharge : -> FiniteFloat .      --- stop charging when full
@@ -107,6 +108,9 @@ fmod MODEL-KNOWLEDGE is
 
   op targets : Id LocList LocList -> Info .
   eq hasId(id,targets(id,locs,locs1) @ t) = true .
+
+  op lastVisit : Id Loc -> Info .
+  eq hasId(id,lastVisit(id,loc) @ t) = true .
 
   op visited : Id LocList -> Info .
   eq hasId(id,visited(id,locs) @ t) = true .
@@ -221,6 +225,7 @@ fmod MODEL-KNOWLEDGE is
   eq rand(id,r1:Nat) @ t0 << rand(id,r2:Nat) @ t1 = t0 < t1 .
   eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
   eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
+  eq lastVisit(id,l0) @ t0 << lastVisit(id,l1) @ t1 = t0 < t1 .
   eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
 
   op atVEdge : Loc -> Bool .
@@ -236,6 +241,11 @@ fmod MODEL-KNOWLEDGE is
    goTos$(cl,id,locs ; locs1) .
   eq goTos$(cl,id,loc ; locs) = goTo(id,loc) goTos$(cl,id,locs) .
   eq goTos$(cl,id,nil) = none .
+
+  op getLastVisits : Class Id KB -> KB .
+  eq getLastVisits(cl,id,(lastVisit(id,loc) @ t) kb)
+   = (lastVisit(id,loc) @ t) getLastVisits(cl,id,kb) .
+  eq getLastVisits(cl,id, kb) = none [owise] .
 
 **** at the same grid as a station and not fully charged 
   op canCharge : Class Id KB -> Bool .
@@ -275,11 +285,12 @@ fmod MODEL-KNOWLEDGE is
    if l0 := getLoc(id,kb)
    /\ v := getVel(id,kb)
    /\ e0 := getEnergy(id,kb) - cost2loc(l0,loc,v) 
-   /\ t := getTime(kb)
+   /\ ff := distanceFF(l0,loc)
    --- Once we are able to link the model's timestamp with SITL's 
-   --- We should be able to estimate the arrival time
-   /\ kb1 := addK(kb, (clock(s t)) (atloc(id,loc) @ s t)
-                      (energy(id,e0) @ s t) ) .
+   --- This is a very rough estimate of arrival time
+   /\ t := getTime(kb) + round(ff / v)
+   /\ kb1 := addK(kb, (clock(t)) (atloc(id,loc) @ t)
+                      (energy(id,e0) @ t) ) .
 
 
   op cost2loc : Loc Loc FiniteFloat -> FiniteFloat .
