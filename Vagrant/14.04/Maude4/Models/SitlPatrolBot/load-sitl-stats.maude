@@ -8,6 +8,7 @@ load knowledge
 load tasks-sitl
 load actions
 **** load scp
+load pretty
 load scenario-sitl
 
 load model-checker 
@@ -37,7 +38,10 @@ eq asys1 = { conf1 } .
  (loadg2dlib g2d  /home/vagrant/imaude/jlib/jl-util.lsp)
  (loadg2dlib g2d stats-funs.lsp)
  (initAgentEset maude g2d g2d plambda SCENARIO asys1 OnePatrolBot) 
- (augAgentEsetStats Patrol 400 GenericApprox .25 .25)
+**** (augAgentEsetStats Patrol 400 GenericApprox .25 .25)
+**** (augAgentEsetStats Patrol 400 GenericApprox .5 .5)
+**** 16sep04 clt
+(augAgentEsetStats Patrol 400 nGenericApprox .5 .5 2)
 )
 
 

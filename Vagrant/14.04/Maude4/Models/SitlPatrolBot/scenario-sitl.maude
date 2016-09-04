@@ -1,6 +1,7 @@
 mod SCENARIO is
   inc MODEL-ACTIONS .
   inc SOFT-AGENT-RULES .
+  inc PRETTY .
   --- inc SOLVE-SCP{valuation2valpatrolonly} . 
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
@@ -141,16 +142,58 @@ eq upDateRandKB(lkb,n) = lkb [owise] .
 ****
 eq windThresh = rand.25 .
 
+***(
 **** true if landed at home 
 **** false owise
-
 op getObs : ASystem -> Bool .
-op getObsKB : KB KB -> Bool .
 eq getObs({[ b(0) : Bot | lkb : lkb, attrs] [eid | ekb ] aconf }) =
    getObsKB(lkb,ekb)  .
-eq getObsKB(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home) , 
+op getObsKB : KB KB -> Bool .
+eq getObsKB(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home), 
             ( atloc(b(0),loc) @ t0) ekb) = distance(home,loc) < 4 .
 eq getObs({ aconf }) = false [owise] .
+)
+
+
+sort BoolRes .
+**** bool indicates multi or single
+**** res is string rep of answer 
+op br : Bool String -> BoolRes .
+op getObs : ASystem -> BoolRes .
+
+
+**** pick the first for GenericApprox, the second for nGenericApprox
+**** eq getObs({aconf}) = br(false,getObs1(aconf)) .
+eq getObs({aconf}) = br(true,getObsN(aconf)) .
+
+op getObsHome : KB KB -> String .
+eq getObsHome(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home), 
+            ( atloc(b(0),loc) @ t0) ekb) = 
+     (if (distance(home,loc) < 4)
+      then "(double 1)"
+      else "(double 0)"
+      fi) .
+eq getObsHome(lkb,ekb) = "(double 0)" [owise] .
+
+
+**** for GenericApprox
+op getObs1 : Conf -> String .
+eq getObs1([ id : Bot | lkb : lkb, attrs] [eid | ekb ] aconf ) 
+      =  getObsHome(lkb,ekb) .
+eq getObs1( aconf ) =  "(double 0)" [owise] .
+
+**** for nGenericApprox
+op getObsN : Conf -> String .
+ceq getObsN([ id : Bot | lkb : lkb, attrs] [eid | ekb ] aconf )
+    =  getObsHome(lkb,ekb) + " " + mkdouble(e)   
+ if kb (energy(id,e) @ t) := ekb .
+
+eq getObsN( aconf ) = "(double 0) (double 0)" [owise] .  
+
+op mkdouble : FiniteFloat -> String .
+eq mkdouble(e) = 
+  "(" + "double" + " " + makeString(decFloat(e,2)) + ")"  .
+
 
 endm
 

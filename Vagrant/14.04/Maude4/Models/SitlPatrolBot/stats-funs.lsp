@@ -21,7 +21,8 @@
   (let ((statsObject (fetch handle)))
     (if (isobject statsObject)
 		 (seq
-     	(invoke statsObject "recordRunResult" (apply makeDouble val))
+;;  	(invoke statsObject "recordRunResult" (apply makeDouble val))
+     	(invoke statsObject "recordRunResult" val)
       (invoke java.lang.System.err "println" (concat "runResult: " val))
       (sinvoke "g2d.util.ActorMsg"  "send" "maude" "g2d" "OK")
       (apply doStatsAux handle statsObject (invoke statsObject "done"))

@@ -1,46 +1,3 @@
-fmod PRETTY is
- pr CONVERSION .
- op makeString : DecFloat -> String .
- op makeString2 : String NzNat -> String .
- op sign : Int -> String .
- op zeros : Int -> String .
-
- var S : Int .
- var M : String .
- var E : Int .
- var P : NzNat .
- var N : Nat .
- 
- eq sign(-1) = "-" .
- eq sign(0) = "" .
- eq sign(1) = "" .
-
- eq zeros(- P) = "" .
- eq zeros(0) = "" .
- eq zeros(s N) = "0" + zeros(N) . 
-
- eq makeString(< S, M, P >) = sign(S) + makeString2(M + zeros((P + 1) - length(M)), P) .
- eq makeString(< S, M, E >) = sign(S) + "0." + zeros(- E) + M [owise] .
-
- eq makeString2(M, P) = substr(M, 0, P) + "." + substr(M, P, length(M) - P) .
-endfm
-
-***(
-red makeString(decFloat(0.0025, 3)) .
-red makeString(decFloat(0.25, 3)) .
-red makeString(decFloat(2.5, 3)) .
-red makeString(decFloat(25.0, 3)) .
-red makeString(decFloat(25000000.0, 3)) .
-
-red makeString(decFloat(0.0, 3)) .
-
-red makeString(decFloat(-0.0025, 3)) .
-red makeString(decFloat(-0.25, 3)) .
-red makeString(decFloat(-2.5, 3)) .
-red makeString(decFloat(-25.0, 3)) .
-red makeString(decFloat(-25000000.0, 3)) .
-)
-
 mod META-CP-E-AGENT is
   inc RFE  .   *** rewriter + filemanager
   inc PRETTY .
@@ -293,6 +250,7 @@ if createSOExp := mkSOExp(statsOp,sname,toks)
 
 **** BlackboxApprox
 op mkSOExp : Qid Qid QidList -> String .
+***(
 eq mkSOExp(statsOp,sname, toks) =
   (if (statsOp == 'GenericApprox) 
 	 then mkGenericApproxSOExp(sname,toks)
@@ -302,7 +260,18 @@ eq mkSOExp(statsOp,sname, toks) =
 	       then mkQAApproxSOExp(sname,toks) 
        	 else "(apply mkDefaultStatsObject)"
 	 fi) fi) fi) .
-
+)
+eq mkSOExp(statsOp,sname, toks) =
+  (if (statsOp == 'GenericApprox) 
+	 then mkGenericApproxSOExp(sname,toks)
+	 else (if (statsOp == 'nGenericApprox) 
+      	 then mknGenericApproxSOExp(sname,toks)
+   else (if (statsOp == 'BlackboxApprox)
+	       then mkBlackboxApproxSOExp(sname,toks) 
+	 else (if (statsOp == 'QAApprox)
+	       then mkQAApproxSOExp(sname,toks) 
+       	 else "(apply mkDefaultStatsObject)"
+	 fi) fi) fi) fi) .
 
 op genericApproxTemplate : -> String [ctor] .
 eq genericApproxTemplate =
@@ -318,6 +287,25 @@ eq mkGenericApproxSOExp(sname,epsilon delta toks) =
 eq mkGenericApproxSOExp(sname,toks) =
    fillTemplate(genericApproxTemplate,
              	 (("%sname" :~ sqquote(sname)),
+							  ("%epsilon" :~ ".25"),
+                ("%delta" :~ ".25") )) [owise] .
+
+op ngenericApproxTemplate : -> String [ctor] .
+eq ngenericApproxTemplate =
+"(object (\"g2d.stats.nGenericApprox\" %sname (double %epsilon) (double %delta) (int %n)))" .
+
+op mknGenericApproxSOExp : Qid QidList -> String .
+eq mknGenericApproxSOExp(sname,epsilon delta nq toks) =
+   fillTemplate(ngenericApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							 ("%n" :~ string(nq)),
+							 ("%epsilon" :~ string(epsilon)),
+                ("%delta" :~ string(delta)) )) .
+
+eq mknGenericApproxSOExp(sname,toks) =
+   fillTemplate(ngenericApproxTemplate,
+             	 (("%sname" :~ sqquote(sname)),
+							  ("%n" :~ "1"),
 							  ("%epsilon" :~ ".25"),
                 ("%delta" :~ ".25") )) [owise] .
 
@@ -1089,6 +1077,7 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
 /\ str := mkRunReplyExp(sname, bT)
 /\ toks' := str2toks(str) .
 
+***(
 op runReplyTemplate : -> String .
 eq runReplyTemplate = "(apply runResult %sname (double %obs))" .
 
@@ -1098,6 +1087,24 @@ eq mkRunReplyExp(sname, bT) =
 	            (("%sname" :~ sqquote(sname)), 
                ("%obs" :~ (if bT == 'true.Bool then "1" else "0" fi)) ))
 			  .
+)
+
+op runReplyTemplate : -> String .
+eq runReplyTemplate =
+     "(apply runResult %sname (apply makeDouble  %obs))" .
+
+op runReplyNTemplate : -> String .
+eq runReplyNTemplate = 
+     "(apply runResult %sname (array double %obs))"   .
+
+op mkRunReplyExp : Qid Term -> String .
+**** true -- multi obs fill array template, false single obs
+eq mkRunReplyExp(sname, 'br[bT, t]) =
+  fillTemplate((if bT == 'true.Bool 
+                then runReplyNTemplate
+                else runReplyTemplate fi),
+	            (("%sname" :~ sqquote(sname)), 
+               ("%obs" :~ downTerm(t,"")))  ) .
 
 
 ********************************************************************************
