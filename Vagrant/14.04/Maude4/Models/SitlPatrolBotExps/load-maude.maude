@@ -8,5 +8,6 @@ load knowledge
 load scp
 load tasks-sitl
 --- load actions
+load pretty
 load scenario-sitl
 

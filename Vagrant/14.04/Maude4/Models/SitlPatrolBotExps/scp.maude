@@ -97,7 +97,6 @@ fmod TRIVAL is
 
 endfm
 
-
 **** safety valuation function for energy concern
 **** defines eval
 fmod VAL-ENERGY is

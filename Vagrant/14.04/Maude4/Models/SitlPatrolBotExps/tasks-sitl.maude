@@ -136,19 +136,15 @@ ceq sitlActIncremental(id,kb)  =
                  else (if e < c 
                    then {mkMvAct(id,loc,home,v), 
                          addK(pending(id,goTo(id,home)) @ s t,kb)}
-                    else (if locs == nil    **** done, go home
+                    else (if locs == nil    **** done, repeat the loop
                       then {mkMvAct(id,loc,first(locs1),v),
                             addK((pending(id,goTo(id,first(locs1))) @ s t)
                              (targets(id,rest(locs1), first(locs1)) @ s t),kb)}
-                       else (if  locR =/= loc  **** there is wind
-                        then {mkMvAct(id,loc,locR,v), 
-                              addK((rand(id,s s r) @ s t) 
-                              (pending(id,goTo(id,locR)) @ s t),kb)}
-                          else {mkMvAct(id,loc,first(locs),v), 
-                               addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
+                        else {mkMvAct(id,loc,first(locs),v), 
+                             addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
                                (rand(id,s s r) @ s t)
                                (pending(id,goTo(id,first(locs))) @ s t),kb)}
-                    fi ) fi) fi) fi) fi)  fi) fi) fi) fi)       
+                    fi ) fi) fi) fi) fi)  fi) fi) fi)       
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
         myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
@@ -157,16 +153,36 @@ ceq sitlActIncremental(id,kb)  =
    /\ locR := windEffect(loc,r)
 .
 
-ceq sitlActSCP(id,kb) = {act1,kb1}
- if (class(id,cl)) (pending(id,goTo(id,locR)) @ t)
-    (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) kb0 := kb
+*** Add the visited and last visited facts.
+
+ceq sitlActSCP(id,kb) = (if pact == none  
+                          then {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
+                          else (if (e < stopSimulation)
+                           then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+                           else (if notDone(pact,loc) 
+                                  then (if loc =/= locR *** There is wind! 
+                                        then {mkMvAct(id,loc,locR,v),
+                                             addK((pending(id,goTo(id,locR)) @ t), kb)}
+                                        else {continue(id),kb} 
+                                       fi)
+                                   else (if pact == land(id) 
+                                         then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+                                     else (if loc1 =/= loc2 *** Destination changed
+                                           then {mkMvAct(id,loc,loc2,v),
+                                                addK((pending(id,goTo(id,loc2)) @ t), kb)}
+                                       else (if loc2 == home and loc == home
+                                             then {land(id),addK((pending(id,land(id)) @ t), kb)}
+                                             else {continue(id),kb}
+                                             fi) fi) fi) fi) fi) fi)
+ if (class(id,cl)) (pending(id,goTo(id,loc1)) @ t) myAlt(id,alt)
+    (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
+    (rand(id,r) @ t2) (energy(id,e) @ t1) kb0 := kb
+ /\ pact := getPending(id,kb0)
  /\ act acts := solveSCP(id,kb,myActs(cl,id,kb)) 
- /\ goTo(id,loc1) := act 
- /\ act1 := if loc1 == locR then continue(id) 
-            else mkMvAct(id,loc,loc1,v) fi 
- /\ kb1 := if loc1 == locR then kb 
-           else (pending(id,goTo(id,loc1)) @ t) kb fi
+ /\ goTo(id,loc2) := act 
+ /\ locR := windEffect(loc,r)
  . 
+
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
