@@ -1,7 +1,7 @@
 fmod MODEL-TASKS is
   inc MODEL-KNOWLEDGE .
 	inc RANDOM .
-  inc SOLVE-SCP{valuation2valpatrolenergy} . 
+  inc SOLVE-SCP{valuation2valpicsenergyconservative} . 
 
   vars id : Id .
 	var cl : Class .
@@ -63,7 +63,9 @@ op sitlActSCP : Id KB -> ActionKB .
 *** The wind effect moves the drone to some direction 
 *** from the intended position
 
-eq sitlAct(id,kb) = sitlActSimple(id,kb) .
+--- eq sitlAct(id,kb) = sitlActSimple(id,kb) .
+--- eq sitlAct(id,kb) = sitlActIncremental(id,kb) .
+eq sitlAct(id,kb) = sitlActSCP(id,kb) .
 
 ceq sitlActSimple(id,kb)  =
   (if pact == none   ***** haven't started
@@ -153,6 +155,7 @@ ceq sitlActIncremental(id,kb)  =
    /\ locR := windEffect(loc,r)
 .
 
+
 *** Add the visited and last visited facts.
 
 ceq sitlActSCP(id,kb) = (if pact == none  
@@ -162,28 +165,32 @@ ceq sitlActSCP(id,kb) = (if pact == none
                            else (if notDone(pact,loc) 
                                   then (if loc =/= locR *** There is wind! 
                                         then {mkMvAct(id,loc,locR,v),
-                                             addK((pending(id,goTo(id,locR)) @ t), kb)}
+                                             addK((pending(id,goTo(id,locR)) @ s t), kb)}
                                         else {continue(id),kb} 
                                        fi)
                                    else (if pact == land(id) 
                                          then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-                                     else (if loc1 =/= loc2 *** Destination changed
+                                     else (if getLoc(pact) =/= loc2 *** Destination changed
                                            then {mkMvAct(id,loc,loc2,v),
-                                                addK((pending(id,goTo(id,loc2)) @ t), kb)}
+                                                addK((pending(id,goTo(id,loc2)) @ s t), kb1)}
                                        else (if loc2 == home and loc == home
-                                             then {land(id),addK((pending(id,land(id)) @ t), kb)}
+                                             then {land(id),addK((pending(id,land(id)) @ s t), kb)}
                                              else {continue(id),kb}
                                              fi) fi) fi) fi) fi) fi)
- if (class(id,cl)) (pending(id,goTo(id,loc1)) @ t) myAlt(id,alt)
+ if (class(id,cl)) (clock(t)) myAlt(id,alt)
     (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
-    (rand(id,r) @ t2) (energy(id,e) @ t1) kb0 := kb
+    (rand(id,r) @ t2) (energy(id,e) @ t3) kb0 := kb
  /\ pact := getPending(id,kb0)
- /\ act acts := solveSCP(id,kb,myActs(cl,id,kb)) 
- /\ goTo(id,loc2) := act 
+ /\ kb1 := (if isGoTo(pact) 
+            then (if close(getLoc(pact),loc) *** We are assuming there is a goto
+                  then addK(lastVisit(id,getLoc(pact)) @ t, kb) 
+                  else kb fi)
+            else kb fi)
+ /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
+ /\ goTo(id,loc2) := (if acts == none then goTo(id,home) else pickOne(acts) fi)
  /\ locR := windEffect(loc,r)
  . 
-
-
+ 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
   eq randMax = 4294967295 .
@@ -227,16 +234,27 @@ op getPending : Id KB -> ActSet . **** 0 or 1
 eq getPending(id, kb (pending(id,pact) @ t)) = pact .
 eq getPending(id, kb) = none [owise] .
 
+op pickOne : ActSet -> Action .
+eq pickOne(act acts) = act .
+
 op notDone : Action Loc -> Bool .
 
 ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
  if pt(ix,iy,iz) := getGridLoc(loc) .
 ceq notDone(land(id), loc)  = abs(iz) > 2 
  if pt(ix,iy,iz) := getGridLoc(loc) .
-ceq notDone(goTo(id,loc0), loc)  =  abs(ix0 - ix) + abs(iy0 - iy) > 3
+eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
+eq notDone(act,loc) = false [owise] .
+
+op close : Loc Loc -> Bool .
+ceq close(loc0,loc) =  abs(ix0 - ix) + abs(iy0 - iy) < 3
  if pt(ix,iy,iz)    := getGridLoc(loc)
  /\ pt(ix0,iy0,iz0) := getGridLoc(loc0) .
-eq notDone(act,loc) = false [owise] .
+eq close(loc0,loc) = false [owise] .
+
+op isGoTo : ActSet -> Bool .
+eq isGoTo(goTo(id,loc)) = true .
+eq isGoTo(acts) = false [owise] .
 
 ****            from to
 op mkMvAct : Id Loc Loc FiniteFloat -> Action .

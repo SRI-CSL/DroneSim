@@ -104,7 +104,7 @@ fmod MODEL-KNOWLEDGE is
 
   op getLoc : Action -> Loc .
   eq getLoc(goTo(id,loc)) = loc .
-  eq getLoc(act) = nil [owise] .
+  eq getLoc(act) = nil [owise] . *** Make sure it is always a goto
 
   op targets : Id LocList LocList -> Info .
   eq hasId(id,targets(id,locs,locs1) @ t) = true .
@@ -231,7 +231,7 @@ fmod MODEL-KNOWLEDGE is
   eq rand(id,r1:Nat) @ t0 << rand(id,r2:Nat) @ t1 = t0 < t1 .
   eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
   eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
-  eq lastVisit(id,l0) @ t0 << lastVisit(id,l1) @ t1 = t0 < t1 .
+  eq lastVisit(id,l0) @ t0 << lastVisit(id,l0) @ t1 = t0 < t1 .
   eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
 
   op atVEdge : Loc -> Bool .
@@ -243,8 +243,8 @@ fmod MODEL-KNOWLEDGE is
 
   op goTos : Class Id KB -> ActSet .
   op goTos$ : Class Id LocList -> ActSet .
-  eq goTos(cl,id,(targets(id,locs,locs1) @ t)) = 
-   goTos$(cl,id,locs ; locs1) .
+  eq goTos(cl,id,(targets(id,locs,locs1) @ t) kb) = 
+   goTos$(cl,id, locs ; locs1) .
   eq goTos$(cl,id,loc ; locs) = goTo(id,loc) goTos$(cl,id,locs) .
   eq goTos$(cl,id,nil) = none .
 
@@ -295,7 +295,7 @@ fmod MODEL-KNOWLEDGE is
    --- Once we are able to link the model's timestamp with SITL's 
    --- This is a very rough estimate of arrival time
    /\ t := getTime(kb) + round(ff / v)
-   /\ kb1 := addK(kb, (clock(t)) (atloc(id,loc) @ t)
+   /\ kb1 := addK(kb, (clock(t)) (atloc(id,loc) @ t) 
                       (energy(id,e0) @ t) ) .
 
 

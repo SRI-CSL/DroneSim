@@ -10,4 +10,5 @@ load tasks-sitl
 --- load actions
 load pretty
 load scenario-sitl
+load test
 

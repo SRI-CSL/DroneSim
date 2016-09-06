@@ -246,6 +246,9 @@ fmod FFVAL is
 
 endfm
 
+--- Agent decides by considering how stale and how far the points are.
+--- I am not considering resolution this time.
+
 fmod VAL-PICS is
   inc SOFT-AGENTS .
   inc CONVERSION .
@@ -269,9 +272,9 @@ fmod VAL-PICS is
   ceq benefit(id,kb,goTo(id,loc)) = st2 - st1
    if kb1 := doAct(id,kb,goTo(id,loc))
    /\ t := getTime(kb1)
-   /\ kb2 := addK(kb1,lastVisit(id,loc) @ t)
+   /\ kb2 := addK(lastVisit(id,loc) @ t,kb1)
    /\ st1 := valueCS(id,kb)
-   /\ st2 := valueCS(id,kb1) .
+   /\ st2 := valueCS(id,kb2) .
 
   ceq cost(id,kb,goTo(id,loc)) = cost2loc(loc0,loc,v) 
    if v := getVel(id,kb) 
@@ -282,6 +285,8 @@ fmod VAL-PICS is
      then valueCS(id,(clock(t)) kb)
      else timeFactor(t1,t) +
           valueCS(id,(clock(t)) kb) fi .
+
+  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have maximum priority          
 ---           photo time, current time
   op timeFactor : Nat Nat -> FiniteFloat . 
   eq timeFactor(t1,t) = if 2 * (t - t1) > periodicity
@@ -292,8 +297,31 @@ fmod VAL-PICS is
 
 endfm
 
---- Agent decides by considering how stale and how far the points are.
---- I am not considering resolution this time.
+fmod VAL-PICS-ENERGY is
+  inc VAL-PICS .
+  inc VAL-ENERGY-CONSERVATIVE .
+
+  var id : Id . 
+  var kb : KB . 
+  var act : Action .
+  vars b1 b2 : TriVal .
+  vars u1 u2 : FF .
+  
+  sort TFFVal .
+  op {_,_} : TriVal FF -> TFFVal .
+
+  op val : Id KB -> TFFVal .
+  op val : Id KB Action -> TFFVal .
+  eq val(id,kb) = {val-energy(id,kb),{1.0,1.0}} .
+  eq val(id,kb,act) = {val-energy(id,kb,act),val-pics(id,kb,act)} .
+
+  op _<_ : TFFVal TFFVal -> Bool .
+  op equivZero : TFFVal -> Bool .
+
+  eq {b1,u1} < {b2,u2} = (b1 < b2) or (b1 == b2 and u1 < u2) .
+  eq equivZero({b1,u1}) = (equivZero(b1)) .
+  
+endfm
 
 
 fmod VAL-PATROL is
@@ -406,6 +434,9 @@ view  valuation2valpatrolenergyconservative from VALUATION to VAL-PATROL-ENERGY-
   sort Grade to BUVal .
 endv  
 
+view  valuation2valpicsenergyconservative from VALUATION to VAL-PICS-ENERGY is
+  sort Grade to TFFVal .
+endv  
 
 
 
