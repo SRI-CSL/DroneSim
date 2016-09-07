@@ -74,9 +74,16 @@ op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Finit
 eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) = 
     mkBekb(n,sx,sy,sz,v,e) myAlt(b(n),a) (caution(b(n),c) @ 0)
     myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(0),locs,nil) @ 0) 
-    (rand(b(0),0) @ 0)(visited(b(0),nil) @ 0) 
-    (lastVisit(b(0),mkLoc(sx,sy,sz)) @ 0) clock(0) .
- 
+    (rand(b(n),0) @ 0)(visited(b(n),nil) @ 0) 
+    (lastVisit(b(n),mkLoc(sx,sy,sz)) @ 0)
+    (mkCountVisits(n,locs))
+     clock(0) .
+
+op mkCountVisits : Nat LocList -> KB .
+eq mkCountVisits(n,loc ; locs) 
+ = (countVisit(b(n),loc,0) @ 0) mkCountVisits(n,locs) .
+eq mkCountVisits(n,nil) = none .
+
 op mkB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> Agent .
 eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
  [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs),

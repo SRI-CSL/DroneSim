@@ -276,6 +276,7 @@ fmod AGENT-CONF is
   eq getAgent(a, [a : cl | attrs] aconf) = [a : cl | attrs] .
   eq getAgent(a, aconf) = none [owise] .
 
+  
   *** availalbe actions (with delay 0)
   op effActs : Conf -> EventSet .
   eq effActs([a : cl | evs : evs, attrs] aconf) = effActs(evs) effActs(aconf) .

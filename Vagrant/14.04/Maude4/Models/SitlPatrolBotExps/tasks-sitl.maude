@@ -159,31 +159,31 @@ ceq sitlActIncremental(id,kb)  =
 *** Add the visited and last visited facts.
 
 ceq sitlActSCP(id,kb) = (if pact == none  
-                          then {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
-                          else (if (e < stopSimulation)
-                           then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-                           else (if notDone(pact,loc) 
-                                  then (if loc =/= locR *** There is wind! 
-                                        then {mkMvAct(id,loc,locR,v),
-                                             addK((pending(id,goTo(id,locR)) @ s t), kb)}
-                                        else {continue(id),kb} 
-                                       fi)
-                                   else (if pact == land(id) 
-                                         then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-                                     else (if getLoc(pact) =/= loc2 *** Destination changed
-                                           then {mkMvAct(id,loc,loc2,v),
-                                                addK((pending(id,goTo(id,loc2)) @ s t), kb1)}
-                                       else (if loc2 == home and loc == home
-                                             then {land(id),addK((pending(id,land(id)) @ s t), kb)}
-                                             else {continue(id),kb}
-                                             fi) fi) fi) fi) fi) fi)
- if (class(id,cl)) (clock(t)) myAlt(id,alt)
+      then {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
+      else (if (e < stopSimulation)
+          then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+          else (if notDone(pact,loc) 
+            then (if loc =/= locR *** There is wind! 
+                   then {mkMvAct(id,loc,locR,v),
+                        addK((pending(id,goTo(id,locR)) @ s t), kb)}
+                   else {continue(id),kb}  fi)
+            else (if pact == land(id) 
+              then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+              else (if getLoc(pact) =/= loc2 *** Destination changed
+                then {mkMvAct(id,loc,loc2,v),
+                     addK((pending(id,goTo(id,loc2)) @ s t), kb1)}
+                else (if loc2 == home and loc == home
+                 then {land(id),addK((pending(id,land(id)) @ s t), kb)}
+                 else {continue(id),kb}
+          fi) fi) fi) fi) fi) fi)
+ if (class(id,cl)) (clock(t)) myAlt(id,alt) 
     (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
-    (rand(id,r) @ t2) (energy(id,e) @ t3) kb0 := kb
+    (rand(id,r) @ t2) (energy(id,e) @ t3)  
+    kb0 := kb
  /\ pact := getPending(id,kb0)
- /\ kb1 := (if isGoTo(pact) 
-            then (if close(getLoc(pact),loc) *** We are assuming there is a goto
-                  then addK(lastVisit(id,getLoc(pact)) @ t, kb) 
+ /\ kb1 := (if isGoTo(pact)
+            then (if close(getLoc(pact),loc) 
+                  then addK(lastVisit(id,getLoc(pact)) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
                   else kb fi)
             else kb fi)
  /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 

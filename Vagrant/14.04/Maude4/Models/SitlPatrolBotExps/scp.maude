@@ -257,7 +257,7 @@ fmod VAL-PICS is
 
   vars kb kb' kb1 kb2 kb3 : KB .
   vars id st : Id .
-  vars x y x1 y1 z1 x0 y0 z0 m n : Nat .
+  vars x y x1 y1 z1 x0 y0 z0 m n i : Nat .
   var act : Action .
   vars loc loc0 loc1 loc2 : Loc .
   var locs locs0 locs1 : LocList .
@@ -274,19 +274,34 @@ fmod VAL-PICS is
   ceq benefit(id,kb,goTo(id,loc)) = st2 - st1
    if kb1 := doAct(id,kb,goTo(id,loc))
    /\ t := getTime(kb1)
-   /\ kb2 := addK(lastVisit(id,loc) @ t,kb1)
    /\ st1 := valueCS(id,kb)
-   /\ st2 := valueCS(id,kb2) .
+   /\ st2 := valueCS(id,kb1) .
 
-  ceq benefit2(id,kb,goTo(id,loc)) = float(n - m)
-   if (countVisit(id,loc,n) @ t1) kb3 := kb
-   /\ kb1 := doAct(id,kb,goTo(id,loc))
+  eq valueCS(id,(clock(t)) (lastVisit(id,loc) @ t1) kb)
+   = if t - t1 > periodicity 
+     then valueCS(id,(clock(t)) kb)
+     else timeFactor(t1,t) +
+          valueCS(id,(clock(t)) kb) fi .
+
+  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have maximum priority          
+---           photo time, current time
+  op timeFactor : Nat Nat -> FiniteFloat . 
+  eq timeFactor(t1,t) = if 2 * (t - t1) > periodicity
+                        then 0.1 * float((t - t1) / periodicity) else 1.0 fi .
+
+
+ ceq cost(id,kb,goTo(id,loc)) = cost2loc(loc0,loc,v) 
+   if v := getVel(id,kb) 
+   /\ loc0 := getLoc(id,kb) .
+
+ ceq benefit2(id,kb,goTo(id,loc)) = float(m - n) *** reduction of zeros
+   if kb1 := doAct(id,kb,goTo(id,loc))
    /\ t := getTime(kb1)
-   /\ kb2 := addK(countVisit(id,loc,s n) @ t,kb1)
    /\ m := valueCS2(id,kb)
-   /\ n := valueCS2(id,kb2) .
+   /\ n := valueCS2(id,kb1) .
 
-  ceq valueCS2(id,kb) = m
+  *** Completing a round should be more desirable
+  ceq valueCS2(id,kb) = m + (n * 100) 
    if n := findMin(kb,100000) 
    /\ kb1 := subtractVisit(kb,n)
    /\ m := countZeroVisits(kb1) .
@@ -307,24 +322,8 @@ fmod VAL-PICS is
    = s (countZeroVisits(kb)) .
   eq countZeroVisits(kb) = 0 [owise] .
 
-  ceq cost(id,kb,goTo(id,loc)) = cost2loc(loc0,loc,v) 
-   if v := getVel(id,kb) 
-   /\ loc0 := getLoc(id,kb) .
-
-  eq valueCS(id,(clock(t)) (lastVisit(id,loc) @ t1) kb)
-   = if t - t1 > periodicity 
-     then valueCS(id,(clock(t)) kb)
-     else timeFactor(t1,t) +
-          valueCS(id,(clock(t)) kb) fi .
-
-  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have maximum priority          
----           photo time, current time
-  op timeFactor : Nat Nat -> FiniteFloat . 
-  eq timeFactor(t1,t) = if 2 * (t - t1) > periodicity
-                        then 0.1 * float((t - t1) / periodicity) else 1.0 fi .
-
   eq val-pics(id,kb,act) 
-   = {benefit(id,kb,act),cost(id,kb,act)} .
+   = {benefit2(id,kb,act),cost(id,kb,act)} .
 
 endfm
 

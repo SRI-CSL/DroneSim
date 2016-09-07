@@ -9,7 +9,7 @@ fmod MODEL-KNOWLEDGE is
   vars l l0 l1 l2 l3 loc : Loc .
   vars senl0 senl1 : SenLoc .
   vars gl0 gl1 gl2 gl3 : GridLoc .
-  vars ekb ekb0 ekb1 kb  lkb kb1 lkb0  :  KB .
+  vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 :  KB .
   var dir dir0 dir1 : Dir .
   vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
@@ -239,6 +239,10 @@ fmod MODEL-KNOWLEDGE is
   eq countVisit(id,l0,n0) @ t0 << countVisit(id,l0,n1) @ t1 = t0 < t1 .
   eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
 
+  op incCountVisit : Id Loc Time KB -> KB .
+  eq incCountVisit(id,loc,t1,(countVisit(id,loc,n) @ t) kb) = (countVisit(id,loc,s n) @ t1) kb .
+  eq incCountVisit(id,loc,t1,kb) = kb [owise] .
+
   op atVEdge : Loc -> Bool .
   eq atVEdge({senl0,pt(x,y,z)}) =  ((x == 0) or (s x == edgeX))  . 
 	
@@ -300,12 +304,15 @@ fmod MODEL-KNOWLEDGE is
    --- Once we are able to link the model's timestamp with SITL's 
    --- This is a very rough estimate of arrival time
    /\ t := getTime(kb) + round(ff / v)
-   /\ kb1 := addK(kb, (clock(t)) (atloc(id,loc) @ t) 
-                      (energy(id,e0) @ t) ) .
+   /\ kb1 := addK((clock(t)) (atloc(id,loc) @ t) 
+                  (lastVisit(id,loc) @ t)
+                  (energy(id,e0) @ t),incCountVisit(id,loc,t,kb)) .
 
 
   op cost2loc : Loc Loc FiniteFloat -> FiniteFloat .
   eq cost2loc(l0,l1,v) = distanceFF(l0,l1) * costMv(v) .
 
+  op getLKB : Id Conf -> KB .
+  eq getLKB(id:Id,[id:Id : cl:Class | lkb : kb:KB, attrs:AttributeSet] pc:Conf) = kb:KB .
 	
 endfm
