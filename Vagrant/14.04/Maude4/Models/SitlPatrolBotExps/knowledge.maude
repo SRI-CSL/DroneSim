@@ -14,6 +14,7 @@ fmod MODEL-KNOWLEDGE is
   vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
   var act act0 act1  : Action .
+  vars n n0 n1 : Nat .
 	
 *** parameters
   --- ops gridX gridY gridZ : -> Nat .
@@ -111,6 +112,9 @@ fmod MODEL-KNOWLEDGE is
 
   op lastVisit : Id Loc -> Info .
   eq hasId(id,lastVisit(id,loc) @ t) = true .
+
+  op countVisit : Id Loc Nat -> Info .
+  eq hasId(id,countVisit(id,loc,n) @ t) = true .
 
   op visited : Id LocList -> Info .
   eq hasId(id,visited(id,locs) @ t) = true .
@@ -232,6 +236,7 @@ fmod MODEL-KNOWLEDGE is
   eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
   eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
   eq lastVisit(id,l0) @ t0 << lastVisit(id,l0) @ t1 = t0 < t1 .
+  eq countVisit(id,l0,n0) @ t0 << countVisit(id,l0,n1) @ t1 = t0 < t1 .
   eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
 
   op atVEdge : Loc -> Bool .

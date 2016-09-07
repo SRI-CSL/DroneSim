@@ -255,17 +255,19 @@ fmod VAL-PICS is
   inc FFVAL .
   inc MODEL-KNOWLEDGE .
 
-  vars kb kb' kb1 kb2 : KB .
+  vars kb kb' kb1 kb2 kb3 : KB .
   vars id st : Id .
-  vars x y x1 y1 z1 x0 y0 z0 : Nat .
+  vars x y x1 y1 z1 x0 y0 z0 m n : Nat .
   var act : Action .
   vars loc loc0 loc1 loc2 : Loc .
+  var locs locs0 locs1 : LocList .
   vars dir dir1 : Dir .
   vars t t0 t1 : Time .
   vars st1 st2 v : FiniteFloat .
 
   op valueCS : Id KB -> FiniteFloat .
-  op benefit : Id KB Action -> FiniteFloat .
+  op valueCS2 : Id KB -> Nat .
+  ops benefit benefit2 : Id KB Action -> FiniteFloat .
   op cost : Id KB Action -> FiniteFloat .
   op val-pics : Id KB Action  -> FF .
 
@@ -275,6 +277,35 @@ fmod VAL-PICS is
    /\ kb2 := addK(lastVisit(id,loc) @ t,kb1)
    /\ st1 := valueCS(id,kb)
    /\ st2 := valueCS(id,kb2) .
+
+  ceq benefit2(id,kb,goTo(id,loc)) = float(n - m)
+   if (countVisit(id,loc,n) @ t1) kb3 := kb
+   /\ kb1 := doAct(id,kb,goTo(id,loc))
+   /\ t := getTime(kb1)
+   /\ kb2 := addK(countVisit(id,loc,s n) @ t,kb1)
+   /\ m := valueCS2(id,kb)
+   /\ n := valueCS2(id,kb2) .
+
+  ceq valueCS2(id,kb) = m
+   if n := findMin(kb,100000) 
+   /\ kb1 := subtractVisit(kb,n)
+   /\ m := countZeroVisits(kb1) .
+
+  op findMin : KB Nat -> Nat .
+  ceq findMin((countVisit(id,loc,n) @ t) kb, m)
+   = findMin(kb, n)
+   if n < m .
+  eq findMin(kb, m) = m [owise] .
+
+  op subtractVisit : KB Nat -> KB .
+  eq subtractVisit((countVisit(id,loc,n) @ t) kb, m) = 
+   (countVisit(id,loc,n monus m) @ t) subtractVisit(kb, m) .
+  eq subtractVisit(kb, m) = kb [owise] .
+
+  op countZeroVisits : KB -> Nat .
+  eq countZeroVisits(((countVisit(id,loc,0) @ t) kb)) 
+   = s (countZeroVisits(kb)) .
+  eq countZeroVisits(kb) = 0 [owise] .
 
   ceq cost(id,kb,goTo(id,loc)) = cost2loc(loc0,loc,v) 
    if v := getVel(id,kb) 
