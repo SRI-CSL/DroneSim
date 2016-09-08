@@ -119,19 +119,12 @@ fmod VAL-ENERGY is
   var dummy : BVal .
  
   op val-energy : Id KB  -> BVal .
-  eq val-energy(id,(energy(id,e) @ t0) (atloc(id,loc) @ t) 
-     (myHome(id,locb)) kb) = 
-   if e > cost2loc(loc,locb,getVel(id,kb)) then top else bot fi .
+  eq val-energy(id,(energy(id,e) @ t0) kb) = 
+   if e > getCaution(id,kb) then top else bot fi .
 
   op val-energy : Id KB Action  -> BVal .
-  eq val-energy(id,kb,goTo(id,loc1)) = 
-  	      val-energy(id,doAct(id,kb,goTo(id,loc1)))  .
-  eq val-energy(id,
-	       (energy(id,e) @ t0) (atloc(id,loc0) @ t) 
-         (myHome(id,locb)) kb, charge(id)) =
-         (if (loc0 == locb) 
-				  then (if (e >= maxCharge) then bot else top fi)
-					else bot fi) .
+  eq val-energy(id,(myHome(id,locb)) kb,goTo(id,loc1)) = 
+   if locb == loc1 then top else  val-energy(id,doAct(id,kb,goTo(id,loc1))) fi .
 
   eq val-energy(id,kb,act) = bot [owise] .  **** shouldn't happen
 
@@ -169,7 +162,7 @@ fmod VAL-ENERGY-CONSERVATIVE is
   op val-energy : Id KB  -> TriVal .
   eq val-energy(id,(energy(id,e) @ t0) (atloc(id,loc) @ t) 
      (myHome(id,locb)) kb) = 
-   if e > cost2loc(loc,locb,getVel(id,kb)) + getCaution(id,kb) then top else 
+   if e >  getCaution(id,kb) then top else 
     (if e > cost2loc(loc,locb,getVel(id,kb)) then mid else bot fi) fi .
 
   op val-energy : Id KB Action  -> TriVal .
@@ -177,8 +170,8 @@ fmod VAL-ENERGY-CONSERVATIVE is
           val-energy(id,doAct(id,kb,goTo(id,loc1)))  
   if not (val-energy(id,doAct(id,kb,goTo(id,loc1))) == mid) .
 
-  ceq val-energy(id,kb,goTo(id,loc1)) = if towards(loc,loc1,locb) then 
-                                     mid else bot fi
+  ceq val-energy(id,kb,goTo(id,loc1)) = 
+    if towards(loc,loc1,locb) then mid else bot fi
    if val-energy(id,doAct(id,kb,goTo(id,loc1))) == mid  
    /\ (atloc(id,loc) @ t) (myHome(id,locb)) kb' := kb .
 
@@ -294,17 +287,17 @@ fmod VAL-PICS is
    if v := getVel(id,kb) 
    /\ loc0 := getLoc(id,kb) .
 
- ceq benefit2(id,kb,goTo(id,loc)) = float(m - n) *** reduction of zeros
+ ceq benefit2(id,kb,goTo(id,loc)) = float(n - m) 
    if kb1 := doAct(id,kb,goTo(id,loc))
    /\ t := getTime(kb1)
    /\ m := valueCS2(id,kb)
    /\ n := valueCS2(id,kb1) .
 
   *** Completing a round should be more desirable
-  ceq valueCS2(id,kb) = m + (n * 100) 
+  ceq valueCS2(id,kb) =  (n * 100) + m
    if n := findMin(kb,100000) 
    /\ kb1 := subtractVisit(kb,n)
-   /\ m := countZeroVisits(kb1) .
+   /\ m := countVisits(kb1) .
 
   op findMin : KB Nat -> Nat .
   ceq findMin((countVisit(id,loc,n) @ t) kb, m)
@@ -317,10 +310,11 @@ fmod VAL-PICS is
    (countVisit(id,loc,n monus m) @ t) subtractVisit(kb, m) .
   eq subtractVisit(kb, m) = kb [owise] .
 
-  op countZeroVisits : KB -> Nat .
-  eq countZeroVisits(((countVisit(id,loc,0) @ t) kb)) 
-   = s (countZeroVisits(kb)) .
-  eq countZeroVisits(kb) = 0 [owise] .
+  op countVisits : KB -> Nat .
+  ceq countVisits(((countVisit(id,loc,n) @ t) kb)) 
+   = s (countVisits(kb)) 
+   if n > 0 .
+  eq countVisits(kb) = 0 [owise] .
 
   eq val-pics(id,kb,act) 
    = {benefit2(id,kb,act),cost(id,kb,act)} .
@@ -329,16 +323,16 @@ endfm
 
 fmod VAL-PICS-ENERGY is
   inc VAL-PICS .
-  inc VAL-ENERGY-CONSERVATIVE .
+  inc VAL-ENERGY .
 
   var id : Id . 
   var kb : KB . 
   var act : Action .
-  vars b1 b2 : TriVal .
+  vars b1 b2 : BVal .
   vars u1 u2 : FF .
   
   sort TFFVal .
-  op {_,_} : TriVal FF -> TFFVal .
+  op {_,_} : BVal FF -> TFFVal .
 
   op val : Id KB -> TFFVal .
   op val : Id KB Action -> TFFVal .

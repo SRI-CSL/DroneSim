@@ -172,7 +172,7 @@ ceq sitlActSCP(id,kb) = (if pact == none
               else (if getLoc(pact) =/= loc2 *** Destination changed
                 then {mkMvAct(id,loc,loc2,v),
                      addK((pending(id,goTo(id,loc2)) @ s t), kb1)}
-                else (if loc2 == home and loc == home
+                else (if loc2 == home and close(loc,home)
                  then {land(id),addK((pending(id,land(id)) @ s t), kb)}
                  else {continue(id),kb}
           fi) fi) fi) fi) fi) fi)
@@ -247,7 +247,7 @@ eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .
 
 op close : Loc Loc -> Bool .
-ceq close(loc0,loc) =  abs(ix0 - ix) + abs(iy0 - iy) < 3
+ceq close(loc0,loc) =  abs(ix0 - ix) + abs(iy0 - iy) < 4
  if pt(ix,iy,iz)    := getGridLoc(loc)
  /\ pt(ix0,iy0,iz0) := getGridLoc(loc0) .
 eq close(loc0,loc) = false [owise] .
