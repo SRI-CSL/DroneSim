@@ -49,7 +49,7 @@ class SimpleDrone(object):
 
     """
 
-    def __init__(self, name, instance_no=0, debug=True, speedup=3):
+    def __init__(self, name, instance_no=0, debug=False, speedup=3):
         """Creates a drone with given name and default state.
         """
         self.name = name
