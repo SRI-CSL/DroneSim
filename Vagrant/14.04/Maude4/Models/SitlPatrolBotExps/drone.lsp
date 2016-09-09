@@ -7,7 +7,7 @@
 ;;
 (define mkdrone (name x y z v e)
   ;; the 0 is the instance number (all ports depend on it)
-  (let ((drone (apply SimpleDrone name (int 5))))
+  (let ((drone (apply SimpleDrone name (int 3))))
     (setuid drone name)
     (invoke drone "initialize")
     drone))

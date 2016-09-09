@@ -1,7 +1,12 @@
 Test Summary:
 All test with low confidence 0.5 0.5
 
+Average = [home,energy,no of rounds,no of points]
+
+
 Scenario 4 points.
+mkLoc(50.0,-50.0,5.0) ; mkLoc(50.0,50.0,5.0)
+           ; mkLoc(-50.0,50.0,5.0) ; mkLoc(-50.0,-50.0,5.0) .
 Caution 20%
 
 SCP:
@@ -34,6 +39,11 @@ Exp6:
 
 
 Scenario several points:
+mkLoc(30.0,-30.0,5.0) ; 
+            mkLoc(50.0,-10.0,5.0) ; mkLoc(50.0,15.0,5.0) ; 
+            mkLoc(50.0,30.0,5.0) ; mkLoc(-15.0,10.0,5.0) ; 
+            mkLoc(-30.0,30.0,5.0) ; mkLoc(-20.0,-10.0,5.0) ;
+            mkLoc(-10.0,-10.0,5.0) .
 
 Exp7:
 wind = 0
@@ -93,7 +103,29 @@ Exp6:
 
 Scenario several points
 
-TODO
+Exp7:
+wind = 0
+averages ===> [ 1.0, 16.333333333333332, 3.0, 28.0]
+
+Exp8:
+  wind = rand.25/10
+ averages ===> [ 1.0, 14.666666666666666, 1.6666666666666667, 22.333333333333332]
+
+Exp9:
+wind = rand.25/5
+verages ===> [ 1.0, 14.666666666666666, 1.0, 19.666666666666668]
+
+Exp10:
+wind = rand.25/3
+averages ===> [ 1.0, 13.666666666666666, 1.3333333333333333, 16.666666666666668]
+
+Exp11:
+wind = rand.25/2
+averages ===> [ 1.0, 11.333333333333334, 0.3333333333333333, 12.666666666666666]
+
+Exp12:
+wind = rand.25/1
+rigth
 
 =========================
 
@@ -120,16 +152,37 @@ Exp4:
 
 Exp5:
   wind = rand.25/2
-left
+averages ===> [ 0.6666666666666666, 9.333333333333334, 1.0, 4.0]
 
 Exp6:
   wind = rand.25/1
-right
+averages ===> [ 0.0, 2.0, 0.0, 0.3333333333333333]
 
+Scenario several points:
 
+Exp7:
+ wind = 0
+averages ===> [ 1.0, 15.0, 3.0, 28.0]
 
+Exp8:
+  wind = rand.25/10
+averages ===> [ 1.0, 15.0, 2.0, 25.333333333333332]
 
+Exp9:
+  wind = rand.25/5
+  averages ===> [ 0.6666666666666666, 10.0, 2.0, 24.333333333333332]
 
+Exp10:
+  wind = rand.25/3
+  averages ===> [ 0.6666666666666666, 8.666666666666666, 1.3333333333333333, 15.0]
+
+Exp11:
+  wind = rand.25/2
+averages ===> [ 0.6666666666666666, 11.333333333333334, 0.3333333333333333, 7.0]
+
+Exp12:
+  wind = rand.25/1
+averages ===> [ 0.0, 1.6666666666666667, 0.0, 0.6666666666666666]
 
 
 
