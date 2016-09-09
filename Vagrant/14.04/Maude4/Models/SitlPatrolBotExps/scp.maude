@@ -287,6 +287,10 @@ fmod VAL-PICS is
    if v := getVel(id,kb) 
    /\ loc0 := getLoc(id,kb) .
 
+ceq benefit2(id,kb,goTo(id,loc)) = 0.0  
+   if (atloc(id,loc1) @ t) kb1 := kb
+   /\ close(loc1,loc) .
+
  ceq benefit2(id,kb,goTo(id,loc)) = float(n - m) 
    if kb1 := doAct(id,kb,goTo(id,loc))
    /\ t := getTime(kb1)
@@ -295,15 +299,15 @@ fmod VAL-PICS is
 
   *** Completing a round should be more desirable
   ceq valueCS2(id,kb) =  (n * 100) + m
-   if n := findMin(kb,100000) 
+   if n := findMin(id,kb,100000) 
    /\ kb1 := subtractVisit(kb,n)
    /\ m := countVisits(kb1) .
 
-  op findMin : KB Nat -> Nat .
-  ceq findMin((countVisit(id,loc,n) @ t) kb, m)
-   = findMin(kb, n)
+  op findMin : Id KB Nat -> Nat .
+  ceq findMin(id,(countVisit(id,loc,n) @ t) kb, m)
+   = findMin(id,kb, n)
    if n < m .
-  eq findMin(kb, m) = m [owise] .
+  eq findMin(id,kb, m) = m [owise] .
 
   op subtractVisit : KB Nat -> KB .
   eq subtractVisit((countVisit(id,loc,n) @ t) kb, m) = 

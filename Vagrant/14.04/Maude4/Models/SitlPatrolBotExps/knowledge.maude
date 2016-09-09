@@ -234,15 +234,16 @@ fmod MODEL-KNOWLEDGE is
   eq targetVel(id,ff0) @ t0 << targetVel(id,ff1) @ t1 = t0 < t1 .
   eq rand(id,r1:Nat) @ t0 << rand(id,r2:Nat) @ t1 = t0 < t1 .
   eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
-  eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
+  --- eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
   eq lastVisit(id,l0) @ t0 << lastVisit(id,l0) @ t1 = t0 < t1 .
-  eq countVisit(id,l0,n0) @ t0 << countVisit(id,l0,n1) @ t1 = t0 < t1 .
   eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
 
   op incCountVisit : Id Loc Time KB -> KB .
   eq incCountVisit(id,loc,t1,(countVisit(id,loc,n) @ t) kb) = (countVisit(id,loc,s n) @ t1) kb .
   eq incCountVisit(id,loc,t1,kb) = kb [owise] .
 
+  op close : Loc Loc -> Bool .
+ 
   op atVEdge : Loc -> Bool .
   eq atVEdge({senl0,pt(x,y,z)}) =  ((x == 0) or (s x == edgeX))  . 
 	

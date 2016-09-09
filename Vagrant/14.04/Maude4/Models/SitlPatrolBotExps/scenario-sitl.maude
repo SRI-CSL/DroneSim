@@ -6,7 +6,7 @@ mod SCENARIO is
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
 
-vars n n' t t0 : Nat .
+vars n n' t t0 m : Nat .
 vars i j x y z : Int .
 vars sx sy sz dx dy dz v e c : FiniteFloat .
 var dir : Dir .
@@ -92,9 +92,16 @@ eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
 ops mkE1 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
 eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)  ] .
 
-ops locs1 : -> LocList .
+ops locs1 locs2 : -> LocList .
 eq locs1 = mkLoc(50.0,-50.0,5.0) ; mkLoc(50.0,50.0,5.0)
            ; mkLoc(-50.0,50.0,5.0) ; mkLoc(-50.0,-50.0,5.0) .
+
+eq locs2 =  mkLoc(30.0,-30.0,5.0) ; 
+            mkLoc(50.0,-10.0,5.0) ; mkLoc(50.0,15.0,5.0) ; 
+            mkLoc(50.0,30.0,5.0) ; mkLoc(-15.0,10.0,5.0) ; 
+            mkLoc(-30.0,30.0,5.0) ; mkLoc(-20.0,-10.0,5.0) ;
+            mkLoc(-10.0,-10.0,5.0) .
+
 
 --- energy parameter is not yet useful
 ops conf1 conf2 conf3 conf4 : -> Conf .
@@ -102,8 +109,17 @@ ops conf1 conf2 conf3 conf4 : -> Conf .
 eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,70.0,5,locs1)
            mkE1(0,0.0,0.0,0.0,5.0,100.0) . 
 
+eq conf2 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkE1(0,0.0,0.0,0.0,5.0,100.0) . 
+
+eq conf3 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs2)
+           mkE1(0,0.0,0.0,0.0,5.0,100.0) . 
+
+
 ops asys1 asys2 asys3 asys4 : -> ASystem .
 eq asys1 = { conf1 } .
+eq asys2 = { conf2 } .
+eq asys3 = { conf3 } .
 
 ops asys asys2 : Nat -> ASystem .
 eq asys(n) = { conf1 bound(n) } .
@@ -139,7 +155,7 @@ eq upDateRandKB((rand(id,n') @ t) lkb,n) = (rand(id,n' + n) @ t) lkb .
 eq upDateRandKB(lkb,n) = lkb [owise] .
 
 ****
-eq windThresh = rand.25 .
+eq windThresh = round(float(rand.25) / 1.0) .
 --- eq windThresh = 0 .
 eq stopSimulation = 5.0 .
 
@@ -155,7 +171,7 @@ op getObs : ASystem -> BoolRes .
 op getObsHome : KB KB -> String .
 eq getObsHome(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home), 
             ( atloc(b(0),loc) @ t0) ekb) = 
-     (if (distance(home,loc) < 4)
+     (if (close(home,loc))
       then "(double 1)"
       else "(double 0)"
       fi) .
@@ -170,10 +186,17 @@ eq getObs1( aconf ) =  "(double 0)" [owise] .
 **** for nGenericApprox
 op getObsN : Conf -> String .
 ceq getObsN([ id : Bot | lkb : lkb, attrs] [eid | ekb ] aconf )
-    =  getObsHome(lkb,ekb) + " " + mkdouble(e)   
- if kb (energy(id,e) @ t) := ekb .
+    =  getObsHome(lkb,ekb) + " " + mkdouble(e)  + " " + mkdouble(float(m)) + " " + mkdouble(float(n))
+ if kb (energy(id,e) @ t) := ekb 
+ /\ m := findMin(id,lkb,100000) 
+ /\ n := countTotal(id,lkb) .
 
-eq getObsN( aconf ) = "(double 0) (double 0)" [owise] .  
+op countTotal : Id KB -> Nat .
+eq countTotal(id,(countVisit(id,loc,n) @ t) kb) 
+ = n + countTotal(id,kb) .
+eq countTotal(id,kb) = 0 [owise] .
+
+--- eq getObsN( aconf ) = "(double 0) (double 0)" [owise] .  
 
 op mkdouble : FiniteFloat -> String .
 eq mkdouble(e) = 

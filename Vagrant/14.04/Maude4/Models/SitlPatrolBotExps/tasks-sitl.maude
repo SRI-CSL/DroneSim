@@ -64,22 +64,23 @@ op sitlActSCP : Id KB -> ActionKB .
 *** from the intended position
 
 --- eq sitlAct(id,kb) = sitlActSimple(id,kb) .
---- eq sitlAct(id,kb) = sitlActIncremental(id,kb) .
-eq sitlAct(id,kb) = sitlActSCP(id,kb) .
+eq sitlAct(id,kb) = sitlActIncremental(id,kb) .
+--- eq sitlAct(id,kb) = sitlActSCP(id,kb) .
 
 ceq sitlActSimple(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
    else (if (e < stopSimulation) --- Force to land whenever the energy is too low
-     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+     then {land(id), addK(pending(id,stop(id)) @ s t,kb)}
        else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
-         then (if locR =/= loc and getLoc(pact) =/= nil --- Wind in the middle of performing an action and in goTo mode.
+         then (if locR =/= loc and isGoTo(pact) --- Wind in the middle of performing an action and in goTo mode.
                then {mkMvAct(id,loc,addLoc(getLoc(pact),locR,loc),v), 
                     addK((rand(id,s s r) @ s t) 
                       --- Add interference on the target location
                     (pending(id,goTo(id,addLoc(getLoc(pact),locR,loc))) @ s t) 
-                    (targets(id,getLoc(pact) ; locs, locs1) @ s t),kb)}
-                   else {continue(id), kb} fi)
+                    ,kb)}
+                   else {continue(id), 
+                         addK((rand(id,s s r) @ s t),kb)} fi)
            else (if pact == land(id) --- if landing, then stop
             then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
               else (if pact == goTo(id,home)
@@ -90,19 +91,24 @@ ceq sitlActSimple(id,kb)  =
                     else (if locs == nil    
                       then {mkMvAct(id,loc,first(locs1),v),
                             addK((pending(id,goTo(id,first(locs1))) @ s t)
-                             (targets(id,rest(locs1), first(locs1)) @ s t)
-                             (visited(id,locs2 ; getLoc(pact)) @ s t),kb)}
+                             (targets(id,rest(locs1), first(locs1)) @ s t),
+                             kb1)}
                        else {mkMvAct(id,loc,first(locs),v), 
                                addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
                                (rand(id,s s r) @ s t)
-                               (pending(id,goTo(id,first(locs))) @ s t)
-                               (visited(id,locs2 ; getLoc(pact)) @ s t),kb)}
+                               (pending(id,goTo(id,first(locs))) @ s t),
+                               kb1)}
                     fi ) fi) fi) fi) fi)  fi) fi)        
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
         myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
-      (rand(id,r) @ t5) (visited(id,locs2) @ t6) kb0 ) := kb
-   /\ pact := getPending(id,kb0)  
+      (rand(id,r) @ t5) kb0 ) := kb
+   /\ pact := getPending(id,kb0)
+   /\ kb1 := (if isGoTo(pact)
+            then (if close(getLoc(pact),loc) 
+                  then addK(lastVisit(id,getLoc(pact)) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
+                  else kb fi)
+            else kb fi)  
    /\ locR := windEffect(loc,r)
 .
 
@@ -128,12 +134,11 @@ ceq sitlActIncremental(id,kb)  =
                     addK((rand(id,s s r) @ s t) 
                     (pending(id,goTo(id,locR)) @ s t)
                     (targets(id,getLoc(pact) ; locs, locs1) @ s t),kb)}
-                 else {continue(id), kb} fi)
+                 else {continue(id), 
+                       addK((rand(id,s s r) @ s t),kb)} fi)
          else (if pact == land(id)
           then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-           else (if pact == land(id)
-            then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-              else (if pact == goTo(id,home)
+            else (if pact == goTo(id,home)
                 then {land(id), addK(pending(id,land(id)) @ s t,kb)}
                  else (if e < c 
                    then {mkMvAct(id,loc,home,v), 
@@ -141,17 +146,24 @@ ceq sitlActIncremental(id,kb)  =
                     else (if locs == nil    **** done, repeat the loop
                       then {mkMvAct(id,loc,first(locs1),v),
                             addK((pending(id,goTo(id,first(locs1))) @ s t)
-                             (targets(id,rest(locs1), first(locs1)) @ s t),kb)}
+                             (targets(id,rest(locs1), first(locs1)) @ s t),
+                             kb1)}
                         else {mkMvAct(id,loc,first(locs),v), 
                              addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
                                (rand(id,s s r) @ s t)
-                               (pending(id,goTo(id,first(locs))) @ s t),kb)}
-                    fi ) fi) fi) fi) fi)  fi) fi) fi)       
+                               (pending(id,goTo(id,first(locs))) @ s t),
+                               kb1)}
+                    fi ) fi) fi) fi) fi)  fi) fi)
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
         myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
       (rand(id,r) @ t5) kb0 ) := kb
    /\ pact := getPending(id,kb0)  
+   /\ kb1 := (if isGoTo(pact)
+            then (if close(getLoc(pact),loc) 
+                  then addK(lastVisit(id,getLoc(pact)) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
+                  else kb fi)
+            else kb fi)  
    /\ locR := windEffect(loc,r)
 .
 
@@ -163,15 +175,17 @@ ceq sitlActSCP(id,kb) = (if pact == none
       else (if (e < stopSimulation)
           then {land(id), addK(pending(id,land(id)) @ s t,kb)}
           else (if notDone(pact,loc) 
-            then (if loc =/= locR *** There is wind! 
+            then (if loc =/= locR and isGoTo(pact) *** There is wind! 
                    then {mkMvAct(id,loc,locR,v),
-                        addK((pending(id,goTo(id,locR)) @ s t), kb)}
-                   else {continue(id),kb}  fi)
+                        addK((rand(id,s s r) @ s t)
+                          (pending(id,goTo(id,locR)) @ s t), kb)}
+                   else {continue(id),addK((rand(id,s s r) @ s t),kb)}  fi)
             else (if pact == land(id) 
               then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
               else (if getLoc(pact) =/= loc2 *** Destination changed
                 then {mkMvAct(id,loc,loc2,v),
-                     addK((pending(id,goTo(id,loc2)) @ s t), kb1)}
+                     addK((pending(id,goTo(id,loc2)) @ s t) 
+                          (rand(id,s s r) @ s t), kb1)}
                 else (if loc2 == home and close(loc,home)
                  then {land(id),addK((pending(id,land(id)) @ s t), kb)}
                  else {continue(id),kb}
@@ -241,12 +255,12 @@ op notDone : Action Loc -> Bool .
 
 ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
  if pt(ix,iy,iz) := getGridLoc(loc) .
-ceq notDone(land(id), loc)  = abs(iz) > 2 
+ceq notDone(land(id), loc)  = false 
+--- ceq notDone(land(id), loc)  = abs(iz) > 3 
  if pt(ix,iy,iz) := getGridLoc(loc) .
 eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .
 
-op close : Loc Loc -> Bool .
 ceq close(loc0,loc) =  abs(ix0 - ix) + abs(iy0 - iy) < 4
  if pt(ix,iy,iz)    := getGridLoc(loc)
  /\ pt(ix0,iy0,iz0) := getGridLoc(loc0) .
