@@ -14,9 +14,11 @@ fmod MODEL-ACTIONS is
   vars senl0 senl1 senl2  : SenLoc .
   vars gl0 gl1 gl2 : GridLoc .
 
-   eq okEnv(class(id,Bot)  (atloc(id, l1) @ t) 
+**** implicit that id =/= id' since shouldn't be two class facts for id
+**** using same t means locs are refreshed at each time step
+ eq okEnv(class(id,Bot)  (atloc(id, l1) @ t) 
                  class(id',Bot) (atloc(id',l1) @ t) ekb) = false .
-  eq okEnv(ekb) = true [owise] .
+ eq okEnv(ekb) = true [owise] .
 
 
 **** incase there is only one bot l3 should be l2, no occupation conflict
