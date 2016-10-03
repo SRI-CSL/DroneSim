@@ -166,7 +166,9 @@ fmod EVENTS is
   sort DEvent .
   subsort DEvent < Event .  
 
-  op _@_ : Task Time -> DEvent .           --- for agent todo: task @ delay
+  op _@_ : Task Time -> DEvent .    --- for agent todo: task @ delay
+  op _@_ : Action Time -> DEvent .  --- for the envt: action @ delay 
+                          --- sitl style, duration determined by action
   op _@_;_ : Action Time Time -> DEvent .  --- for the enviroment: action @ delay ; duration
 
  ceq act @ t ; t' = none if t' == zero .   --- action with zero duration has no effect
@@ -179,6 +181,7 @@ fmod EVENTS is
   op getTime : DEvent -> Time .
   eq getTime(tsk @ t) = t .
   eq getTime(act @ t ; t') = t .
+  eq getTime(act @ t) = t .
   eq getTime(dev) = zero [owise] .
   
   op tstamp : InfoSet Time -> KB .
@@ -284,9 +287,9 @@ fmod AGENT-CONF is
 
 ***!!! becuase t may count down to zero during envAct
   op effActs : EventSet -> EventSet .
-  eq effActs((act @ t ; t') evs) 
-   =  (act @ t ; t') effActs(evs) .
+  eq effActs((act @ t ; t') evs)  =  (act @ t ; t') effActs(evs) .
 ***   = (if t == zero then (act @ t ; t') else none fi) effActs(evs) .
+  eq effActs((act @ t ) evs)  =  (act @ t) effActs(evs) .
   eq effActs(evs) = none [owise] .
 
   **** the global envkb 
@@ -327,7 +330,16 @@ fmod AGENT-CONF is
 	if u > t  then act @ 0 ; t' - (u - t)
 )
   eq timeEffect(evs, u) = evs [owise] .
+
+  eq timeEffect((act @ t) evs, u) = 
+     (if (t >= u)
+       then  (act @ (t monus u))
+       else  timeEffectA(act, u monus t)
+       fi ) 
+        timeEffect(evs,u) .
   
+  op timeEffectA : Action Time -> EventSet .
+    
   **** assume that actions are annotated with delays 
   op mte : Conf -> TimeInf .
   eq mte(aconf) = mteX(aconf) .
@@ -343,9 +355,10 @@ fmod AGENT-CONF is
 ***  eq mte(iev evs) = zero .
   eq mte(iev evs) = mte(evs) .
   eq mte((tsk @ t) evs) = minimum(t,mte(evs)) .
-  eq mte((act @ t ; t') evs) = mte(evs) . --- actions are performed with timeStep
+--- actions are performed with timeStep
+  eq mte((act @ t ; t') evs) = mte(evs) .
+  eq mte((act @ t) evs) = mte(evs) .
   eq mte((none).EventSet) = infty .
-
 
   *** doEnvAct(t, nzt,ekb,evs): 
 	**** performs actions evs for duration nzt from global time t

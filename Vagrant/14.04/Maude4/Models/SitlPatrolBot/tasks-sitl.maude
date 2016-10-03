@@ -41,13 +41,20 @@ fmod MODEL-TASKS is
 ****   op solveScp : Id KB ActSet -> ActSet .
 
   ceq doTask(cl,id,tick,ievs,devs,ekb,lkb) = 
-{lkb3, devs (tick @ 1) (act @ 0 ; 1),tell(id,act,lkb3)} 
+**** {lkb3, devs (tick @ 1) (act @ 0 ; 1),tell(id,act,lkb3)} 
+**** {lkb3, devs (tick @ 1) (act @ 0 ),tell(id,act,lkb3)}
+ --- duration computed, drone only deals with one action at a time
+  {lkb3, (tick @ 1) updateDevs(devs,act),tell(id,act,lkb3)} 
    if lkb0 := handleS(cl,id,lkb,ievs)
    /\ lkb1 := getSensors(id,ekb)
    /\ lkb2 := proSensors(id,lkb0,lkb1)
    /\ {act,lkb3} := sitlAct(id,lkb2) 
  .
 
+
+op updateDevs : EventSet Action -> EventSet .
+eq updateDevs(devs,continue(id)) = devs (continue(id) @ 0) . 
+eq updateDevs(devs,act) = (act @ 0) [owise] . 
 
 sort LocList .
 subsort Loc < LocList .
@@ -80,6 +87,7 @@ eq hasId(id,myAlt(id,alt)) = true .
 op continue : Id -> Action .
 op takeOff : Id Int -> Action .
 op land : Id -> Action .
+op land : Id Nat -> Action .
 op stop : Id -> Action .
 op goTo : Id Loc -> Action .
 
@@ -115,21 +123,24 @@ ceq sitlAct-old(id,kb)  =
    /\ pact := getPending(id,kb0)	.
 
 
+
 op sitlAct : Id KB -> ActionKB .
 
 ceq sitlAct(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
    else (if (e < c)
-     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+     then {land(id,getGridAlt(loc)),
+           addK(pending(id,land(id,getGridAlt(loc))) @ s t,kb)}
            **** {mkMvAct(id,loc,home,v), 
            ****  addK(pending(id,goTo(id,home)) @ s t,kb)}
       else (if notDone(pact,loc)
         then {continue(id), kb}
-        else (if pact == land(id)
+        else (if pact == land(id,alt)
           then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
            else (if pact == goTo(id,home)
-            then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+            then {land(id,getGridAlt(loc)),
+                  addK(pending(id,land(id,getGridAlt(loc))) @ s t,kb)}
             else (if locs == nil    **** done, go home
               then {mkMvAct(id,loc,home,v), 
                     addK(pending(id,goTo(id,home)) @ s t,kb)}
@@ -152,6 +163,8 @@ ceq sitlAct(id,kb)  =
 ****   /\ locR := {senlR, msen2grid(senlR)} 
        /\ locR := windEffect(loc,r)
 .
+
+
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
@@ -187,6 +200,7 @@ ceq sitlAct(id,kb)  =
 ***(
 pending acts:
  land(id)
+ land(id,alt)
  takeOff(id,alt)
  goTo(id,loc)
  stop(id)
@@ -200,6 +214,8 @@ op notDone : Action Loc -> Bool .
 ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
  if pt(ix,iy,iz) := getGridLoc(loc) .
 ceq notDone(land(id), loc)  = abs(iz) > 2 
+ if pt(ix,iy,iz) := getGridLoc(loc) .
+ceq notDone(land(id,alt), loc)  = abs(iz) > 2 
  if pt(ix,iy,iz) := getGridLoc(loc) .
 ceq notDone(goTo(id,loc0), loc)  =  abs(ix0 - ix) + abs(iy0 - iy) > 2
  if pt(ix,iy,iz)    := getGridLoc(loc)

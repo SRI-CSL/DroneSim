@@ -33,6 +33,10 @@ fmod MODEL-KNOWLEDGE is
   op botDelay : -> Nat .
   op costMv : -> FiniteFloat .
 
+***** done up/dn velocities
+  op vlift : -> FiniteFloat .
+  op vland : -> FiniteFloat .
+
 *** class
   op Bot : -> Class .
   op Station : -> Class .
@@ -60,6 +64,9 @@ fmod MODEL-KNOWLEDGE is
  op getGridLoc : Loc -> GridLoc .
  eq getGridLoc({senl0,gl0}) = gl0 .
 
+ op getGridAlt : Loc -> Nat .
+ eq getGridAlt({senl0,pt(x,y,z)}) = z .
+ 
 **** Bot specific knowledge
   op myY : Id Nat -> Info .    **** myY is the track bot is moving along
   op myDir : Id Dir -> Info .  **** myDir is the direction the bot is heading

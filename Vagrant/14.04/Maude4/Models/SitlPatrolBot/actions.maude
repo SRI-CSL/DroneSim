@@ -10,9 +10,43 @@ fmod MODEL-ACTIONS is
   var b b0 b1 b2 : Bool .
   var evs : EventSet .
   vars e e0 v : FiniteFloat .
-	var n : Nat .
+	var n u alt : Nat .
   vars senl0 senl1 senl2  : SenLoc .
   vars gl0 gl1 gl2 : GridLoc .
+
+  var alt1 : Rat .
+  vars ffx ffy ffz ffx0 ffy0 ffz0 dx dy dz d dv : FiniteFloat .
+  
+******* timeEffectA for sitl style actions
+
+  eq timeEffectA(continue(id) , u) = none .
+  eq timeEffectA(stop(id), u) = none .  
+ 
+  ceq timeEffectA(takeOff(id,alt), u) =
+     (if  alt1 <= 0
+     then none
+     else takeOff(id, alt1) @ 0
+     fi) 
+  if alt1 := rat(float(alt) - (float(u) * vlift)) .
+
+  ceq timeEffectA(land(id,alt), u) =
+       (if alt1 <= 0
+       then none **** landed
+       else land(id, alt1) @ 0
+       fi)
+   if alt1 := rat(float(alt) - (float(u) * vland)) .
+     
+  ceq timeEffectA(mv(id,dir(ffx,ffy,ffz),v), u) =
+       (if d < v * float(u)
+       then none  --- will finish in u time units
+       else mv(id, dir(ffx - dx, ffy - dy, ffz - dz),v) @ 0
+       fi) 
+  if d := sqrt((ffx * ffx) + (ffy * ffy) + (ffz * ffz))     
+  /\ dv := (v / d) * float(u)  ---- d/v secs to do v/d portion per sec
+  /\ dx := dv * ffx
+  /\ dy := dv * ffy
+  /\ dz := dv * ffz .
+  
 
 **** implicit that id =/= id' since shouldn't be two class facts for id
 **** using same t means locs are refreshed at each time step
@@ -23,7 +57,8 @@ fmod MODEL-ACTIONS is
 
 **** incase there is only one bot l3 should be l2, no occupation conflict
 **** performs actions for one-time unit -- but SEQUENTIALLY!! see below
-  op doUnitEnvAct : Time KB EventSet -> KB .
+****  op doUnitEnvAct : Time KB EventSet -> KB .
+
  ceq doUnitEnvAct(t, ekb, (mv(id,dir,v) @ 0 ; nzt) evs)
    = doUnitEnvAct(t, addK(ekb,(atloc(id,l3) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
@@ -64,20 +99,92 @@ fmod MODEL-ACTIONS is
   if t rem 17 == 0 .
 )
 
-***(
-**** incase there is only one bot l3 should be l2 -- i.e. no occupation conflict
-**** an alter
---- performs actions for one-time unit
-  op doUnitEnvActs : Time KB EventSet -> KB .
-  op doUnitEnvActsX : Time KB KB EventSet -> KB .
 
-  eq doUnitEnvActs(t, ekb, evs) = doUnitEnvActsX(t, ekb, ekb,evs) .
+************ sitl like unit actions
 
- ceq doUnitEnvActsX(t, ekb1, ekb, (act @ 0 ; nzt) evs) =
-	   doUnitEnvActsX(t, addK(ekb0,ekb1), ekb,evs) 
-   if ekb0 := doUnitEnvAct(t,ekb,(act @ 0 ; nzt)) .
- eq doUnitEnvActsX(t, ekb1, ekb, none) = ekb1 .
+  ceq doUnitEnvAct(t, ekb, (mv(id,dir(ffx,ffy,ffz),v) @ 0 ) evs)
+   = doUnitEnvAct(t, addK(ekb,(atloc(id,l3) @ s(t)) 
+                              energy(id,e0) @ s(t)) , evs)
+   if l0 := getLoc(id,ekb)
+   /\ l1 := doMvU(l0,dir(ffx,ffy,ffz),v) 
+   /\ e := getEnergy(id,ekb)
+   /\ e0 := energyMvU(e,v)
+   /\ l3 := (if occupied(l1,ekb) then l0 else l1 fi)
+  .
+
+  op energyMvU : FiniteFloat FiniteFloat  -> FiniteFloat .
+  eq energyMvU(e,v) = max(e - costMv,0.0) .  ---!!!fix
+
+  op doMvU : Loc Dir FiniteFloat -> Loc .
+  ceq doMvU(l0,dir(ffx,ffy,ffz),v) =
+    (if (d < v )
+  	then addLoc(l0,dir(ffx,ffy,ffz))
+  	else addLoc(l0, dir(dx,dy,dz))
+    fi)
+  if d := sqrt((ffx * ffx) + (ffy * ffy) + (ffz * ffz))     
+  /\ dv := (v / d)     ---- d/v secs to complete v/d portion per sec
+  /\ dx := dv * ffx
+  /\ dy := dv * ffy
+  /\ dz := dv * ffz
+  .
+
+  op addLoc : Loc Dir -> Loc .
+  ceq addLoc(l0,dir(ffx,ffy,ffz)) =  {senl1,msen2grid(senl1)}
+  if senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
+  /\ senl1 := senLoc(ffx0 + ffx,ffy0 + ffy, ffz0 + ffz) .
+
+ ceq doUnitEnvAct(t, ekb, (takeOff(id,alt) @ 0 ) evs)
+   = doUnitEnvAct(t, addK(ekb,(atloc(id,l1) @ s(t)) 
+                              energy(id,e0) @ s(t)) , evs)
+ if l0 := getLoc(id,ekb)
+ /\ l1 := doTakeOffU(l0,alt) 
+ /\ e := getEnergy(id,ekb)
+ /\ e0 := energyTakeOffU(e,vlift)
+  .
+
+***( 
+ alt = 2  v = 3  alt - v neg so add alt
+ alt = 2 v = 1    add v
 )
+
+  op energyTakeOffU : FiniteFloat FiniteFloat  -> FiniteFloat .
+  eq energyTakeOffU(e,v) = max(e - costMv,0.0) .  ---!!!fix
+
+  op doTakeOffU : Loc Nat -> Loc .
+  ceq doTakeOffU(l0,alt) = {senl1, msen2grid(senl1)}
+  if senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
+  /\ ffz := (if float(alt) <= vlift 
+            then ffz0 + float(alt) 
+            else ffz0 + vlift 
+            fi)
+  /\ senl1 := senLoc(ffx0,ffy0,ffz) .
+
+
+ ceq doUnitEnvAct(t, ekb, (land(id,alt) @ 0 ) evs)
+   = doUnitEnvAct(t, addK(ekb,(atloc(id,l1) @ s(t)) 
+                              energy(id,e0) @ s(t)) , evs)
+   if l0 := getLoc(id,ekb)
+   /\ l1 := doLandU(l0,alt) 
+   /\ e := getEnergy(id,ekb)
+   /\ e0 := energyLandU(e,vlift)
+  .
+
+***( 
+ alt = 2  v = 3  alt - v neg so subtract alt
+ alt = 2 v = 1    substract v
+)
+
+  op energyLandU : FiniteFloat FiniteFloat  -> FiniteFloat .
+  eq energyLandU(e,v) = max(e - costMv,0.0) .  ---!!!fix
+
+  op doLandU : Loc Nat -> Loc .
+  ceq doLandU(l0,alt) = {senl1, msen2grid(senl1)}
+  if senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
+  /\ ffz := (if float(alt) <= vlift 
+            then ffz0 - float(alt) 
+            else ffz0 - vlift fi)
+  /\ senl1 := senLoc(ffx0,ffy0,ffz) .
+
 
 endfm
 
