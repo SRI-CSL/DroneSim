@@ -22,9 +22,7 @@ loop init .
  (initAgentEset maude0 g2d g2d plambda0 SCENARIO asys3 OnePatrolBot) 
  (pyexe plambda0 (load "drone.lsp"))
  (pyexe plambda0 (define b0 (apply mkdrone "b0" (int 0))))
- (loadg2dlib g2d  /home/vagrant/imaude/jlib/jl-util.lsp)
- (loadg2dlib g2d stats-funs.lsp)
- (augAgentEsetStats Patrol 400 nGenericApprox .5 .5 4)
+ (augAgentEsetConcurrentStats Patrol 400 nGenericApprox .5 .5 4)
 )
 
 

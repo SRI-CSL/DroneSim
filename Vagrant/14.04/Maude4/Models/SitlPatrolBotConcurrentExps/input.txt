@@ -11,6 +11,11 @@
 (user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
 (user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
 
+
+**** speaking to jlambda
+
+(user (load "g2dinit.lsp"))
+
 **** speaking to plambda
 
 (user (load "drone.lsp"))
@@ -37,6 +42,7 @@
 (show val tval agentConf)
 (doActs )
 (show val tval agentConf)
+(show val qval simStatus)
 **** doTask again ...
 
 **** initialize stats runs

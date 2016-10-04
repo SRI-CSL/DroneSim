@@ -205,9 +205,9 @@ eq enabled(wait4s,
 
 
 **** this tells Maude the stats params
-rl[augAgentEsetStats]:
+crl[augAgentEsetConcurrentStats]:
    [nil, 
-    st(processing(req('augAgentEsetStats, 
+    st(processing(req('augAgentEsetConcurrentStats, 
                       ql(statsname randinc toks),
                        reqQ')),
        wait4s,reqQ,es,log),
@@ -215,12 +215,15 @@ rl[augAgentEsetStats]:
    =>
    [nil, 
     st(ready, 
-       (wait4s, 
-        reqQ,
-        augAgentEsetStats(es, amodname, statsname, randinc),
+       wait4s !
+       wait4(statsname,nil, req('graphreq,ql(g2dvname),nil)), 
+       reqQ,
+       augAgentEsetStats(es, amodname, statsname, randinc),
        log), 
       outQ ]
-  .
+  if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
+     /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+.
 
 
 op initStatsTemplate : -> String [ctor] .

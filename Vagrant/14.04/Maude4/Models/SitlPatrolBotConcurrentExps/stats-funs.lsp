@@ -3,8 +3,6 @@
 ;; (supdate "g2d.Main" "DEBUG" (boolean true))
 
 
-(define maudes (array java.lang.String "maude0" "maude1"))
-
 (define makeInteger (int_or_string)
   (sinvoke "java.lang.Integer" "valueOf" int_or_string))
 
@@ -47,7 +45,7 @@
      )) )
 
 
-(define doConcurrentStats (handle)
+(define doConcurrentStats (handle maudes)
   (let ((statsObject (fetch handle)))
     (if (isobject statsObject)
 	(for maude maudes 
@@ -61,7 +59,7 @@
       (invoke java.lang.System.err "println" statsObject)
     (seq
      (invoke java.lang.System.err "println" (concat "calling doRun with " maude))
-     (apply doConcurrentRun handle) maude
+     (apply doConcurrentRun handle maude)
      )) )
 
 (define doConcurrentRun (handle maude)
