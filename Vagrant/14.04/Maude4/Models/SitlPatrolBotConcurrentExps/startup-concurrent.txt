@@ -1,3 +1,4 @@
+start g2d iop_graphics2d_wrapper $IOPBINDIR -Xms256m -Xmx1024m
 start plambda pyactor plambda controller.lsp
 select plambda
 
