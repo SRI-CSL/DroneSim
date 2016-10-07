@@ -1,0 +1,28 @@
+**** load load  **** scenario0
+
+load ../../Lib/time
+load ../../Lib/soft-agents
+load ../../Lib/cp-e-config
+load ../../Lib/cp-e-rules
+load knowledge
+load scp
+load tasks-sitl
+load pretty
+--- load actions
+load scenario-sitl
+
+load model-checker 
+load /home/vagrant/imaude/ilib/load-lib
+**** load ../../../../imaude/ilib/load-lib
+load meta-cp-e 
+
+loop init .
+
+(seq
+ (initAgentEset maude0 g2d g2d plambda0 SCENARIO asys3 OnePatrolBot) 
+ (pyexe plambda0 (load "drone.lsp"))
+ (pyexe plambda0 (define b0 (apply mkdrone "b0" (int 0))))
+ (augAgentEsetConcurrentStats Patrol 400 nGenericApprox .5 .5 4)
+)
+
+
