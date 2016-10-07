@@ -1,4 +1,4 @@
-start plambda pyactor plambda init.lsp
+start plambda pyactor plambda controller.lsp
 select plambda
 
 
