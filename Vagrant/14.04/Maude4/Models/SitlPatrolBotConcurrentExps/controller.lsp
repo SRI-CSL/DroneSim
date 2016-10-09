@@ -10,6 +10,11 @@
    "(load 'drone.lsp')"
    "\n"
    "(define b0 (apply mkdrone 'b0' (int {1})))"
+   "\n"
+   "(import 'plambda.actors.actorlib')"
+   "\n"
+   "(apply plambda.actors.actorlib.send 'plambda' 'plambda{1}' 'initedOK plambda{1}')"
+   "\n"
    )
   )
 
@@ -89,8 +94,34 @@
     )
   )
 
+(define inited_clones (mklist))
+
+(define init_handler 
+  (lambda (sender message)
+    (let ((tokens (invoke message 'split')))
+      (if (> (apply len tokens) (int 1))
+	  (let ((verb (get tokens (int 0)))
+		(noun (get tokens (int 1))))
+	    (if (and (== verb 'initedOK') (invoke noun 'startswith' 'plambda'))
+		(seq
+		 (invoke inited_clones 'append' noun)
+		 (if (== (apply len inited_clones) plambda_population)
+		     (apply plambda.actors.actorlib.send 'g2d' 'plambda' '(load "g2dinit.lsp")'))
+		 (boolean True)
+		 )
+	      )
+	    )
+	(boolean False)
+	)
+      )
+    )
+  )
+     
+	    
+	    
 
 (import 'plambda.util.Util')
+(import 'time')
 (define init_clones (clones prefix)
   (if (== prefix 'plambda')
       (seq
@@ -101,30 +132,38 @@
 	      (apply plambda.actors.actorlib.send clone 'plambda' (concat '(load "' loadfile '")'))
 	      )
 	    )
-       (apply plambda.actors.actorlib.send 'system' 'plambda' (concat 'start maude0 iop_maude_wrapper ' (apply make_args 'maude' (int 0))))
+       (apply plambda.actors.actorlib.send
+	      'system'
+	      'plambda'
+	      (concat 'start maude0 iop_maude_wrapper ' (apply make_args 'maude' (int 0))))
        )
     )
   (if (== prefix 'maude')
-      (for clone clones
-	   (seq 
-	    (apply logmsg (concat 'clone: ' clone ' with prefix ' prefix '\n'))
+      (seq
+       (for clone clones
+	    (seq 
+	     (apply logmsg (concat 'clone: ' clone ' with prefix ' prefix '\n'))
+	     )
 	    )
-	   )
-    ;; here we start the drones rolling by sending g2d a message ...
-    
+       )
     )
   )
 
 
 
-(define catchall (lambda (sender message)  (invoke  sys.stderr 'write' (concat 'Handled: ' message ' from ' sender '\n'))))
+(define catchall
+  (lambda (sender message)
+    (invoke  sys.stderr 'write' (concat 'Handled: ' message ' from ' sender '\n'))))
 
 (import 'plambda.actors.pyactor')
+
 (apply plambda.actors.pyactor.add_handler
        (apply make_cloner 'plambda' 'pyactor' plambda_clones plambda_population))
+
 (apply plambda.actors.pyactor.add_handler
        (apply make_cloner 'maude' 'iop_maude_wrapper' maude_clones maude_population))
 
+(apply plambda.actors.pyactor.add_handler init_handler)
 
 ;;make the maude load files.
 (for instanceno maude_population

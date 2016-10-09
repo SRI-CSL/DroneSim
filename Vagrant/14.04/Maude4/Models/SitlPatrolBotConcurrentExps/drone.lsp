@@ -1,3 +1,6 @@
+;; maude sends the time.sleep to us, so we have better know about it
+(import 'time') 
+
 (import "sitl_drone")
 
 (define SimpleDrone sitl_drone.SimpleDrone)
@@ -44,6 +47,5 @@
     )
   )
 
-(import "time")
-
+(invoke sys.stderr "write"  "loaded drone.lsp\n")
 
