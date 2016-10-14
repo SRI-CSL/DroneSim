@@ -57,6 +57,7 @@ class SimpleDrone(object):
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
         self.speedup = speedup
+        self.timeOfStart = time.clock()
 
         if self.debug:
             sys.stderr.write("SimpleDrone with name {0} and instance number {1}\n".format(self.name, self.ino))
@@ -207,7 +208,9 @@ class SimpleDrone(object):
                 dx = dx / vel
                 dy = dy / vel
                 dz = dz / vel
-            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
+            timeElapsed = (time.clock() - self.timeOfStart) * self.speedup
+            sys.stderr.write('to Maude: {0} {1} {2} {3} {4} {5} {6} {7} {8}'.format(east, north, alt, dx, dy, dz, vel, bat, timeElapsed))
+            return '{0} {1} {2} {3} {4} {5} {6} {7} {8}'.format(east, north, alt, dx, dy, dz, vel, bat, timeElapsed)
         else:
             return 'Uninitialized'
 
