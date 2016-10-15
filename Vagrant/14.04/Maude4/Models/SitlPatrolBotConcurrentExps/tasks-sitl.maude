@@ -70,7 +70,7 @@ eq sitlAct(id,kb) = sitlActSimple(id,kb) .
 ceq sitlActSimple(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
-   else (if (e < stopSimulation) --- Force to land whenever the energy is too low
+   else (if (e < stopSimulation) and not (pact == land(id) or pact == stop(id)) --- Force to land whenever the energy is too low
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
        else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
          then (if locR =/= loc and isGoTo(pact) --- Wind in the middle of performing an action and in goTo mode.
@@ -255,8 +255,8 @@ op notDone : Action Loc -> Bool .
 
 ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
  if pt(ix,iy,iz) := getGridLoc(loc) .
-ceq notDone(land(id), loc)  = false 
---- ceq notDone(land(id), loc)  = abs(iz) > 3 
+--- ceq notDone(land(id), loc)  = false 
+ceq notDone(land(id), loc)  = iz > 2 
  if pt(ix,iy,iz) := getGridLoc(loc) .
 eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .

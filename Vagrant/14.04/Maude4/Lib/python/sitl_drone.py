@@ -49,7 +49,7 @@ class SimpleDrone(object):
 
     """
 
-    def __init__(self, name, instance_no=0, debug=True, speedup=3):
+    def __init__(self, name, instance_no=0, debug=False, speedup=3):
         """Creates a drone with given name and default state.
         """
         self.name = name
@@ -191,6 +191,7 @@ class SimpleDrone(object):
             if self.debug:
                 sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
+        # sys.stderr.write('STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \nSTOP STOP STOP STOP \n')
         
 
     def __str__(self):

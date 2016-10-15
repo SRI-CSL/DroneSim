@@ -43,7 +43,7 @@
   )
 
 
-(define clone_count (int 2))
+(define clone_count (int 3))
 
 (define plambda_clones (mklist))
 (define plambda_population clone_count)
