@@ -1,0 +1,67 @@
+mod TEST is
+  inc SCENARIO .
+  inc MODEL-TASKS .
+
+vars id : Id .
+  var cl : Class .
+  vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
+  vars l loc loc0 home locR loc1 loc2 : Loc .
+  vars senl0 senl1 senlR senlD : SenLoc .
+  vars gl0 gl1 : GridLoc .
+  vars kb kb0 kbp kb1 : KB .
+  vars evs evs' ievs devs : EventSet . 
+  var dir dir1 : Dir .
+  var act act0 act1  : Action .
+  vars acts acts0 pact : ActSet .
+  var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 : FiniteFloat .
+  vars alt ix iy iz ix0 iy0 iz0 : Int .
+  var r j n : Nat .
+  
+  vars locs locs0 locs1 locs2 locs3 : LocList .
+
+  ops lkb ekb lkb0 ekb0 lkb1 lkb2 : -> KB .
+  op conf0 : -> Conf .
+  op gotos : -> ActSet .
+  op sSCP : KB -> ActSet .
+  op evalIf : KB -> KB .
+
+  ceq evalIf(kb) = (if isGoTo(pact)
+            then (if close(getLoc(pact),loc) 
+                  then addK(lastVisit(id,getLoc(pact)) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
+                  else kb fi)
+            else kb fi)
+   if (class(id,cl)) (clock(t)) myAlt(id,alt) 
+    (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
+    (rand(id,r) @ t2) (energy(id,e) @ t3)  
+    kb0 := kb 
+    /\ pact := getPending(id,kb0) .
+
+  eq gotos = goTo(b(0), {senLoc(-5.0e+1, -5.0e+1, 5.0),pt(-50, -50, 5)})    goTo(b(0), {senLoc(-5.0e+1, 5.0e+1, 5.0),pt(-50, 50, 5)}) goTo(b(0), {    senLoc(0.0, 0.0, 0.0),pt(0, 0, 0)}) goTo(b(0), {senLoc(5.0e+1, -5.0e+1,    5.0),pt(50, -50, 5)}) goTo(b(0), {senLoc(5.0e+1, 5.0e+1, 5.0),pt(50,50,5)}) .
+
+ eq lkb0 = getLKB(b(0),conf1) .
+
+  eq lkb = (clock(24)class(b(0),Bot)(atloc(b(0),{senLoc(-3.0617521285999999e+1,
+    -5.5559539794899997e+1,5.0667724609400002),pt(-30,-55,5)})@ 23)(pending(b(
+    0),goTo(b(0),{senLoc(-3.0000000000000007e+1,-5.0e+1,4.9999999999999991),pt(
+    -31,-50,5)}))@ 18)(lastVisit(b(0),{senLoc(-5.0e+1,5.0e+1,5.0),pt(-50,50,
+    5)})@ 16)(lastVisit(b(0),{senLoc(0.0,0.0,0.0),pt(0,0,0)})@ 0)(lastVisit(b(
+    0),{senLoc(5.0e+1,-5.0e+1,5.0),pt(50,-50,5)})@ 6)(lastVisit(b(0),{senLoc(
+    5.0e+1,5.0e+1,5.0),pt(50,50,5)})@ 11)(visited(b(0),nil)@ 0)(energy(b(0),
+    6.7e+1)@ 23)(caution(b(0),2.0e+1)@ 0)(rand(b(0),46)@ 24)(targetVel(b(0),
+    5.0)@ 0)(vel(b(0),1.7117242768599999e-1)@ 23)(targets(b(0),nil,{senLoc(
+    5.0e+1,-5.0e+1,5.0),pt(50,-50,5)};{senLoc(5.0e+1,5.0e+1,5.0),pt(50,50,5)};{
+    senLoc(-5.0e+1,5.0e+1,5.0),pt(-50,50,5)};{senLoc(-5.0e+1,-5.0e+1,5.0),pt(
+    -50,-50,5)})@ 17)(countVisit(b(0),{senLoc(-5.0e+1,-5.0e+1,5.0),pt(-50,-50,
+    5)},0)@ 0)(countVisit(b(0),{senLoc(-5.0e+1,5.0e+1,5.0),pt(-50,50,5)},1)@
+    16)(countVisit(b(0),{senLoc(5.0e+1,-5.0e+1,5.0),pt(50,-50,5)},1)@ 6)(
+    countVisit(b(0),{senLoc(5.0e+1,5.0e+1,5.0),pt(50,50,5)},1)@ 11)myHome(b(0),
+    {senLoc(0.0,0.0,0.0),pt(0,0,0)})myAlt(b(0),5)) .
+
+  eq ekb = clock(24)class(b(0),Bot)(atloc(b(0),{senLoc(-3.0767503738399999e+1,
+    -5.5642066955600001e+1,5.0381336212200001),pt(-30,-55,5)})@ 24)(energy(b(
+    0),6.6e+1)@ 24)(targetVel(b(0),5.0)@ 0)vel(b(0),1.1401754251e-1)@ 24 .
+
+ eq lkb1 = getSensors(b(0),ekb) .
+ eq lkb2 = proSensors(b(0),lkb,lkb1) .
+
+endm

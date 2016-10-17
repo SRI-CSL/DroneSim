@@ -1,0 +1,14 @@
+**** load load  **** scenario0
+
+load ../../Lib/time
+load ../../Lib/soft-agents
+load ../../Lib/cp-e-config
+load ../../Lib/cp-e-rules
+load knowledge
+load scp
+load tasks-sitl
+--- load actions
+load pretty
+load scenario-sitl
+load test
+

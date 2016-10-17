@@ -57,7 +57,6 @@ class SimpleDrone(object):
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
         self.speedup = speedup
-        self.timeOfStart = time.clock()
 
         if self.debug:
             sys.stderr.write("SimpleDrone with name {0} and instance number {1}\n".format(self.name, self.ino))
@@ -120,8 +119,7 @@ class SimpleDrone(object):
         if self.debug:
             sys.stderr.write("slept\n")
 
-        mpargs = self.mavproxy_args()
-        
+        mpargs = self.mavproxy_args()    
             
         if self.debug:
             sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
@@ -192,6 +190,25 @@ class SimpleDrone(object):
                 sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
         # sys.stderr.write('STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \nSTOP STOP STOP STOP \n')
+
+    def log(self):
+        if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
+            north =  self.vehicle.location.local_frame.north
+            east =  self.vehicle.location.local_frame.east
+            alt =  -self.vehicle.location.local_frame.down
+            auxVel = self.vehicle.velocity
+            bat = self.vehicle.battery.level
+            dx = auxVel[0]
+            dy = auxVel[1]
+            dz = auxVel[2]
+            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
+            if vel != 0:
+                dx = dx / vel
+                dy = dy / vel
+                dz = dz / vel
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
+        else:
+            return 'Uninitialized'
         
 
     def __str__(self):
@@ -209,9 +226,7 @@ class SimpleDrone(object):
                 dx = dx / vel
                 dy = dy / vel
                 dz = dz / vel
-            timeElapsed = (time.clock() - self.timeOfStart) * self.speedup
-            sys.stderr.write('to Maude: {0} {1} {2} {3} {4} {5} {6} {7} {8}'.format(east, north, alt, dx, dy, dz, vel, bat, timeElapsed))
-            return '{0} {1} {2} {3} {4} {5} {6} {7} {8}'.format(east, north, alt, dx, dy, dz, vel, bat, timeElapsed)
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
 

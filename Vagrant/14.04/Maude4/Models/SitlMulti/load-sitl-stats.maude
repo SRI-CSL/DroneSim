@@ -34,10 +34,11 @@ eq asys1 = { conf1 } .
 
 (seq
  (pyexe plambda (load "drone.lsp"))
- (pyexe plambda (define b0 (apply mkdrone "b0" (int 0) (boolean true))))
- (initAgentEset maude g2d g2d plambda SCENARIO asys2 OnePatrolBot) 
+ (pyexe plambda (define b0 (apply mkdrone "b0" "0" "0" "0" "1" "15")))
+ (loadg2dlib g2d  /home/vagrant/imaude/jlib/jl-util.lsp)
+ (loadg2dlib g2d stats-funs.lsp)
+ (initAgentEset maude g2d g2d plambda SCENARIO asys3 OnePatrolBot) 
+ (augAgentEsetStats Patrol 400 nGenericApprox .5 .5 4)
 )
 
 
-***(
-)

@@ -5,9 +5,9 @@
 ;; at some stage the x y z v e will be used.
 ;; currently we drop them on the floor.
 ;;
-(define mkdrone (name ins mapP)
+(define mkdrone (name ins)
   ;; the 0 is the instance number (all ports depend on it)
-  (let ((drone (apply SimpleDrone name ins mapP)))
+  (let ((drone (apply SimpleDrone name ins)))
     (setuid drone name)
     (invoke drone "initialize")
     drone))
@@ -46,4 +46,7 @@
 
 (import "time")
 
+(define setStartTime () (define startTime (invoke time "clock")))
 
+(define getTimeElapsed ()
+  (* (- (invoke time "clock") startTime ) (int 1000)))
