@@ -197,7 +197,6 @@ eq augAgentEsetStats(es,amodname, statsname,randinc) =
                 'tval, 'randIx, tm(amodname, '0.Zero)),
                 'tval, 'randInc, tm(amodname, qid2NatT(randinc))) .
 
-
 eq isReq('augAgentEsetStats) = true .
 eq enabled(wait4s,
            req('augAgentEsetStats, 
@@ -229,6 +228,34 @@ crl[augAgentEsetStats]:
  /\ es' := augAgentEsetStats(es, amodname, statsname, randinc)
  /\ str := mkInitStatsExp([amodname],mname,g2dvname, statsname, statsOp,toks)
  /\ toks' := str2toks(str) .
+
+
+eq isReq('augAgentEsetConcurrentStats) = true .
+eq enabled(wait4s,
+           req('augAgentEsetConcurrentStats, 
+                 ql(statsname randinc toks),reqQ)) = true .
+
+
+**** this tells Maude the stats params
+crl[augAgentEsetConcurrentStats]:
+   [nil, 
+    st(processing(req('augAgentEsetConcurrentStats, 
+                      ql(statsname randinc toks),
+                       reqQ')),
+       wait4s,reqQ,es,log),
+     outQ]
+   =>
+   [nil, 
+    st(ready, 
+       wait4s !
+       wait4(statsname,nil, req('graphreq,ql(g2dvname),nil)), 
+       reqQ,
+       augAgentEsetStats(es, amodname, statsname, randinc),
+       log), 
+      outQ ]
+  if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
+     /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+.
 
 
 op initStatsTemplate : -> String [ctor] .
@@ -1076,36 +1103,26 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
            then getTerm(res1??) else nT fi)               
 /\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
 /\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
-/\ str := mkRunReplyExp(sname, bT)
+/\ str := mkRunReplyExp(sname,mname, bT)
 /\ toks' := str2toks(str) .
 
-***(
-op runReplyTemplate : -> String .
-eq runReplyTemplate = "(apply runResult %sname (double %obs))" .
-
-op mkRunReplyExp : Qid Term -> String .
-eq mkRunReplyExp(sname, bT) =
-  fillTemplate(runReplyTemplate, 
-              (("%sname" :~ sqquote(sname)), 
-               ("%obs" :~ (if bT == 'true.Bool then "1" else "0" fi)) ))
-        .
-)
 
 op runReplyTemplate : -> String .
 eq runReplyTemplate =
-     "(apply runResult %sname (apply makeDouble  %obs))" .
+     "(apply runConcurrentResult %sname %mname (apply makeDouble  %obs))" .
 
 op runReplyNTemplate : -> String .
 eq runReplyNTemplate = 
-     "(apply runResult %sname (array double %obs))"   .
+     "(apply runConcurrentResult %sname %mname (array double %obs))"   .
 
-op mkRunReplyExp : Qid Term -> String .
+op mkRunReplyExp : Qid Qid Term -> String .
 **** true -- multi obs fill array template, false single obs
-eq mkRunReplyExp(sname, 'br[bT, t]) =
+eq mkRunReplyExp(sname,mname, 'br[bT, t]) =
   fillTemplate((if bT == 'true.Bool 
                 then runReplyNTemplate
                 else runReplyTemplate fi),
               (("%sname" :~ sqquote(sname)), 
+  						 ("%mname" :~ sqquote(mname)), 
                ("%obs" :~ downTerm(t,"")))  ) .
 
 

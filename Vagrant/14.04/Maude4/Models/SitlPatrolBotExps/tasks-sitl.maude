@@ -70,7 +70,7 @@ eq sitlAct(id,kb) = sitlActSimple(id,kb) .
 ceq sitlActSimple(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
-   else (if (e < stopSimulation) --- Force to land whenever the energy is too low
+   else (if (e < stopSimulation and not (pact == land(id) or pact == stop(id))) --- Force to land whenever the energy is too low
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
        else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
          then (if locR =/= loc and isGoTo(pact) --- Wind in the middle of performing an action and in goTo mode.
@@ -126,7 +126,7 @@ ceq addLoc$(senLoc(sx1,sy1,sz1),senLoc(sx2,sy2,sz2),senLoc(sx3,sy3,sz3)) = {senl
 ceq sitlActIncremental(id,kb)  =
   (if pact == none   ***** haven't started
    then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
-   else (if (e < stopSimulation)
+   else (if (e < stopSimulation and not (pact == land(id) or pact == stop(id)))
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
        else (if notDone(pact,loc)
          then (if locR =/= loc --- Wind in the middle of performing an action
@@ -172,7 +172,7 @@ ceq sitlActIncremental(id,kb)  =
 
 ceq sitlActSCP(id,kb) = (if pact == none  
       then {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
-      else (if (e < stopSimulation)
+      else (if (e < stopSimulation and not (pact == land(id) or pact == stop(id)))
           then {land(id), addK(pending(id,land(id)) @ s t,kb)}
           else (if notDone(pact,loc) 
             then (if loc =/= locR and isGoTo(pact) *** There is wind! 

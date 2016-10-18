@@ -72,7 +72,10 @@ class SimpleDrone(object):
 
         self.dronekit = None
         self.mavproxy = None
-        
+    
+    def getName(self):
+        return self.name
+
     def initialize(self):
 
         self.spawn()

@@ -21,7 +21,7 @@ loop init .
 (seq
  **** (pyexe plambda (load "drone.lsp"))
  (pyexe plambda (define b0 (apply mkdrone "b0" (int 0))))
- (pyexe plambda (define b1 (apply mkdrone "b1" (int 1))))
+ --- (pyexe plambda (define b1 (apply mkdrone "b1" (int 1))))
  (pyexe plambda (apply setStartTime))
- (initAgentEset maude g2d g2d plambda SCENARIO asys4 OnePatrolBot) 
+ (initAgentEset maude g2d g2d plambda SCENARIO asys2 OnePatrolBot) 
 )

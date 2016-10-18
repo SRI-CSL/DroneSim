@@ -1,6 +1,7 @@
 mod SCENARIO is
   inc MODEL-TASKS .
   inc SOFT-AGENT-RULES .
+  inc MODEL-ACTIONS .
   inc PRETTY .
   --- inc SOLVE-SCP{valuation2valpatrolonly} . 
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
@@ -8,7 +9,7 @@ mod SCENARIO is
 
 vars n n' t t0 m : Nat .
 vars i j x y z : Int .
-vars sx sy sz dx dy dz v e c : FiniteFloat .
+vars sx sy sz dx dy dz v e c dt : FiniteFloat .
 var dir : Dir .
 vars wkb kb lkb ekb : KB .
 var aconf : Conf .
@@ -40,6 +41,8 @@ eq botDelay = 1 .
 eq costMv(v) = 0.06 . --- consumes x percent battery per meter
 eq periodicity = 60 .
 
+eq vlift = 5.0 .
+eq vland = 5.0 .
 
 ***(
 Performed one experiment with dronekit copter at velocity 5m/s
@@ -57,9 +60,7 @@ Landing/Disarm : 58% -> 55%
 
 )
 
-op b : Nat -> Id .
-op st : Nat -> Id .
-op eI : -> Id .
+
     
 op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
 eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
@@ -67,15 +68,15 @@ eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
 op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
              -> KB .
 eq mkBekb(n,sx,sy,sz,v,e) = 
-    (atloc(b(n),mkLoc(sx,sy,sz)) @ 0)
-    class(b(n),Bot) (energy(b(n),e) @ 0) (targetVel(b(n),v) @ 0) .
+    (atloc(b(n),mkLoc(sx,sy,sz)) @ 0) (rand(0) @ 0)
+    class(b(n),Bot) (energy(b(n),e) @ 0) (targetVel(b(n),v) @ 0) (timeElapsed(0.0) @ 0) .
 
 op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> KB .
 eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) = 
     mkBekb(n,sx,sy,sz,v,e) myAlt(b(n),a) (caution(b(n),c) @ 0)
     myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
-    (rand(b(n),0) @ 0)(visited(b(n),nil) @ 0) 
-    (lastVisit(b(n),mkLoc(sx,sy,sz)) @ 0)
+    (visited(b(n),nil) @ 0) 
+    (lastVisit(b(n),mkLoc(sx,sy,sz),0.0) @ 0)
     (mkCountVisits(n,locs))
      clock(0) .
 
@@ -135,18 +136,11 @@ ops asys asys2 : Nat -> ASystem .
 eq asys(n) = { conf1 bound(n) } .
 
 *** VN: For now ingnoring direction
-op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
-***(
-eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) = 
-      addK(ekb,
-      (atloc(id,{senLoc(sx,sy,sz),sen2grid(senLoc(sx,sy,sz))}) @ s n)
-      (vel(id,v) @ s n) (energy(id,e) @ s(n))) .
-)
-eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,n) = 
+op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
+eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,dt,n) = 
       addK(ekb,
       (atloc(id,{senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))}) @ s n)
-      (vel(id,v) @ s n) (energy(id,e) @ s(n))) .
-
+      (vel(id,v) @ s n) (energy(id,e) @ s(n)) (timeElapsed(dt) @ s n)) .
 
 op getIds : ASystem -> IdSet .
 eq getIds({ aconf }) = getIdsX(aconf, none)  .
@@ -155,14 +149,13 @@ op getIdsX : Conf IdSet -> IdSet .
 eq getIdsX(aconf, ids) = ids [owise] .
 eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
 
-***()
 op upDateRand : ASystem Nat -> ASystem .
-eq upDateRand({[ b(0) : Bot | lkb : lkb, attrs] aconf}, n) =
-               {[b(0) : Bot | lkb : upDateRandKB(lkb,n), attrs] aconf} .
+eq upDateRand({[ eI | ekb ] aconf}, n) =
+              {[ eI | upDateRandKB(ekb,n)] aconf} .
 
 op upDateRandKB  : KB Nat -> KB .
-eq upDateRandKB((rand(id,n') @ t) lkb,n) = (rand(id,n' + n) @ t) lkb .
-eq upDateRandKB(lkb,n) = lkb [owise] .
+eq upDateRandKB((rand(n') @ t) kb,n) = (rand(n' + n) @ t) kb .
+eq upDateRandKB(kb,n) = kb [owise] .
 
 ****
 --- eq windThresh = round(float(rand.25) / 2.0) .
