@@ -380,8 +380,6 @@ fmod AGENT-CONF is
   --- check if there is collision
   op okEnv : KB -> Bool .
 
-
-
 endfm
 
 

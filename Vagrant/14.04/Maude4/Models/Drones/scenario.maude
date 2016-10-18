@@ -135,13 +135,6 @@ eq asys4 = { conf4 } .
 ops asys asys2 : Nat -> ASystem .
 eq asys(n) = { conf1 bound(n) } .
 
-*** VN: For now ingnoring direction
-op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
-eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,dt,n) = 
-      addK(ekb,
-      (atloc(id,{senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))}) @ s n)
-      (vel(id,v) @ s n) (energy(id,e) @ s(n)) (timeElapsed(dt) @ s n)) .
-
 op getIds : ASystem -> IdSet .
 eq getIds({ aconf }) = getIdsX(aconf, none)  .
 
@@ -171,56 +164,6 @@ sort BoolRes .
 op br : Bool String -> BoolRes .
 op getObs : ASystem -> BoolRes .
 
-op getObsHome : KB KB -> String .
-eq getObsHome(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home), 
-            ( atloc(b(0),loc) @ t0) ekb) = 
-     (if (close(home,loc))
-      then "(double 1)"
-      else "(double 0)"
-      fi) .
-eq getObsHome(lkb,ekb) = "(double 0)" [owise] .
-
-**** for GenericApprox
-op getObs1 : Conf -> String .
-eq getObs1([ id : Bot | lkb : lkb, attrs] [eid | ekb ] aconf ) 
-      =  getObsHome(lkb,ekb) .
-eq getObs1( aconf ) =  "(double 0)" [owise] .
-
-**** for nGenericApprox
-op getObsN : Conf -> String .
-ceq getObsN([ id : Bot | lkb : lkb, attrs] [eid | ekb ] aconf )
-    =  getObsHome(lkb,ekb) + " " + mkdouble(e)  + " " + mkdouble(float(m)) + " " + mkdouble(float(n))
- if kb (energy(id,e) @ t) := ekb 
- /\ m := findMin(id,lkb,100000) 
- /\ n := countTotal(id,lkb) .
-
-op countTotal : Id KB -> Nat .
-eq countTotal(id,(countVisit(id,loc,n) @ t) kb) 
- = n + countTotal(id,kb) .
-eq countTotal(id,kb) = 0 [owise] .
-
---- eq getObsN( aconf ) = "(double 0) (double 0)" [owise] .  
-
-op mkdouble : FiniteFloat -> String .
-eq mkdouble(e) = 
-  "(" + "double" + " " + makeString(decFloat(e,2)) + ")"  .
-
-op getObsKB : KB KB -> Bool .
-eq getObs({aconf}) = br(true,getObsN(aconf)) .
-
-***(
-
-eq getObs({[ b(0) : Bot | lkb : lkb, attrs] [eid | ekb ] aconf }) =
-   getObsKB(lkb,ekb)  .
-eq getObsKB(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home) , 
-            ( atloc(b(0),loc) @ t0) ekb) = distance(home,loc) < 6 .
-eq getObs({ aconf }) = false [owise] .
-)
-op getObsVisited : ASystem -> Nat .
-op getObsEnergy : ASystem -> FiniteFloat .
-eq getObsVisited({[ b(0) : Bot | lkb : ((visited(b(0),locs) @ t0) lkb), attrs] [eid | ekb ] aconf }) 
- = len(locs).
-eq getObsEnergy({[ b(0) : Bot | lkb : lkb, attrs] [eid | ((energy(b(0),e) @ t) ekb) ] aconf }) = e .
 
 endm
 

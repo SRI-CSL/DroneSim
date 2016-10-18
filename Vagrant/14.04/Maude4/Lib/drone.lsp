@@ -5,15 +5,14 @@
 ;; at some stage the x y z v e will be used.
 ;; currently we drop them on the floor.
 ;;
-(define mkdrone (name ins)
+(define mkdrone (name ins mapP logP logFileName)
   ;; the 0 is the instance number (all ports depend on it)
-  (let ((drone (apply SimpleDrone name ins)))
+  (let ((drone (apply SimpleDrone name ins mapP)))
     (setuid drone name)
     (invoke drone "initialize")
+    (define logging logP)
+    (define logFile logFileName)
     drone))
-
-(define logging (boolean true))
-(define logFile "log10.txt")
 
 (import "plambda.actors.actorlib")
 

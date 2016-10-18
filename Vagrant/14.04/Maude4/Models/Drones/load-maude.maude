@@ -7,7 +7,7 @@ load ../../Lib/cp-e-rules
 load ../../Lib/pretty
 load knowledge
 load scp
-load tasks-sitl
+load tasks
 load actions
 load scenario
 --- load test
