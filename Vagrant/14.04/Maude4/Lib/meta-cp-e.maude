@@ -16,7 +16,7 @@ vars es0 es es' es'' es1 : ESet .
 vars InQ OutQ outQ toks toks' rids args ql : QidList .
 vars q modname initname aname amodname mname g2dname g2dvname pyname sname
       maudename id reqid  gname scaleq dsizeq 
-      act dir x y z dx dy dz v e idchar amt  status
+      act dir x y z dx dy dz v e dt idchar amt  status
       rid sysOp nq statsname statsOp randinc
       epsilon delta threshold rounds alpha pval minrounds maxrounds rate 
       : Qid .
@@ -28,7 +28,7 @@ vars t t' t0 idT idterm sxT syT szT vT xT yT zT dxT dyT dzT
       timeT timeT1 mteT nztT nztT1 actsT actsT1 ekbT ekbT' delayT durT
       aconfT aconfT0 aconfT1 aconfT2 aconfT' confT sconfT edgeXT
       idLocsT  maxCT chargeUT costMvT 
-      bT nT1 idsT : Term .
+      bT nT1 idsT dtT : Term .
 var tl idLocTL actTL : TermList .
 vars res? res?? res1? res1?? res0? 
      res0?? res2?? res3?? res4?? res5?? res6?? res7??
@@ -774,22 +774,24 @@ eq id2IdT(idstr) = 'unk.Id [owise] .
 
  crl[odUnitAct]:
     [nil,
-     st(processing(req('odUnitAct, ql(id x y z dx dy dz v e toks),reqQ')), 
+     st(processing(req('odUnitAct, 
+                       ql(id x y z dx dy dz v e dt toks),reqQ')), 
         wait4s,reqQ,es,log), 
      outQ]
       =>
       [nil,  
-       st(ready, wait4s, (reqQ reqQ0), updateEkbT(es,id,x,y,z,dx,dy,dz,v,e),log),
+       st(ready, wait4s, (reqQ reqQ0),
+           updateEkbT(es,id,x,y,z,dx,dy,dz,v,e,dt),log),
       outQ ] 
-    if reqQ0 :=   req('logreq,ql('odUnitAct id x y z v e toks), reqQ')
+    if reqQ0 :=   req('logreq,ql('odUnitAct id x y z v e dt toks), reqQ')
                  .
 
-op updateEkbT : ESet Qid Qid Qid Qid Qid Qid Qid Qid Qid -> ESet .
-ceq updateEkbT(es,id,x,y,z,dx,dy,dz,v,e) =
+op updateEkbT : ESet Qid Qid Qid Qid Qid Qid Qid Qid Qid Qid -> ESet .
+ceq updateEkbT(es,id,x,y,z,dx,dy,dz,v,e,dt) =
         addEntry(es,'tval,'envKB,tm(amodname,ekbT'))
 if tm(amodname,ekbT) := 
        getVal(es,'tval,'envKB,tm('SOFT-AGENTS,'none.KB))
-/\ tm(modname,timeT) := getVal(es,'tval,'time,tm('amodname,'infty.TimeInf))   
+/\ tm(modname,timeT) := getVal(es,'tval,'time,tm('amodname,'infty.TimeInf))  
 /\ idT := id2IdT(id)
 /\ xT := upTerm(float(string(x)))
 /\ yT := upTerm(float(string(y)))
@@ -798,26 +800,17 @@ if tm(amodname,ekbT) :=
 /\ dyT := upTerm(float(string(dy)))
 /\ dzT := upTerm(float(string(dz)))
 /\ vT := upTerm(float(string(v)))
-/\ eT := upTerm(float(rat(string(e),10)))  
-/\ res1?? := metaReduce([amodname],'updateEkb[ekbT,idT,xT,yT,zT,dxT,dyT,dzT,vT,eT,timeT])
+/\ eT := upTerm(float(rat(string(e),10)))
+/\ dtT := upTerm(float(string(dt)))  
+/\ res1?? := metaReduce([amodname],   
+                 'updateEkb[ekbT,idT,xT,yT,zT,dxT,dyT,dzT,vT,eT,dtT,timeT])
 /\ ekbT' := (if res1?? :: ResultPair then getTerm(res1??) else ekbT fi)
 .
 
- eq isReq('doActs) = true .
- eq enabled(wait4s,req('doActs,ql(toks),reqQ)) = true .
- 
- crl[doActs]:
-    [nil,
-     st(processing(req('doActs, ql(toks),reqQ')), 
-        wait4s,reqQ,es,log), 
-     outQ]
-      =>
-     [nil,  
-       st(ready, wait4s,  (reqQ reqQ0), es',log),
-      outQ]
-  if tm(amodname,aconfT) := 
+op doActs : ESet -> ESet .
+ceq doActs(es) = es' 
+if tm(amodname,aconfT) := 
        getVal(es,'tval,'agentConf,tm('SOFT-AGENTS,'`{_`}['none.Conf]))
-
   /\ res1?? := metaReduce([amodname],'envKB[aconfT])
   /\ ekbT := (if res1?? :: ResultPair then getTerm(res1??) else 'none.KB fi)
   /\ res2?? := metaReduce([amodname],'getTime['getConf[aconfT]])
@@ -838,12 +831,27 @@ if tm(amodname,ekbT) :=
              'tval,'mte,tm(amodname,mteT)), 
              'tval,'nzt,tm(amodname,mteT)), 
              'tval,'acts,tm(amodname,actsT))
+   .             
+             
+ eq isReq('doActs) = true .
+ eq enabled(wait4s,req('doActs,ql(toks),reqQ)) = true .
+ 
+ crl[doActs]:
+    [nil,
+     st(processing(req('doActs, ql(toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+     [nil,  
+       st(ready, wait4s,  (reqQ reqQ0), es',log),
+      outQ]
+  if es' := doActs(es)
+  /\ tm(amodname,mteT) := getVal(es','tval, 'mte, tm('NAT,'0.Zero))
   /\  reqQ1 := req('odActs,ql(toks),reqQ')
   /\  reqQ0 := (if hasSort([amodname],mteT,'NzTime)
                then req('doUnitActs,ql(toks),reqQ1)
                else reqQ'
-               fi)
-  .      
+               fi)  .      
 
 
  eq isReq('odActs) = true .
@@ -927,6 +935,7 @@ if tm(amodname,actsT) :=
 **** Act metatheory
 **** charge(id) @ 0 ; nzt
 ****   op _@_;_ : Action Time Time -> DEvent . 
+****   op _@_ : Action Time -> DEvent . 
 **** assume action declarations have the form op act : Id .. -> Action [ctor]
 
 op actsT2actTL : Term -> TermList .
@@ -943,6 +952,11 @@ eq getActTId('_@_;_[act[idT,tl],delayT,durT]) = idT2id(idT) .
 eq getActTAct('_@_;_[act[idT,tl],delayT,durT]) = act .
 eq getActTArgs(amodname,'_@_;_[act[idT,tl],delayT,durT]) = actArgs2QidL(amodname,tl) .
 eq getActTDelay('_@_;_[act[idT,tl],delayT,durT]) = delayT .
+
+eq getActTId('_@_[act[idT,tl],delayT]) = idT2id(idT) .
+eq getActTAct('_@_[act[idT,tl],delayT]) = act .
+eq getActTArgs(amodname,'_@_[act[idT,tl],delayT]) =   actArgs2QidL(amodname,tl) .
+eq getActTDelay('_@_[act[idT,tl],delayT]) = delayT .
 
 ****!!!! For now arg is constant
 --- actArgs2QidL('MODEL-KNOWLEDGE,upTerm(dir(1.0,0.0,0.0))) .

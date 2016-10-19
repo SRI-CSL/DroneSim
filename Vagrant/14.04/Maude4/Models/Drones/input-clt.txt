@@ -1,0 +1,55 @@
+
+*** what is going on
+(show control)
+(show requests)
+(show wait4s)
+(show log)
+(show summary)
+
+(reset control)
+(reset wait4s)
+
+**** restore maudes state
+(graphics2d OK)
+(plambda OK)
+
+**** check init
+(show val tval agentConf)
+(show val tval envKB)
+(show val qval simStatus)
+
+
+**** use doSimRound to step n units
+(doSimRound plambda 1)
+
+
+
+**** step by hand, 
+(rewTilDone timeStep)
+(show val tval agentConf)
+(rewTilDone  doTask)
+(show val tval agentConf)
+(doActs )
+(show val tval agentConf)
+**** doTask again ...
+
+*** setup drone
+(pyexe plambda (load "drone.lsp"))
+
+
+**** turn on IOP/g2d VERBOSITY
+(g2dexe graphics2d (supdate "g2d.util.ActorMsg" "VERBOSE" (boolean true)))
+(g2dexe graphics2d (supdate "g2d.Main" "DEBUG" (boolean true)))
+
+**** turn off IOP/g2d VERBOSITY
+(g2dexe graphics2d (supdate "g2d.util.ActorMsg" "VERBOSE" (boolean false)))
+(g2dexe graphics2d (supdate "g2d.Main" "DEBUG" (boolean false)))
+
+
+**** turn on IOP/plambda VERBOSITY
+(user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
+(user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
+
+**** turn off IOP/plambda VERBOSITY
+(user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
+(user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
