@@ -14,6 +14,8 @@ op [_|_] : Id KB -> Env [ctor format (n d nt d d d)] .  *** 6 format points
 
 eq timeEffect([eid | clock(t) ekb] aconf, u)
  = [eid | clock(t plus u) ekb] timeEffect(aconf, u) .
+eq timeEffectN([eid | clock(t) ekb] aconf, u)
+ = [eid | clock(t plus u) ekb] timeEffectN(aconf, u) .
 eq mteX([eid | ekb]) = infty .
 
  op getTime : Conf -> Time .

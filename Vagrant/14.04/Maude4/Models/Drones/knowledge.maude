@@ -270,6 +270,8 @@ fmod MODEL-KNOWLEDGE is
   eq incLateVisit(dt0,dt1,t1,(countLate(id,n) @ t) kb) = 
    if dt1 - dt0 > float(periodicity) then (countLate(id,s n) @ t1) kb
    else (countLate(id,n) @ t) kb fi .
+  eq incLateVisit(dt0,dt1,t1,kb) = kb [owise] .
+
 
   op close : Loc Loc -> Bool .
  

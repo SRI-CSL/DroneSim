@@ -77,7 +77,7 @@ eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) =
     myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
     (visited(b(n),nil) @ 0) 
     (lastVisit(b(n),mkLoc(sx,sy,sz),0.0) @ 0)
-    (mkCountVisits(n,locs))
+    (mkCountVisits(n,locs)) (countLate(b(n),0) @ 0)
      clock(0) .
 
 op mkCountVisits : Nat LocList -> KB .
