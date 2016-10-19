@@ -1,5 +1,19 @@
-fmod ANALYSIS is
+mod ANALYSIS is
   inc SCENARIO .
+
+vars n n' t t0 m : Nat .
+vars i j x y z : Int .
+vars sx sy sz dx dy dz v e c dt : FiniteFloat .
+var dir : Dir .
+vars wkb kb lkb ekb : KB .
+var aconf : Conf .
+var attrs : AttributeSet .
+var id eid : Id .
+var ids : IdSet .
+var cl : Class .
+var l home loc : Loc .
+var a : Int .
+var locs : LocList .
 
   op getObsHome : KB KB -> String .
   eq getObsHome(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home), 
@@ -53,4 +67,4 @@ fmod ANALYSIS is
   eq getObsEnergy({[ b(0) : Bot | lkb : lkb, attrs] [eid | ((energy(b(0),e) @ t) ekb) ] aconf }) = e .
 
 
-endfm
+endm

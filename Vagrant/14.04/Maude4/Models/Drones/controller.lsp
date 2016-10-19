@@ -7,9 +7,12 @@
    "\n"
    "(invoke sys.stderr 'write' 'initializing {0}\\n')"
    "\n"
-   "(load 'drone.lsp')"
+   "(load '../../Lib/drone.lsp')"
    "\n"
-   "(define b0 (apply mkdrone 'b0' (int {1})))"
+   "(define b0 (apply mkdrone 'b0' (int {1}) (boolean false) (boolean false)
+   'log.txt'))"
+   "\n"
+   "(apply setStartTime)"
    "\n"
    "(import 'plambda.actors.actorlib')"
    "\n"
@@ -27,7 +30,7 @@
    "\n"
    "loop init ."
    "\n"
-   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} SCENARIO asys3 OnePatrolBot)\n (augAgentEsetConcurrentStats Patrol 400))"
+   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} STATS asys2 false)\n (augAgentEsetConcurrentStats Patrol 400))"
    "\n"
    )
   )
@@ -40,7 +43,7 @@
    '\n'
    '(load "/home/vagrant/imaude/jlib/jl-util.lsp")'
    '\n'
-   '(load "stats-funs.lsp")'
+   '(load "../../Lib/stats-funs.lsp")'
    '\n'
    '(define generic_alpha (double {1}))'
    '\n'
@@ -69,7 +72,7 @@
   )
 
 
-(define clone_count (int 3))
+(define clone_count (int 4))
 
 (define plambda_clones (mklist))
 (define plambda_population clone_count)

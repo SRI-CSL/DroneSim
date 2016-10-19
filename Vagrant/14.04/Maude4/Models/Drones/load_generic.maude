@@ -1,15 +1,21 @@
-**** load load  **** scenario0
+**** generic load file for maude clones
 
 load ../../Lib/time
 load ../../Lib/soft-agents
 load ../../Lib/cp-e-config
 load ../../Lib/cp-e-rules
 load ../../Lib/pretty
+
 load knowledge
 load scp
 load tasks
 load actions
 load scenario
---- load test
+load sitl
 load analysis-stats
 
+mod STATS is inc SITL . inc ANALYSIS . endm
+
+load model-checker 
+load /home/vagrant/imaude/ilib/load-lib
+load ../../Lib/meta-cp-e 
