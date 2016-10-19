@@ -340,6 +340,28 @@ fmod AGENT-CONF is
   
   op timeEffectA : Action Time -> EventSet .
     
+
+  *** time elapse (also update local clocks) for nonMaude physics
+  op timeEffectN : Conf Time -> Conf .
+  eq timeEffectN([a : cl | lkb : (lkb clock(t)), evs : evs, attrs] aconf, u) 
+   = [a : cl | lkb : (lkb clock(t plus u)), evs : timeEffectN(evs,u), attrs] timeEffectN(aconf, u) .
+  eq timeEffectN(aconf, u) = aconf [owise] .
+
+  op timeEffectN : EventSet Time -> EventSet .
+  eq timeEffectN((tsk @ t) evs, u) 
+   = (tsk @ (t monus u)) timeEffectN(evs,u) .
+  eq timeEffectN((act @ t ; t') evs, u) 
+   = (act @ (t monus u) ; (t' monus (u monus t))) timeEffectN(evs,u) .
+  eq timeEffectN(evs, u) = evs [owise] .
+
+  eq timeEffectN((act @ t) evs, u) = 
+     (if (t >= u)
+       then  (act @ (t monus u))
+       else  none
+       fi ) 
+        timeEffectN(evs,u) .
+
+
   **** assume that actions are annotated with delays 
   op mte : Conf -> TimeInf .
   eq mte(aconf) = mteX(aconf) .
