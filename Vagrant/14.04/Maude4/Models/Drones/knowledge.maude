@@ -118,8 +118,14 @@ fmod MODEL-KNOWLEDGE is
   op targets : Id LocList LocList -> Info .
   eq hasId(id,targets(id,locs,locs1) @ t) = true .
 
+  op isTarget : Loc KB -> Bool .
+  eq isTarget(loc,(targets(id,locs0 ; loc ; locs,locs1) @ t) kb) = true .
+  eq isTarget(loc,(targets(id,locs,locs0 ; loc ; locs1) @ t) kb) = true .
+  eq isTarget(loc,kb) = false [owise] .
+
   op lastVisit : Id Loc FiniteFloat -> Info .
   eq hasId(id,lastVisit(id,loc,dt) @ t) = true .
+
   op getTimeVisit : Id Loc KB -> FiniteFloat .
   eq getTimeVisit(id,loc,(lastVisit(id,loc,dt) @ t) kb) = dt .
   eq getTimeVisit(id,loc,kb) = 0.0 [owise] .
@@ -160,7 +166,7 @@ fmod MODEL-KNOWLEDGE is
 
   op rand : Nat -> Info .
   op getRand : Id KB -> KB .
-  eq getRand(b(j),(rand(r) @ t) (clock(t1)) kb) = rand(r + t1 * (s j)) @ t .
+  eq getRand(b(j),(rand(r) @ t) (clock(t1)) kb) = rand(r + t1 * (s j)) @ t1 .
   eq getRand(id,kb) = none [owise] .
 
   **** This is the target velocity is the absolute velocity

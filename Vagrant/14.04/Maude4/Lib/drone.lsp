@@ -51,7 +51,7 @@
 (define setStartTime () (define startTime (invoke time "clock")))
 
 (define getTimeElapsed ()
-  (* (- (invoke time "clock") startTime ) (int 1000)))
+  (- (invoke time "clock") startTime ) )
 
 
 (import "plambda.util.Util")
