@@ -212,7 +212,9 @@ class SimpleDrone(object):
             return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
-        
+    
+    def gotoW(self,vx,vy,vz,wx,wy,wz,dur):
+        vehicle.send_ned_velocity(vx + wx,vy + wy,vz + wz,dur)
 
     def __str__(self):
         if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:

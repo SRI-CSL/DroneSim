@@ -114,6 +114,11 @@ eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
 op asys1 : -> ASystem .
 eq asys1 = { conf1 } .
 
+--- eq windThresh = round(float(rand.25) / 2.0) .
+eq windThresh = 0 .
+eq stopSimulation = 75.0 .
+
+
 ops asys asys2 : Nat -> ASystem .
 eq asys(n) = { conf1 bound(n) } .
 
@@ -134,9 +139,7 @@ eq upDateRandKB(clock(t1) (rand(n') @ t) kb,n) =
 eq upDateRandKB(kb,n) = kb [owise] .
 
 ****
---- eq windThresh = round(float(rand.25) / 2.0) .
-eq windThresh = 0 .
-eq stopSimulation = 75.0 .
+
 
 **** true if landed at home 
 **** false owise

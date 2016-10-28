@@ -130,9 +130,8 @@ ceq sitlActIncremental(id,kb)  =
        else (if notDone(pact,loc)
          then (if locR =/= loc --- Wind in the middle of performing an action
                then {mkMvAct(id,loc,locR,v), 
-                    addK((pending(id,goTo(id,locR)) @ s t)
-                    (targets(id,getLoc(pact) ; locs, locs1) @ s t),kb)}
-                 else {continue(id),kb} fi)
+                    addK((pending(id,goTo(id,locR)) @ s t),kb)}
+                else {continue(id),kb} fi)
          else (if pact == land(id)
           then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
             else (if pact == goTo(id,home)
@@ -140,14 +139,14 @@ ceq sitlActIncremental(id,kb)  =
                  else (if e < c 
                    then {mkMvAct(id,loc,home,v), 
                          addK(pending(id,goTo(id,home)) @ s t,kb)}
-                    else (if locs == nil    **** done, repeat the loop
+                    else 
+                     (if getLoc(pact) == first(locs)
                       then {mkMvAct(id,loc,first(locs1),v),
-                            addK((pending(id,goTo(id,first(locs1))) @ s t)
-                             (targets(id,rest(locs1), first(locs1)) @ s t),
+                        addK((pending(id,goTo(id,first(locs1))) @ s t)
+                        (targets(id,first(locs1), rest(locs1) ; first(locs)) @ s t),
                              kb1)}
-                        else {mkMvAct(id,loc,first(locs),v), 
-                             addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
-                               (pending(id,goTo(id,first(locs))) @ s t),
+                      else {mkMvAct(id,loc,first(locs),v), 
+                            addK((pending(id,goTo(id,first(locs))) @ s t),
                                kb1)}
                     fi ) fi) fi) fi) fi)  fi) fi)
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
@@ -159,7 +158,7 @@ ceq sitlActIncremental(id,kb)  =
             then (if close(getLoc(pact),loc) and isTarget(getLoc(pact),kb) 
                   then 
                     addK(lastVisit(id,getLoc(pact),dt) @ t, 
-                    incLateVisit(getTimeVisit(id,getLoc(pact),kb),dt,t,
+                    incLateVisit(dt,getTimeVisit(id,getLoc(pact),kb),t,
                     incCountVisit(id,getLoc(pact),t,kb)))
                   else kb fi)
             else kb fi)  

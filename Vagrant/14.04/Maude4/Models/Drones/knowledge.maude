@@ -11,7 +11,7 @@ fmod MODEL-KNOWLEDGE is
   vars gl0 gl1 gl2 gl3 : GridLoc .
   vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 :  KB .
   var dir dir0 dir1 : Dir .
-  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 : FiniteFloat .
+  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
   var act act0 act1  : Action .
   vars n n0 n1 r j : Nat .
@@ -108,6 +108,11 @@ fmod MODEL-KNOWLEDGE is
    /\ ffy1 := float(y1) / norm2 
    /\ ffz1 := float(z1) / norm2 .
    
+  op wind : FiniteFloat FiniteFloat FiniteFloat -> Info .
+  op getWind : KB -> KB .
+  eq getWind((wind(ffx,ffy,ffz) @ t) kb ) = (wind(ffx,ffy,ffz) @ t) .
+  eq getWind(kb ) = none [owise] .
+
   op pending : Id Action -> Info .
   eq hasId(id,pending(id,act) @ t) = true .
 
@@ -189,6 +194,8 @@ fmod MODEL-KNOWLEDGE is
   op land : Id Nat -> Action .
 --- We will need to probably add velocity to the goTo action
   op goTo : Id Loc -> Action .
+  op goToW : Id Loc FiniteFloat -> Action .
+  op goToW : Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Action .
   *** the following two are deprecated!
   op mv : Id Dir FiniteFloat -> Action .
   op charge : Id -> Action .
@@ -200,6 +207,12 @@ fmod MODEL-KNOWLEDGE is
   eq distance({senl0,pt(x0,y0,z0)},{senl1,pt(x1,y1,z1)}) = 
     abs(x0 - x1) + abs(y0 - y1) + abs(z0 - z1) .
 
+  op getNormVec : Loc Loc -> Dir .
+  ceq getNormVec({senLoc(ffx0,ffy0,ffz0),gl0},{senLoc(ffx1,ffy1,ffz1),gl1}) = dir(fdx / ffn, fdy / ffn, fdz / ffn)
+   if fdx := ffx1 - ffx0
+   /\ fdy := ffy1 - ffy0
+   /\ fdz := ffz1 - ffz0
+   /\ ffn := sqrt(fdx ^ 2.0 + fdy ^ 2.0 + fdz ^ 2.0) .
 
   --- location occupied if there is a bot at the location
   op occupied : Loc KB -> Bool .
@@ -277,7 +290,6 @@ fmod MODEL-KNOWLEDGE is
    if dt1 - dt0 > float(periodicity) then (countLate(id,s n) @ t1) kb
    else (countLate(id,n) @ t) kb fi .
   eq incLateVisit(dt0,dt1,t1,kb) = kb [owise] .
-
 
   op close : Loc Loc -> Bool .
  

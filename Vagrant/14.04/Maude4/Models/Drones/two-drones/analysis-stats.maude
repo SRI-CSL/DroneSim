@@ -1,5 +1,5 @@
 mod ANALYSIS is
-  inc SCENARIO .
+  inc SITL .
 
 vars n n' t t0 m k n1 h : Nat .
 vars i j x y z : Int .
