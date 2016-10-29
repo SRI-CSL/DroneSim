@@ -59,11 +59,6 @@ Landing/Disarm : 58% -> 55%
 
 )
 
-
-    
-op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
-eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
-
 op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
              -> KB .
 eq mkBekb(n,sx,sy,sz,v,e) = 
@@ -92,7 +87,7 @@ eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
 ops mkE1 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
 ops mkE2 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
 eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)] .
-eq mkE2(n,sx,sy,sz,v,e) = [eI | clock(0) (rand(0) @ 0) 
+eq mkE2(n,sx,sy,sz,v,e) = [eI | clock(0) (rand(0) @ 0) (wind(0.0,1.0,0.0) @ 0)
                                          mkBekb(n,sx,sy,sz,v,e) 
                                          mkBekb(s n,sx,sy,sz,v,e)] .
 

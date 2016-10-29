@@ -19,7 +19,7 @@ vars q modname initname aname amodname mname g2dname g2dvname pyname sname
       act dir x y z dx dy dz v e dt idchar amt  status
       rid sysOp nq statsname statsOp randinc
       epsilon delta threshold rounds alpha pval minrounds maxrounds rate 
-      : Qid .
+      vx vy vz wx wy wz dur : Qid .
 vars mod agentMod amod module : Module .
 vars ?string str idstr argstr createSOExp
       dsize scale gx gy gz maxC chargeU costMv edgeX sx sy sz  : String .
@@ -703,6 +703,9 @@ eq mkActArgs('takeOff, amt toks) = sqquote(amt) .
 **** eq mkActArgs('charge, amt toks) = sqquote(amt) .
 **** eq mkActArgs('charge, nil) = squote("5") .
 eq mkActArgs(act,toks) = "" [owise] .
+eq mkActArgs('goToW, vx vy vz wx wy wz dur toks) = 
+     sqquote(vx) + " " + sqquote(vy) + " " + sqquote(vz) + " " +
+     sqquote(wx) + " " + sqquote(wy) + " " + sqquote(wz) + " " + sqquote(dur) .
 
 --- op mkActArgsDir : Qid -> String .
 --- eq mkActArgsDir('dir[x,y,z]) = sqquote(x) + " " +  sqquote(y) + " " +  sqquote(z) .

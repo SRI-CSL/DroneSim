@@ -61,6 +61,9 @@ fmod MODEL-KNOWLEDGE is
           rat(floor((ffz - senZLow) / gridStepZ)))
     .
 
+  op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
+  eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
+
   op equiv : Loc Loc -> Bool .
   eq equiv({senl0,gl0},{senl1,gl0}) = true .
   eq equiv(l0,l1) = false [owise] .

@@ -21,6 +21,7 @@ fmod MODEL-TASKS is
   vars locs locs0 locs1 locs2 locs3 : LocList .
  
   op sampleTime : -> FiniteFloat .
+  eq sampleTime = 1.0 .
 
 **** bot processes rcvs any other events are ignored
 **** should not be any others
@@ -55,7 +56,7 @@ eq doControl(act,kb) = {act,kb} [owise] .
 
 op windEffect : KB -> Dir .
 ceq windEffect((rand(r) @ t) (wind(ffx,ffy,ffz) @ t1) kb) = 
-  if j > windThresh 
+  if j < windThresh 
   then dir(ffx * wsp, ffy * wsp, ffz * wsp)
   else dir(0.0,0.0,0.0) fi
  if j := random(r)
@@ -67,7 +68,7 @@ ceq windEffect((rand(r) @ t) (wind(ffx,ffy,ffz) @ t1) kb) =
 ****   op solveScp : Id KB ActSet -> ActSet .
 
   ceq doTask(cl,id,tick,ievs,devs,ekb,lkb) = 
-{lkb3, devs (tick @ 1) (act @ 0),tell(id,act,lkb3)} 
+{lkb4, devs (tick @ 1) (act1 @ 0),tell(id,act1,lkb3)} 
    if lkb0 := handleS(cl,id,lkb,ievs)
    /\ lkb1 := getSensors(id,ekb)
    /\ lkb2 := proSensors(id,lkb0,lkb1)
@@ -75,12 +76,11 @@ ceq windEffect((rand(r) @ t) (wind(ffx,ffy,ffz) @ t1) kb) =
    /\ {act1,lkb4} := doControl(act,lkb3)
  .
 
-
-
 sort ActionKB .
 op `{_`,_`} : Action KB -> ActionKB .
 
 op sitlAct : Id KB -> ActionKB .
+op sitlTest : Id KB -> ActionKB .
 op sitlActSimple : Id KB -> ActionKB .
 op sitlActIncremental : Id KB -> ActionKB .
 op sitlActSCP : Id KB -> ActionKB .
@@ -91,9 +91,31 @@ op sitlActSCP : Id KB -> ActionKB .
 *** The wind effect moves the drone to some direction 
 *** from the intended position
 
---- eq sitlAct(id,kb) = sitlActSimple(id,kb) .
-eq sitlAct(id,kb) = sitlActIncremental(id,kb) .
+--- eq sitlAct(id,kb) = sitlTest(id,kb) .
+eq sitlAct(id,kb) = sitlActSimple(id,kb) .
+--- eq sitlAct(id,kb) = sitlActIncremental(id,kb) .
 --- eq sitlAct(id,kb) = sitlActSCP(id,kb) .
+
+ceq sitlTest(id,kb) = 
+ {takeOff(id,alt), addK((pending(id,takeOff(id,alt)) @ s t), kb)}
+ if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
+        myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
+      (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
+      (rand(r) @ t5) (timeElapsed(dt) @ t6) kb0 ) := kb
+ /\ none := getPending(id,kb) .
+
+ceq sitlTest(id, kb) = 
+ {goToW(id,mkLoc(40.0,-10.0,float(alt)),5.0), 
+  addK(pending(id,goToW(id,mkLoc(40.0,-10.0,float(alt)),5.0)) @ s t, kb)}
+if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
+        myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
+      (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
+      (rand(r) @ t5) (timeElapsed(dt) @ t6) kb0 ) := kb
+/\ takeOff(id,alt) := getPending(id,kb0)
+/\ not notDone(takeOff(id,alt),loc) .
+
+eq sitlTest(id,kb) = {continue(id),kb} [owise] . 
+
 
 ceq sitlActSimple(id,kb)  =
   (if pact == none   ***** haven't started
@@ -101,32 +123,28 @@ ceq sitlActSimple(id,kb)  =
    else (if (e < stopSimulation and not (pact == land(id) or pact == stop(id))) --- Force to land whenever the energy is too low
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
        else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
-         then (if locR =/= loc and isGoTo(pact) --- Wind in the middle of performing an action and in goTo mode.
-               then {mkMvAct(id,loc,addLoc(getLoc(pact),locR,loc),v), 
-                    addK((pending(id,goTo(id,addLoc(getLoc(pact),locR,loc))) @ s t) 
-                    ,kb)}
-                   else {continue(id),kb} fi)
+         then {continue(id),kb} 
            else (if pact == land(id) --- if landing, then stop
             then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-              else (if pact == goTo(id,home)
+              else (if pact == goToW(id,home,v)
                 then {land(id), addK(pending(id,land(id)) @ s t,kb)}
                  else (if e < c 
-                   then {mkMvAct(id,loc,home,v), 
-                         addK(pending(id,goTo(id,home)) @ s t,kb)}
+                   then {goToW(id,home,v), 
+                         addK(pending(id,goToW(id,home,v)) @ s t,kb)}
                     else (if locs == nil    
-                      then {mkMvAct(id,loc,first(locs1),v),
-                            addK((pending(id,goTo(id,first(locs1))) @ s t)
+                      then {goToW(id,first(locs1),v),
+                            addK((pending(id,goToW(id,first(locs1),v)) @ s t)
                              (targets(id,rest(locs1), first(locs1)) @ s t),
                              kb1)}
-                       else {mkMvAct(id,loc,first(locs),v), 
+                       else {goToW(id,first(locs),v), 
                                addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
-                               (pending(id,goTo(id,first(locs))) @ s t),
+                               (pending(id,goToW(id,first(locs),v)) @ s t),
                                kb1)}
                     fi ) fi) fi) fi) fi)  fi) fi)        
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
         myAlt(id,alt) myHome(id,home) (targetVel(id,v) @ t2) 
       (targets(id,locs,locs1) @ t3) (caution(id,c) @ t4) 
-      (rand(r) @ t5) (timeElapsed(dt) @ t6) kb0 ) := kb
+       (timeElapsed(dt) @ t6) kb0 ) := kb
    /\ pact := getPending(id,kb0)
    /\ kb1 := (if isGoTo(pact)
             then (if close(getLoc(pact),loc) 
@@ -135,8 +153,7 @@ ceq sitlActSimple(id,kb)  =
                             incCountVisit(id,getLoc(pact),t,kb))) 
                   else kb fi)
             else kb fi)  
-   /\ locR := windEffect(loc,r)
-.
+   .
 
 op addLoc : Loc Loc Loc -> Loc .
 op addLoc$ : SenLoc SenLoc SenLoc -> Loc .
@@ -281,6 +298,7 @@ ceq notDone(land(id), loc)  = false
 --- ceq notDone(land(id), loc)  = abs(iz) > 3 
  if pt(ix,iy,iz) := getGridLoc(loc) .
 eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
+eq notDone(goToW(id,loc0,v), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .
 
 ceq close(loc0,loc) =  abs(ix0 - ix) + abs(iy0 - iy) < 4
@@ -290,6 +308,7 @@ eq close(loc0,loc) = false [owise] .
 
 op isGoTo : ActSet -> Bool .
 eq isGoTo(goTo(id,loc)) = true .
+eq isGoTo(goToW(id,loc,v)) = true .
 eq isGoTo(acts) = false [owise] .
 
 ****            from to

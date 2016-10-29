@@ -213,8 +213,12 @@ class SimpleDrone(object):
         else:
             return 'Uninitialized'
     
-    def gotoW(self,vx,vy,vz,wx,wy,wz,dur):
-        vehicle.send_ned_velocity(vx + wx,vy + wy,vz + wz,dur)
+    def goToW(self,vx,vy,vz,wx,wy,wz,dur):
+         sys.stderr.write("HERE") 
+         # sys.stderr.write('{0} {1} {2} {3} {4} {5} {6}'.format(vx,vy,vz,wx,wy,wz,dur)) 
+         # self.send_ned_velocity(float(vx) + float(wx),float(vy) + float(wy),float(vz) + float(wz),2)
+         self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)), 0.0,2)
+         # self.send_global_velocity(-1.0,1.0,0.0,2)
 
     def __str__(self):
         if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
@@ -235,6 +239,49 @@ class SimpleDrone(object):
         else:
             return 'Uninitialized'
 
+    def send_ned_velocity(self,velocity_x, velocity_y, velocity_z, duration):
+        """
+        Move vehicle in direction based on specified velocity vectors.
+        """
+        msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
+            0,       # time_boot_ms (not used)
+            0, 0,    # target system, target component
+            mavutil.mavlink.MAV_FRAME_LOCAL_NED, # frame
+            0b0000111111000111, # type_mask (only speeds enabled)
+            0, 0, 0, # x, y, z positions (not used)
+            velocity_x, velocity_y, velocity_z, # x, y, z velocity in m/s
+            0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+            0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+
+
+        # send command to vehicle on 1 Hz cycle
+        for x in range(0,duration):
+            self.vehicle.send_mavlink(msg)
+            time.sleep(1)            
+
+    def send_global_velocity(self,velocity_x, velocity_y, velocity_z, duration):
+        """
+        Move vehicle in direction based on specified velocity vectors.
+        """
+        msg = self.vehicle.message_factory.set_position_target_global_int_encode(
+            0,       # time_boot_ms (not used)
+            0, 0,    # target system, target component
+            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # frame
+            0b0000111111000111, # type_mask (only speeds enabled)
+            0, # lat_int - X Position in WGS84 frame in 1e7 * meters
+            0, # lon_int - Y Position in WGS84 frame in 1e7 * meters
+            0, # alt - Altitude in meters in AMSL altitude(not WGS84 if absolute or relative)
+            # altitude above terrain if GLOBAL_TERRAIN_ALT_INT
+            velocity_x, # X velocity in NED frame in m/s
+            velocity_y, # Y velocity in NED frame in m/s
+            velocity_z, # Z velocity in NED frame in m/s
+            0, 0, 0, # afx, afy, afz acceleration (not supported yet, ignored in GCS_Mavlink)
+            0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+
+        # send command to vehicle on 1 Hz cycle
+        # for x in range(0,duration):
+        self.vehicle.send_mavlink(msg)
+            # time.sleep(1)
 
 """
 x.vehicle.location.local_frame.north        
