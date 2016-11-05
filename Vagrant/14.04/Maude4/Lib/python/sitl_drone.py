@@ -214,7 +214,7 @@ class SimpleDrone(object):
             return 'Uninitialized'
     
     def goToW(self,vx,vy,vz,wx,wy,wz,dur):
-         sys.stderr.write("HERE") 
+         sys.stderr.write("HERE\n") 
          # sys.stderr.write('{0} {1} {2} {3} {4} {5} {6}'.format(vx,vy,vz,wx,wy,wz,dur)) 
          # self.send_ned_velocity(float(vx) + float(wx),float(vy) + float(wy),float(vz) + float(wz),2)
          self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)), 0.0,2)
