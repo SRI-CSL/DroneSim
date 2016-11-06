@@ -123,6 +123,8 @@ fmod MODEL-KNOWLEDGE is
   eq getLoc(goTo(id,loc)) = loc .
   eq getLoc(act) = nil [owise] . *** Make sure it is always a goto
 
+   eq getLoc(goToW(id,loc,v)) = loc .
+ 
   op targets : Id LocList LocList -> Info .
   eq hasId(id,targets(id,locs,locs1) @ t) = true .
 
