@@ -1,0 +1,44 @@
+Agent Actions -- 
+
+takeOff(id,alt)
+land(id)
+goToW(id,loc,sp)
+stop(id)
+continue(id)
+
+***(
+controller  maps
+ takeOff(id,alt) >> 
+    if maudePhysics then takeOff(id,alt,z) else takeOff(id,alt)
+ land(id) >> land(id)
+    if maudePhysics then lan(id) else land(id) 
+ stop(id) >> none?
+ 
+ goToW(id,loc,sp) >> goToW(id,vx,vy,vz,wx,wy,wz,dur) -- adding wind vector
+ 
+ continue(id) >>
+   pending(goToW(id,loc,sp))  recompute as above
+   pending(takeOff(id,alt))   if maudePhysics then takeOff(id,alt) else continue(id)
+   pending(land(id))   if maudePhysics then land(id) else continue(id)
+)
+
+How does maude implement goToW(id,vx,vy,vz,wx,wy,wz,dur)
+   desired speed is length of (vx,vy,vz)
+
+ (a) forgetting acceleration
+     newloc = curloc + (vx+wx, vy+wy, vz+wz)
+     newspeed = len(vx+wx, vy+wy, vz+wz)
+
+ (b) accounting for acceleration 
+     cur speed sp0, acc a
+     (vx,vy,vz) = (dx,dy,dz) * sp  -- unit vector * speed
+     if spo >=  sp
+        newloc =  curloc + (vx+wx, vy+wy, vz+wz)
+        newspeed = sp0
+    ow newloc = curloc + (dx,dy,dz) * min(sp,sp0 + a/2) + w -- 
+       new speed = min(sp, sp0+a)
+       
+    
+If landing decrement z until 0ish
+If takeOff increment z until reach altitude        
+     
