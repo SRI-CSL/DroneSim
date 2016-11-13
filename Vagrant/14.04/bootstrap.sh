@@ -10,6 +10,7 @@ sudo apt-get install -y python-dev
 sudo apt-get install -y ipython
 sudo apt-get install -y libtool automake autoconf libexpat1-dev
 sudo apt-get install -y software-properties-common python-software-properties
+sudo apt-get install -y pkg-config
 
 
 
@@ -92,6 +93,8 @@ cd ..
 #
 echo "Cloning ardupilot"
 
+pip install future
+
 git clone git://github.com/ArduPilot/ardupilot.git
 
 
@@ -107,8 +110,16 @@ cd ardupilot
 ./waf configure --board minlure
 ./waf configure --board minlure
 
-echo "Building ardupilot"
+echo "Building arducopter"
 ./waf copter
+
+#
+# plane is not yet ready for prime time?
+#
+# https://github.com/dronekit/dronekit-sitl/issues/79
+#
+#echo "Building arduplane"
+#./waf plane
 
 
 echo "Time to build/testing ardupilot"
@@ -117,10 +128,9 @@ echo "Time to build/testing ardupilot"
 #
 #
 #sim_vehicle.py -v ArduCopter
+#sim_vehicle.py -v ArduPlane
 #
 #Once built you'll have to ^D to exit.
 #Then should be able to launch via:
 #
 #sim_vehicle.py -v ArduCopter --map --console
-
-
