@@ -8,10 +8,8 @@ continue(id)
 
 ***(
 controller  maps
- takeOff(id,alt) >> 
-    if maudePhysics then takeOff(id,alt,z) else takeOff(id,alt)
+ takeOff(id,alt) >>  takeOff(id,alt)
  land(id) >> land(id)
-    if maudePhysics then lan(id) else land(id) 
  stop(id) >> none?
  
  goToW(id,loc,sp) >> goToW(id,vx,vy,vz,wx,wy,wz,dur) -- adding wind vector

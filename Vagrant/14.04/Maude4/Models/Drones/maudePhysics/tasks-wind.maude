@@ -63,10 +63,12 @@ ceq doControl(goToW(id,loc,sp),kb)
  
 ceq doControl(continue(id), (pending(id,goToW(id,loc,sp)) @ t) kb) =
   {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,2.0 * sampleTime),
-   kb}
+   (pending(id,goToW(id,loc,sp)) @ t) kb}
  if dir(ffx,ffy,ffz) := windEffect(kb)
  /\ dir(ffx1,ffy1,ffz1) := getNormVec(getLoc(id,kb),loc) . 
 
+eq doControl(continue(id), (pending(id,act) @ t) kb) 
+          = {act,(pending(id,act) @ t) kb} [owise] .
 eq doControl(act,kb) = {act,kb} [owise] .
 
 op windEffect : KB -> Dir .
@@ -93,6 +95,11 @@ ceq windEffect((rand(r) @ t) (wind(ffx,ffy,ffz) @ t1) kb) =
 
 sort ActionKB .
 op `{_`,_`} : Action KB -> ActionKB .
+op getAKBAct : ActionKB -> Action .
+op getAKBKB : ActionKB -> KB .
+eq  getAKBAct({act,kb}) = act .
+eq  getAKBKB({act,kb}) = kb .
+
 
 op sitlAct : Id KB -> ActionKB .
 op sitlTest : Id KB -> ActionKB .
@@ -118,23 +125,23 @@ ceq sitlActSimple(id,kb)  =
              not (pact == land(id) or pact == stop(id))) 
              --- Force to land whenever the energy is too low
      then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-       else (if notDone(pact,loc) --- if not yet done, check whether there will be wind
+       else (if notDone(pact,loc) 
          then {continue(id),kb} 
            else (if pact == land(id) --- if landing, then stop
             then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
               else (if pact == goToW(id,home,v)
                 then {land(id), addK(pending(id,land(id)) @ s t,kb)}
                  else (if e < c 
-                   then {goToW(id,home,v), 
-                         addK(pending(id,goToW(id,home,v)) @ s t,kb)}
-                    else (if locs == nil    
-                      then {goToW(id,first(locs1),v),
-                            addK((pending(id,goToW(id,first(locs1),v)) @ s t)
-                             (targets(id,rest(locs1), first(locs1)) @ s t),
-                             kb1)}
-                       else {goToW(id,first(locs),v), 
-                               addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
-                               (pending(id,goToW(id,first(locs),v)) @ s t),
+                  then {goToW(id,home,v), 
+                       addK(pending(id,goToW(id,home,v)) @ s t,kb)}
+                  else (if locs == nil    
+                    then {goToW(id,first(locs1),v),
+                          addK((pending(id,goToW(id,first(locs1),v)) @ s t)
+                           (targets(id,rest(locs1), first(locs1)) @ s t),
+                           kb1)}
+                     else {goToW(id,first(locs),v), 
+                           addK((targets(id,rest(locs), locs1 ; first(locs)) @ s t) 
+                             (pending(id,goToW(id,first(locs),v)) @ s t),
                                kb1)}
                     fi ) fi) fi) fi) fi)  fi) fi)        
   if  ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
@@ -148,9 +155,7 @@ ceq sitlActSimple(id,kb)  =
                             incLateVisit(getTimeVisit(id,getLoc(pact),kb),dt,t,
                             incCountVisit(id,getLoc(pact),t,kb))) 
                   else kb fi)
-            else kb fi)  
-   .
-
+            else kb fi)  .
 
 
 **** abstracting random numbers to [0,1]

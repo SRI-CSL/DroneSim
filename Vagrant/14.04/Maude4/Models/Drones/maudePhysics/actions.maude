@@ -13,9 +13,12 @@ fmod MODEL-ACTIONS is
 	var n u alt : Nat .
   vars senl0 senl1 senl2  : SenLoc .
   vars gl0 gl1 gl2 : GridLoc .
+  var act : Action .
 
   var alt1 : Rat .
-  vars ffx ffy ffz ffx0 ffy0 ffz0 dx dy dz d dv dt dist : FiniteFloat .
+  vars ffx ffy ffz ffx1 ffy1 ffz1 ffx0 ffy0 ffz0 ffa  : FiniteFloat .
+  vars dx dy dz d dv dt sp dur : FiniteFloat .
+        
   
 ***** Get rid of timeEffectA  
 eq timeEffectA(act,t) = none .  ---- controller deals with this.
@@ -73,6 +76,22 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
 )
 
 
+***(
+Alisson's logs show .25 / sec early, then .125 /sec later 
+battery drain.
+
+Assume .5 for taking off  
+       .25 for landing
+       .25 for horizontal flight
+       .125 for hovering
+)
+
+ **** for 1 sec     
+ op costMv : FiniteFloat -> FiniteFloat .
+
+ op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+
+
 ************ sitl like unit actions
 **** goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp, ffx,ffy,ffz,dur)
 
@@ -85,16 +104,17 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
   /\ dx := ffx1 + ffx
   /\ dy := ffy1 + ffy
   /\ dz := ffz1 + ffz
-  /\ dist := sqrt((dx * dx) + (dy * dy) + (dz * dz))
+  /\ sp := sqrt((ffx1 * ffx1) + (ffy1 * ffy1) + (ffz1 * ffz1))
   /\ senl1 := senLoc(ffx0 + dx,ffy0 + dy,ffz0 + dz)
   /\ l1  := {senl1, msen2grid(senl1)}
   /\ e := getEnergy(id,ekb)
-  /\ e0 := energyGoToW(e, dist)
+  /\ e0 := energyGoToW(e, sp)
   /\ l3 := (if occupied(l1,ekb) then l0 else l1 fi)
   .
 
+**** costMv horizontal motion as sp for 1 unit
   op energyGoToW : FiniteFloat FiniteFloat  -> FiniteFloat .
-  eq energyGoToW(e,v) = max(e - costMv(dist),0.0) .  
+  eq energyGoToW(e,v) = max(e - costMv(v),0.0) .  
 
 
 ***(
@@ -130,6 +150,7 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
   .
 
 
+
   op takeOffInc : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
   eq takeOffInc(ffz0,ffa,v) = 
     (if ffa - ffz0 > v  then v else ffa - ffz0 fi) .
@@ -147,9 +168,9 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
  /\ senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
  /\ dz := landInc(ffz0,0.0,vland)
  /\ senl1 := senLoc(ffx0,ffy0, ffz0 - dz)
- /\ l1  {senl1, msen2grid(senl1)}
+ /\ l1 := {senl1, msen2grid(senl1)}
  /\ e := getEnergy(id,ekb)
- /\ e0 := energyLandU(e,vland,dz / vland)
+ /\ e0 := energyLandU(e,vland, dz / vland)
   .
 
   op landInc : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
@@ -157,7 +178,7 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
            (if ffz0 - ffa > v  then v else ffz0 - ffa fi) .
 
  op energyLandU : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
- eq energyLandU(e,v,dt) = max(e - costMvZ(v,dt),0.0) .  
+ eq energyLandU(e,v,dt) = max(e - costMvZ(- v,dt),0.0) .  
 
 
 ***( 

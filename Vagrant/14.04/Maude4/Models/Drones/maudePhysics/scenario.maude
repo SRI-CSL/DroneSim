@@ -1,0 +1,234 @@
+mod SCENARIO is
+  inc MODEL-ACTIONS  .
+  inc SOFT-AGENT-RULES .
+  ---  inc PRETTY .
+  --- inc SOLVE-SCP{valuation2valpatrolonly} . 
+  --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
+	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
+
+vars n n' t t0 m t1 : Nat .
+vars i j x y z : Int .
+vars sx sy sz dx dy dz v e c dt te : FiniteFloat .
+var dir : Dir .
+vars wkb kb lkb ekb : KB .
+var aconf : Conf .
+var attrs : AttributeSet .
+var id eid : Id .
+var ids : IdSet .
+var cl : Class .
+var l home loc : Loc .
+var a : Int .
+var locs : LocList .
+
+op bound : Nat -> ConfElt .
+
+eq comDistance = 2 .
+
+eq senXLow = 0.0 .
+eq senYLow = 0.0 .
+eq senZLow = 0.0 .
+
+---- Grid size
+eq gridStepX = 1.0 .
+eq gridStepY = 1.0 .
+eq gridStepZ = 1.0 .
+ 
+eq chargeUnit = 5.0 .
+eq maxCharge = 20.0 .
+
+eq botDelay = 1 .
+eq periodicity = 60 .
+
+eq vlift = 5.0 .
+eq vland = 5.0 .
+
+***(
+Performed one experiment with dronekit copter at velocity 5m/s
+and altitude 5m
+
+Takeoff : 100% -> 97%
+70m  : 96% -> 91%
+100m : 91% -> 85%
+100m : 84% -> 78%
+100m : 77% -> 71%
+100m : 70% -> 65%
+70m : 64% -> 59%
+Landing/Disarm : 58% -> 55%
+
+)
+
+***(
+Alisson's logs show .25 / sec early, then .125 /sec later 
+battery drain.
+
+Assume .5 for taking off  
+       .25 for landing
+       .25 for horizontal flight
+       .125 for hovering
+)
+
+ **** for 1 sec     
+***  op costMv : FiniteFloat -> FiniteFloat .
+eq costMv(v) = (if v < 3.0 then .125 else .25 fi) .
+**** eq costMv(v) = 0.06 . --- consumes x percent battery per meter
+
+
+**** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+ eq costMvZ(v,dt) = 
+     if (v > 0.0) 
+     then  dt * 0.5
+     else  dt * 0.25
+     fi .
+
+
+**** ekb has current velocity vel
+op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
+             -> KB .
+eq mkBekb(n,sx,sy,sz,v,e) = 
+    (atloc(b(n),mkLoc(sx,sy,sz)) @ 0)
+    class(b(n),Bot) (energy(b(n),e) @ 0) (vel(b(n),v) @ 0) .
+
+**** lkb has target velocity 
+op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> KB .
+eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) = 
+    mkBekb(n,sx,sy,sz,v,e)  (targetVel(b(n),v) @ 0) 
+    myAlt(b(n),a) (caution(b(n),c) @ 0)
+    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
+    (visited(b(n),nil) @ 0) 
+    (lastVisit(b(n),mkLoc(sx,sy,sz),0.0) @ 0)
+    (mkCountVisits(n,locs)) (countLate(b(n),0) @ 0)
+     clock(0) .
+
+op mkCountVisits : Nat LocList -> KB .
+eq mkCountVisits(n,loc ; locs) 
+ = (countVisit(b(n),loc,0) @ 0) mkCountVisits(n,locs) .
+eq mkCountVisits(n,nil) = none .
+
+op mkB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> Agent .
+eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
+ [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs),
+               ckb : none, evs : (tick @ 0)] .
+ 
+ops mkE1 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
+ops mkE2 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
+eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)] .
+
+eq mkE2(n,sx,sy,sz,v,e) = 
+      [eI | clock(0) (rand(0) @ 0) (wind(0.0,1.0,0.0) @ 0) (timeElapsed(0.0) @ 0)
+            mkBekb(n,sx,sy,sz,v,e) 
+            mkBekb(s n,sx + 5.0,sy,sz,v,e)] .
+
+
+ops locs1 locs2 locs1p : -> LocList .
+eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
+           ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
+
+eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
+           ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
+
+--- energy parameter is not yet useful
+ops conf1 conf2 conf3 conf4 : -> Conf .
+****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
+
+eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkB(1,5.0,0.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
+
+op asys1 : -> ASystem .
+eq asys1 = { conf1 } .
+
+--- eq windThresh = round(float(rand.25) / 2.0) .
+eq windThresh = 0 .
+eq stopSimulation = 75.0 .
+
+
+ops asys asys2 : Nat -> ASystem .
+eq asys(n) = { conf1 bound(n) } .
+
+op upDateRand : ASystem Nat -> ASystem .
+eq upDateRand({[ eI | ekb ] aconf}, n) =
+              {[ eI | upDateRandKB(ekb,n)] aconf} .
+
+op upDateRandKB  : KB Nat -> KB .
+eq upDateRandKB(clock(t1) (rand(n') @ t) kb,n) = 
+    clock(t1) (rand(n' + n) @ t1) kb .
+eq upDateRandKB(kb,n) = kb [owise] .
+
+
+***** CAVEAT -- this needs to be fixed if running w Sitl.
+***** probably just want two versions of updateConf
+
+op updateTE : KB FiniteFloat -> KB .
+eq updateTE(clock(t1) (timeElapsed(te) @ t) kb, dt)
+           = clock(t1) (timeElapsed(te + dt) @ t1) kb .
+****
+eq updateConf([ eI | ekb ] aconf) = 
+    [ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf .
+
+
+endm
+
+
+***(
+May want to use higher speed or more energy usage
+
+rew [300] asys1 .
+
+result ASystem: {
+[eI
+	| clock(100) class(b(0), Bot) class(b(1), Bot) (timeElapsed(1.0e+2) @
+    100) (rand(400) @ 100) (atloc(b(0), {senLoc(4.5022809024120846e+1,
+    1.2229466183677902e+1, 5.0),pt(45, 12, 5)}) @ 100) (atloc(b(1), {senLoc(
+    1.1136011148639966, -2.4763778176530945e+1, 5.0),pt(1, -24, 5)}) @ 100) (
+    energy(b(0), 7.475e+1) @ 100) (energy(b(1), 7.45e+1) @ 100) (vel(b(0), 5.0)
+    @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(100) class(b(0), Bot) (timeElapsed(9.9e+1) @ 99) (rand(495) @
+    99) (atloc(b(0), {senLoc(4.9481670880124874e+1, 9.9670447045824719, 5.0),
+    pt(49, 10, 5)}) @ 99) (pending(b(0), goToW(b(0), {senLoc(1.0e+1, 3.0e+1,
+    5.0),pt(10, 30, 5)}, 5.0)) @ 100) (countLate(b(0), 0) @ 0) (visited(b(0),
+    nil) @ 0) (energy(b(0), 7.5e+1) @ 99) (caution(b(0), 2.0e+1) @ 0) (
+    targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (wind(0.0, 1.0, 0.0) @ 0) (
+    targets(b(0), {senLoc(-2.0e+1, 5.0e+1, 5.0),pt(-20, 50, 5)} ; {senLoc(
+    -4.0e+1, 5.0, 5.0),pt(-40, 5, 5)}, {senLoc(5.0e+1, 1.0e+1, 5.0),pt(50, 10,
+    5)} ; {senLoc(1.0e+1, 3.0e+1, 5.0),pt(10, 30, 5)}) @ 100) (lastVisit(b(0),
+    {senLoc(-4.0e+1, 5.0, 5.0),pt(-40, 5, 5)}, 8.1e+1) @ 81) (lastVisit(b(0), {
+    senLoc(-2.0e+1, 5.0e+1, 5.0),pt(-20, 50, 5)}, 7.1e+1) @ 71) (lastVisit(b(
+    0), {senLoc(0.0, 0.0, 0.0),pt(0, 0, 0)}, 0.0) @ 0) (lastVisit(b(0), {
+    senLoc(1.0e+1, 3.0e+1, 5.0),pt(10, 30, 5)}, 6.4e+1) @ 64) (lastVisit(b(0),
+    {senLoc(5.0e+1, 1.0e+1, 5.0),pt(50, 10, 5)}, 9.9e+1) @ 99) (countVisit(b(
+    0), {senLoc(-4.0e+1, 5.0, 5.0),pt(-40, 5, 5)}, 2) @ 81) (countVisit(b(0), {
+    senLoc(-2.0e+1, 5.0e+1, 5.0),pt(-20, 50, 5)}, 2) @ 71) (countVisit(b(0), {
+    senLoc(1.0e+1, 3.0e+1, 5.0),pt(10, 30, 5)}, 2) @ 64) (countVisit(b(0), {
+    senLoc(5.0e+1, 1.0e+1, 5.0),pt(50, 10, 5)}, 3) @ 99) myHome(b(0), {senLoc(
+    0.0, 0.0, 0.0),pt(0, 0, 0)}) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), {senLoc(4.9481670880124874e+1,
+    9.9670447045824719, 5.0),pt(49, 10, 5)}) @ 99),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(100) class(b(1), Bot) (timeElapsed(9.9e+1) @ 99) (rand(594) @
+    99) (atloc(b(1), {senLoc(1.1136011148639966, -2.4763778176530945e+1,
+    1.0e+1),pt(1, -24, 10)}) @ 99) (pending(b(1), land(b(1))) @ 100) (
+    countLate(b(1), 0) @ 0) (visited(b(1), nil) @ 0) (energy(b(1), 7.475e+1) @
+    99) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0)
+    @ 0) (wind(0.0, 1.0, 0.0) @ 0) (targets(b(1), {senLoc(-3.5e+1, -5.0,
+    1.0e+1),pt(-35, -5, 10)} ; {senLoc(1.0e+1, -3.0e+1, 1.0e+1),pt(10, -30,
+    10)}, {senLoc(4.0e+1, -1.0e+1, 1.0e+1),pt(40, -10, 10)} ; {senLoc(-4.0e+1,
+    -4.0e+1, 1.0e+1),pt(-40, -40, 10)}) @ 92) (lastVisit(b(1), {senLoc(-4.0e+1,
+    -4.0e+1, 1.0e+1),pt(-40, -40, 10)}, 6.7e+1) @ 67) (lastVisit(b(1), {senLoc(
+    -3.5e+1, -5.0, 1.0e+1),pt(-35, -5, 10)}, 7.4e+1) @ 74) (lastVisit(b(1), {
+    senLoc(5.0, 0.0, 0.0),pt(5, 0, 0)}, 0.0) @ 0) (lastVisit(b(1), {senLoc(
+    1.0e+1, -3.0e+1, 1.0e+1),pt(10, -30, 10)}, 8.4e+1) @ 84) (lastVisit(b(1), {
+    senLoc(4.0e+1, -1.0e+1, 1.0e+1),pt(40, -10, 10)}, 9.1e+1) @ 91) (
+    countVisit(b(1), {senLoc(-4.0e+1, -4.0e+1, 1.0e+1),pt(-40, -40, 10)}, 2) @
+    67) (countVisit(b(1), {senLoc(-3.5e+1, -5.0, 1.0e+1),pt(-35, -5, 10)}, 2) @
+    74) (countVisit(b(1), {senLoc(1.0e+1, -3.0e+1, 1.0e+1),pt(10, -30, 10)}, 2)
+    @ 84) (countVisit(b(1), {senLoc(4.0e+1, -1.0e+1, 1.0e+1),pt(40, -10, 10)},
+    3) @ 91) myHome(b(1), {senLoc(5.0, 0.0, 0.0),pt(5, 0, 0)}) myAlt(b(1),
+    10)),
+  ckb : (class(b(1), Bot) atloc(b(1), {senLoc(1.1136011148639966,
+    -2.4763778176530945e+1, 1.0e+1),pt(1, -24, 10)}) @ 99),
+  evs : (tick @ 0)]}
+
+
+)
