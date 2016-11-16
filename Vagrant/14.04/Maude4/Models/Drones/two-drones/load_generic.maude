@@ -10,6 +10,6 @@ load scenario
 load sitl
 load analysis-stats
 
-load model-checker 
-load /home/vagrant/imaude/ilib/load-lib
-load ../../../Lib/meta-cp-e 
+--- load model-checker 
+--- load /home/vagrant/imaude/ilib/load-lib
+--- load ../../../Lib/meta-cp-e 

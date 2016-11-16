@@ -7,11 +7,11 @@ fmod MODEL-KNOWLEDGE is
   vars id id0 id1 : Id .
 	var cl : Class .
   vars l l0 l1 l2 l3 loc : Loc .
-  vars senl0 senl1 : SenLoc .
-  vars gl0 gl1 gl2 gl3 : GridLoc .
   vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 :  KB .
   var dir dir0 dir1 : Dir .
-  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn : FiniteFloat .
+  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 
+       ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy 
+       fdz ffn : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
   var act act0 act1  : Action .
   vars n n0 n1 r j : Nat .
@@ -49,23 +49,15 @@ fmod MODEL-KNOWLEDGE is
   op Station : -> Class .
 
 *** grid-location
-  sorts GridLoc SenLoc .
-  op {_,_} : SenLoc GridLoc -> Loc .
-  op pt : Int Int Int -> GridLoc .
-  op senLoc : FiniteFloat FiniteFloat FiniteFloat -> SenLoc .
-  op sen2grid : SenLoc -> GridLoc .
-
-  eq sen2grid(senLoc(ffx,ffy,ffz)) = 
-       pt(rat(floor((ffx - senXLow) / gridStepX)), 
-          rat(floor((ffy - senYLow) / gridStepY)),
-          rat(floor((ffz - senZLow) / gridStepZ)))
-    .
+  op pt : Int Int Int -> Loc .
 
   op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
-  eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
+  eq mkLoc(ffx,ffy,ffz) = pt(rat(floor((ffx - senXLow) / gridStepX)), 
+                          rat(floor((ffy - senYLow) / gridStepY)),
+                          rat(floor((ffz - senZLow) / gridStepZ))) .
 
   op equiv : Loc Loc -> Bool .
-  eq equiv({senl0,gl0},{senl1,gl0}) = true .
+  eq equiv(l0,l0) = true .
   eq equiv(l0,l1) = false [owise] .
 
   sort LocList .
@@ -81,26 +73,13 @@ fmod MODEL-KNOWLEDGE is
   eq len(nil) = 0 .
   eq len(loc ; locs) = s (len(locs)) .
 
-  op getSenLoc : Loc -> SenLoc .
-  eq getSenLoc({senl0,gl0}) = senl0 .
-
-  op getGridLoc : Loc -> GridLoc .
-  eq getGridLoc({senl0,gl0}) = gl0 .
-
-  op incZ : Loc FiniteFloat -> Loc .
-  ceq incZ(loc,ff) = {senl0,msen2grid(senl0)}
-   if senLoc(ffx,ffy,ffz) := getSenLoc(loc)
-   /\ senl0 := senLoc(ffx,ffy,ffz + ff) .
-
   op diff : Loc Loc -> Loc .
-  eq diff({senLoc(ffx0,ffy0,ffz0),pt(x0,y0,z0)},
-          {senLoc(ffx1,ffy1,ffz1),pt(x1,y1,z1)}) 
-   = {senLoc(ffx1 - ffx0,ffy1 - ffy1,ffz1 - ffz1),
-      pt(x1 - x0,y1 - y0,z1 - z0)} .
+  eq diff(pt(x0,y0,z0),pt(x1,y1,z1)) 
+   = pt(x1 - x0,y1 - y0,z1 - z0) .
 
   --- Here we are using locs as vectors. So do not use (0,0,0).
   op angle : Loc Loc -> FiniteFloat .
-  ceq angle({senl0,pt(x0,y0,z0)},{senl1,pt(x1,y1,z1)}) 
+  ceq angle(pt(x0,y0,z0),pt(x1,y1,z1)) 
    = acos(ffx0 * ffx1 + ffy0 * ffy1 + ffz0 * ffz1) 
    if norm1 := sqrt(float(x0 ^ 2) + float(y0 ^ 2) + float(z0 ^ 2)) 
    /\ norm2 := sqrt(float(x1 ^ 2) + float(y1 ^ 2) + float(z1 ^ 2)) 
@@ -114,7 +93,7 @@ fmod MODEL-KNOWLEDGE is
   op wind : FiniteFloat FiniteFloat FiniteFloat -> Info .
   op getWind : KB -> KB .
   eq getWind((wind(ffx,ffy,ffz) @ t) kb ) = (wind(ffx,ffy,ffz) @ t) .
-  eq getWind(kb ) = none [owise] .
+  eq getWind(kb) = none [owise] .
 
   op pending : Id Action -> Info .
   eq hasId(id,pending(id,act) @ t) = true .
@@ -206,27 +185,23 @@ fmod MODEL-KNOWLEDGE is
   op charge : Id -> Action .
   
   op distanceFF : Loc Loc -> FiniteFloat .
-  eq distanceFF({senl0,pt(x0,y0,z0)},{senl1,pt(x1,y1,z1)}) = 
+  eq distanceFF(pt(x0,y0,z0),pt(x1,y1,z1)) = 
     float((abs(x0 - x1))) * gridStepX + float(abs(y0 - y1)) * gridStepY + float(abs(z0 - z1)) * gridStepZ .
 
-  eq distance({senl0,pt(x0,y0,z0)},{senl1,pt(x1,y1,z1)}) = 
+  eq distance(pt(x0,y0,z0),pt(x1,y1,z1)) = 
     abs(x0 - x1) + abs(y0 - y1) + abs(z0 - z1) .
 
   op getNormVec : Loc Loc -> Dir .
-  ceq getNormVec({senLoc(ffx0,ffy0,ffz0),gl0},{senLoc(ffx1,ffy1,ffz1),gl1}) = dir(fdx / ffn, fdy / ffn, fdz / ffn)
-   if fdx := ffx1 - ffx0
-   /\ fdy := ffy1 - ffy0
-   /\ fdz := ffz1 - ffz0
+  ceq getNormVec(pt(x0,y0,z0),pt(x1,y1,z1)) = dir(fdx / ffn, fdy / ffn, fdz / ffn)
+   if fdx := float(x1 - x0) / gridStepX
+   /\ fdy := float(y1 - y0) / gridStepY
+   /\ fdz := float(z1 - z0) / gridStepZ
    /\ ffn := sqrt(fdx ^ 2.0 + fdy ^ 2.0 + fdz ^ 2.0) .
 
   --- location occupied if there is a bot at the location
   op occupied : Loc KB -> Bool .
-  op occupied : GridLoc KB -> Bool .
-  eq occupied({senl0,gl0},(atloc(id,{senl1,gl0}) @ t) class(id,Bot) ekb) = true .
+  eq occupied(l0,(atloc(id,l0) @ t) class(id,Bot) ekb) = true .
   eq occupied(l0, ekb) = false [owise] .
-
-  eq occupied(gl0,(atloc(id,{senl1,gl0}) @ t) class(id,Bot) ekb) = true .
-  eq occupied(gl0, ekb) = false [owise] .
 
   --- in contact if distance is less than or equal to comDistance
   eq inContact(id0,id1,ekb) 
@@ -249,11 +224,7 @@ fmod MODEL-KNOWLEDGE is
                                fi)
                          fi)
                        fi .
-**** model of expected result of move actions
-  op senMove : SenLoc Dir FiniteFloat -> SenLoc .
-  eq senMove(senLoc(ffx,ffy,ffz),dir(ffx0,ffy0,ffz0),v) = 
-       senLoc(ffx + ffx0 * v,ffy + ffy0 * v,ffz + ffz0 * v) .
-       
+
   op round : FiniteFloat -> Int .
   ceq round(sx) =
     (if (sx >= 0.0)
@@ -261,13 +232,14 @@ fmod MODEL-KNOWLEDGE is
       else (if r:Rat < 1/2 then ceiling(rat(sx)) else floor(rat(sx)) fi)
     fi)
     if r:Rat := rat(sx) - floor(rat(sx)) .
-    op msen2grid : SenLoc -> GridLoc .
-    eq msen2grid(senLoc(sx,sy,sz)) = pt(round(sx / gridStepX),round(sy / gridStepY),round(sz / gridStepZ)) .
 
+**** model of expected result of move actions
+       
   op doMv : Loc Dir FiniteFloat -> Loc .
-  ceq doMv({senl0,gl0},dir,v) = {senl1,gl1}
-   if senl1 := senMove(senl0,dir,v)
-   /\ gl1 := sen2grid(senl1) .
+  eq doMv(pt(x0,y0,z0),dir(ffx0,ffy0,ffz0),v) 
+   = pt(x0 + round(ffx0 * v / gridStepX),
+        y0 + round(ffy0 * v / gridStepY),
+        z0 + round(ffz0 * v / gridStepZ)) .
 
   eq doMv(l0,dir,v) = l0 [owise] .
 
@@ -297,10 +269,7 @@ fmod MODEL-KNOWLEDGE is
   eq incLateVisit(dt0,dt1,t1,kb) = kb [owise] .
 
   op close : Loc Loc -> Bool .
- 
-  op atVEdge : Loc -> Bool .
-  eq atVEdge({senl0,pt(x,y,z)}) =  ((x == 0) or (s x == edgeX))  . 
-	
+ 	
 ********* helpers
   op myActs : Class Id KB -> ActSet .
   eq myActs(cl,id,lkb) = goTos(cl,id,lkb) .
@@ -320,8 +289,8 @@ fmod MODEL-KNOWLEDGE is
 **** at the same grid as a station and not fully charged 
   op canCharge : Class Id KB -> Bool .
   ceq canCharge(Bot,id,lkb) = true
-	if (atloc(id,{senl0,gl0}) @ t0) class(id,Bot)
-	   (atloc(id1,{senl1,gl0}) @ t1) class(id1,Station)
+	if (atloc(id,l0) @ t0) class(id,Bot)
+	   (atloc(id1,l0) @ t1) class(id1,Station)
 		 (energy(id,e) @ t2) lkb0 := lkb
   /\ e < maxCharge .
 

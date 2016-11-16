@@ -10,7 +10,7 @@ mod SITL is
   op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
   eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,dt,n) = 
         addK(ekb,
-        (atloc(id,{senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))}) @ s n)
+        (atloc(id,mkLoc(sx,sy,sz)) @ s n)
         (vel(id,v) @ s n) (energy(id,e) @ s(n)) (timeElapsed(dt) @ s n)) .
 
 endm

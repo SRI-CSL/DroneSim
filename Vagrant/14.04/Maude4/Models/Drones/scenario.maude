@@ -60,11 +60,6 @@ Landing/Disarm : 58% -> 55%
 
 )
 
-
-    
-op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
-eq mkLoc(sx,sy,sz) = {senLoc(sx,sy,sz),msen2grid(senLoc(sx,sy,sz))} .
-
 op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
              -> KB .
 eq mkBekb(n,sx,sy,sz,v,e) = 

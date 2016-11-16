@@ -6,16 +6,14 @@ fmod MODEL-TASKS is
   vars id : Id .
 	var cl : Class .
 	vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
-  vars l loc loc0 home locR loc1 loc2 : Loc .
-  vars senl0 senl1 senlR senlD : SenLoc .
-  vars gl0 gl1 : GridLoc .
+  vars l l1 loc loc0 home locR loc1 loc2 : Loc .
   vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 : KB .
   vars evs evs' ievs devs : EventSet . 
   var dir dir1 : Dir .
   var act act0 act1  : Action .
 	vars acts acts0 pact : ActSet .
-	var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 dt : FiniteFloat .
-  vars alt ix iy iz ix0 iy0 iz0 : Int .
+	var e v c dt : FiniteFloat .
+  vars alt ix iy iz ix0 iy0 iz0 x1 x2 x3 y1 y2 y3 z1 z2 z3 : Int .
   var r j n : Nat .
   
   vars locs locs0 locs1 locs2 locs3 : LocList .
@@ -107,15 +105,11 @@ ceq sitlActSimple(id,kb)  =
                             incCountVisit(id,getLoc(pact),t,kb))) 
                   else kb fi)
             else kb fi)  
-   /\ locR := windEffect(loc,r)
-.
+   /\ locR := windEffect(loc,r) .
 
 op addLoc : Loc Loc Loc -> Loc .
-op addLoc$ : SenLoc SenLoc SenLoc -> Loc .
-eq addLoc(loc0,loc1,loc2) = addLoc$(getSenLoc(loc0),getSenLoc(loc1),getSenLoc(loc2)) .
-ceq addLoc$(senLoc(sx1,sy1,sz1),senLoc(sx2,sy2,sz2),senLoc(sx3,sy3,sz3)) = {senl0,msen2grid(senl0)}
- if senl0 := senLoc(sx1 + sx2 - sx3,sy1 + sy2 - sy3, sz1 + sz2 - sz3) .
-
+eq addLoc(pt(x1,y1,z1),pt(x2,y2,z2),pt(x3,y3,z3)) =
+          pt((x1 + x2) - x3, (y1 + y2) - y3, (z1 + z2) - z3) .
 
 *** The Incremental strategy is an approximation of what a more realistic
 *** drone would do trying to fly towards the target location.
@@ -218,16 +212,14 @@ ceq sitlActSCP(id,kb) = (if pact == none
 	
 
   op randWind : Loc Nat -> Loc .
-	ceq randWind(loc, j) =  {senlR, msen2grid(senlR)} 
+	ceq randWind(pt(ix,iy,iz), j) =  pt(ix + x1, iy + y1, iz + z1)
 	 if n := random(j) 
-     /\ senlD := 
-	    (if (n < rand.25) then senLoc(0.0,20.0,0.0)
-		   else (if (n < rand.5) then senLoc(20.0,0.0,0.0)
-		   else (if (n < rand.75) then senLoc(0.0,-20.0,0.0)
-       else  senLoc(-20.0,0.0,0.0) fi) fi) fi) 
-     /\ senLoc(sx,sy,sz) := getSenLoc(loc) 
-     /\ senLoc(sx0,sy0,sz0) := senlD
-     /\ senlR := senLoc(sx + sx0, sy + sy0, sz + sz0)
+     /\ l1 := 
+	    (if (n < rand.25) then pt(0,20,0)
+		   else (if (n < rand.5) then pt(20,0,0)
+		   else (if (n < rand.75) then pt(0,-20,0)
+       else  pt(-20,0,0) fi) fi) fi) 
+     /\ pt(x1,y1,z1) := l1
    .
 
 ***(
@@ -246,17 +238,14 @@ eq pickOne(act acts) = act .
 
 op notDone : Action Loc -> Bool .
 
-ceq notDone(takeOff(id,alt), loc)  = abs(alt - iz) > 1 
- if pt(ix,iy,iz) := getGridLoc(loc) .
-ceq notDone(land(id), loc)  = false 
---- ceq notDone(land(id), loc)  = abs(iz) > 3 
- if pt(ix,iy,iz) := getGridLoc(loc) .
+eq notDone(takeOff(id,alt), pt(ix,iy,iz))  = abs(alt - iz) > 1 .
+eq notDone(land(id), pt(ix,iy,iz))  = false .
+--- eq notDone(land(id), pt(ix,iy,iz))  = abs(iz) > 3 
 eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .
 
-ceq close(loc0,loc) =  abs(ix0 - ix) + abs(iy0 - iy) < 4
- if pt(ix,iy,iz)    := getGridLoc(loc)
- /\ pt(ix0,iy0,iz0) := getGridLoc(loc0) .
+eq close(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
+  =  abs(ix0 - ix) + abs(iy0 - iy) < 4 .
 eq close(loc0,loc) = false [owise] .
 
 op isGoTo : ActSet -> Bool .
@@ -265,9 +254,9 @@ eq isGoTo(acts) = false [owise] .
 
 ****            from to
 op mkMvAct : Id Loc Loc FiniteFloat -> Action .
-eq mkMvAct(id,loc,loc0,v) = mv(id,mkDir(getGridLoc(loc),getGridLoc(loc0) ),v) .
+eq mkMvAct(id,loc,loc0,v) = mv(id,mkDir(loc,loc0),v) .
 
-op mkDir : GridLoc GridLoc -> Dir .
+op mkDir : Loc Loc -> Dir .
 eq mkDir(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
      = dir(float(ix0 - ix) * gridStepX,float(iy0 - iy) * gridStepY, float(iz0 - iz) * gridStepZ) .
 
