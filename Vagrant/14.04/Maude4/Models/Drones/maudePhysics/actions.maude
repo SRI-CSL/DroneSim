@@ -11,9 +11,8 @@ fmod MODEL-ACTIONS is
   var evs : EventSet .
   vars e e0 v : FiniteFloat .
 	var n u alt : Nat .
-  vars senl0 senl1 senl2  : SenLoc .
-  vars gl0 gl1 gl2 : GridLoc .
   var act : Action .
+  vars x0 y0 z0 : Int .
 
   var alt1 : Rat .
   vars ffx ffy ffz ffx1 ffy1 ffz1 ffx0 ffy0 ffz0 ffa  : FiniteFloat .
@@ -100,15 +99,16 @@ Assume .5 for taking off
    = doUnitEnvAct(t, addK(ekb,(atloc(id,l3) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
   if l0 := getLoc(id,ekb)
-  /\ senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
+  /\ pt(x0,y0,z0) := l0
   /\ dx := ffx1 + ffx
   /\ dy := ffy1 + ffy
   /\ dz := ffz1 + ffz
   /\ sp := sqrt((ffx1 * ffx1) + (ffy1 * ffy1) + (ffz1 * ffz1))
-  /\ senl1 := senLoc(ffx0 + dx,ffy0 + dy,ffz0 + dz)
-  /\ l1  := {senl1, msen2grid(senl1)}
+  /\ l1 := pt(x0 + round(dx / gridStepX),
+              y0 + round(dy / gridStepY),
+              z0 + round(dz / gridStepZ))
   /\ e := getEnergy(id,ekb)
-  /\ e0 := energyGoToW(e, sp)
+  /\ e0 := energyGoToW(e,sp)
   /\ l3 := (if occupied(l1,ekb) then l0 else l1 fi)
   .
 
@@ -140,19 +140,15 @@ Assume .5 for taking off
  ceq doUnitEnvAct(t, ekb, (takeOff(id,alt) @ 0 ) evs)
    = doUnitEnvAct(t, addK(ekb,(atloc(id,l1) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
- if l0 := getLoc(id,ekb)
- /\ senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
- /\ dz := takeOffInc(ffz0,float(alt),vlift)
- /\ senl1 := senLoc(ffx0,ffy0, ffz0 + dz)
- /\ l1  := {senl1, msen2grid(senl1)}
+ if pt(x0,y0,z0) := getLoc(id,ekb)
+ /\ dz := takeOffInc(float(z0) * gridStepZ,float(alt),vlift)
+ /\ l1 := pt(x0,y0,z0 + round(dz / gridStepZ))
  /\ e := getEnergy(id,ekb)
  /\ e0 := energyTakeOffU(e,vlift,dz / vlift)
   .
 
-
-
-  op takeOffInc : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
-  eq takeOffInc(ffz0,ffa,v) = 
+ op takeOffInc : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
+ eq takeOffInc(ffz0,ffa,v) = 
     (if ffa - ffz0 > v  then v else ffa - ffz0 fi) .
 
  op energyTakeOffU : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
@@ -160,15 +156,12 @@ Assume .5 for taking off
  
  **** cost of vertical move at speed v for dt.
 
-  
  ceq doUnitEnvAct(t, ekb, (land(id) @ 0 ) evs)
    = doUnitEnvAct(t, addK(ekb,(atloc(id,l1) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
- if l0 := getLoc(id,ekb)
- /\ senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
- /\ dz := landInc(ffz0,0.0,vland)
- /\ senl1 := senLoc(ffx0,ffy0, ffz0 - dz)
- /\ l1 := {senl1, msen2grid(senl1)}
+ if pt(x0,y0,z0) := getLoc(id,ekb)
+ /\ dz := landInc(float(z0) * gridStepZ,0.0,vland)
+ /\ l1 := pt(x0,y0,z0 - round(dz * gridStepZ))
  /\ e := getEnergy(id,ekb)
  /\ e0 := energyLandU(e,vland, dz / vland)
   .
@@ -190,12 +183,12 @@ Assume .5 for taking off
   eq energyLandU(e,v) = max(e - costMv(v),0.0) .  ---!!!fix
 
   op doLandU : Loc Nat -> Loc .
-  ceq doLandU(l0,alt) = {senl1, msen2grid(senl1)}
-  if senLoc(ffx0,ffy0,ffz0) := getSenLoc(l0)
+  ceq doLandU(pt(x0,y0,z0),alt) = l1
+  if ffz0 := float(z0) * gridStepZ 
   /\ ffz := (if float(alt) <= vlift 
             then ffz0 - float(alt) 
             else ffz0 - vlift fi)
-  /\ senl1 := senLoc(ffx0,ffy0,ffz) .
+  /\ l1 := pt(x0,y0,round(ffz / gridStepZ)) .
 
 
 endfm
