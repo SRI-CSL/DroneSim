@@ -170,7 +170,6 @@ ceq sitlActSimple(id,kb)  =
   op stopSimulation : -> FiniteFloat .
   op windThresh : -> Nat .
 
- 
 ***(
 pending acts:
  land(id)
@@ -191,6 +190,7 @@ eq notDone(takeOff(id,alt), pt(ix,iy,iz))  = abs(alt - iz) > 1 .
 eq notDone(land(id), pt(ix,iy,iz))  = false .
 --- eq notDone(land(id), pt(ix,iy,iz))  = abs(iz) > 3 
 eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
+eq notDone(goToW(id,loc0,v), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .
 
 eq close(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
