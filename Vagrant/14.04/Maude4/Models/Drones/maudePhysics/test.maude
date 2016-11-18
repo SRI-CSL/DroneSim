@@ -2,9 +2,10 @@ mod TEST is
  inc SCENARIO .
  
 op ekb0 : -> KB .
- 
+ops acts : -> ActSet . 
 ops lkb0 lkb1 ekb1  : -> KB .
 
+eq acts = myActs(Bot,b(0),lkb1) .
 
 eq lkb1 =  (clock(2) class(b(0), Bot) (timeElapsed(1.0) @ 1) (rand(5) @ 1) 
     (atloc(b(0), pt(0, 0,5)) @ 1) 
