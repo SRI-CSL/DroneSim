@@ -590,7 +590,34 @@ if n := rat(string(nq),10)
     else reqQ' fi) .
   
 
+***********************************************************************
+***********************************************************************
+***** quit if simStatus = ql(Stop) or countdown 
+ eq isReq('doMaudeSimRound) = true .
+ eq enabled(wait4s,req('doMaudeSimRound,ql(nq toks),reqQ)) = true .
 
+crl[doMaudeSimRound]:
+   [nil,
+    st(processing(req('doMaudeSimRound, ql(nq toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+       wait4s,
+      (reqQ reqQ0),
+       es,
+       log), outQ  ] 
+if n := rat(string(nq),10)
+/\ ql(status) := getVal(es,'qval,'simStatus, ql('unknown))
+/\ reqQ0 :=
+    (if ( n :: Nat and n > 0 and status =/= 'stop) 
+    then req('rewTilDone, ql('doTask),
+           req('rewTilDone, ql('timeStep),
+             req('doMaudeSimRound, ql(qid(string(sd(n,1),10)) ),
+                 reqQ')))
+    else reqQ' fi) .
+  
 
 ***********************************************************************
 ***(
@@ -1077,10 +1104,17 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
 /\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
                     'qval, 'simStatus, ql('init))
 /\ pyname := getPyName(es)
-/\ reqQ0 := req('resetSitl, ql(pyname), 
-             req('doSimRound, ql(pyname '1000),
-              req('runOd,ql(g2dvname sname),
-               reqQ'))) .
+/\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+/\ reqQ0 := (if q == 'true
+             then req('doMaudeSimRound, ql('1000),
+                      req('runOd,ql(g2dvname sname),
+                          reqQ'))
+             else req('resetSitl, ql(pyname), 
+                   req('doSimRound, ql(pyname '1000),
+                    req('runOd,ql(g2dvname sname),
+                     reqQ')))
+            fi)  .
+
 
  eq isReq('runOd) = true .
  eq enabled(wait4s,req('runOd,ql(g2dvname sname toks),reqQ)) = 
@@ -1115,7 +1149,11 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
            then getTerm(res1??) else nT fi)               
 /\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
 /\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
-/\ str := mkRunReplyExp(sname,mname, bT)
+/\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+/\ str := (if q == 'true
+          then mkRunReplySingleExp(sname, bT)
+          else mkRunReplyExp(sname,mname, bT)
+          fi)
 /\ toks' := str2toks(str) .
 
 
@@ -1137,6 +1175,24 @@ eq mkRunReplyExp(sname,mname, 'br[bT, t]) =
   						 ("%mname" :~ sqquote(mname)), 
                ("%obs" :~ downTerm(t,"")))  ) .
 
+***********  non concurrent status
+op runReplySingleTemplate : -> String .
+eq runReplySingleTemplate =
+     "(apply runResult %sname (apply makeDouble  %obs))" .
+
+op runReplyNSingleTemplate : -> String .
+eq runReplyNSingleTemplate = 
+   "(apply runResult %sname (array double %obs))" 
+   .
+
+op mkRunReplySingleExp : Qid Term -> String .
+**** true -- multi obs fill array template, false single obs
+eq mkRunReplySingleExp(sname, 'br[bT, t]) =
+  fillTemplate((if bT == 'true.Bool 
+                then runReplyNSingleTemplate
+                else runReplySingleTemplate fi),
+	            (("%sname" :~ sqquote(sname)), 
+               ("%obs" :~ downTerm(t,"")))  ) .
 
 ********************************************************************************
 ***** reseting SITL

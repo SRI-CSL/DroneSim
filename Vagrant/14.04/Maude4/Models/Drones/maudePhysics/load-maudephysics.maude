@@ -9,8 +9,3 @@ load tasks-wind
 load actions
 load scenario
 load analysis-stats
-
-load model-checker 
-load /home/vagrant/imaude/ilib/load-lib
-load ../../../Lib/meta-cp-e 
-loop init .
