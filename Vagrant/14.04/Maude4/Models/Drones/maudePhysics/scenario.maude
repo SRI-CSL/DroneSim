@@ -1,7 +1,7 @@
 mod SCENARIO is
   inc MODEL-ACTIONS  .
   inc SOFT-AGENT-RULES .
-  ---  inc PRETTY .
+   inc PRETTY .
   --- inc SOLVE-SCP{valuation2valpatrolonly} . 
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
