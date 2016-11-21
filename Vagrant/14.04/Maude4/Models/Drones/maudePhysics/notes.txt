@@ -40,3 +40,38 @@ How does maude implement goToW(id,vx,vy,vz,wx,wy,wz,dur)
 If landing decrement z until 0ish
 If takeOff increment z until reach altitude        
      
+     
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    
+
+Wind models
+
+1. uniform over area of interest: dir, speed  (thresh for application?)
+
+2. uniform with gusts: add speed of gust, probablility
+
+3. localized wind:  blows only in some strip or sector
+
+4. varies with time of day:
+
+Windmodel : Params KB -> wind vector
+
+----------------------------------------------
+Energy model
+
+ parameters: load factor, battery type, vehicle type
+
+EnergyModel: Params, KB (battery level, velocity, acceleration) -> new battery level
+
+----------------------------------------------
+Fault models
+
+  GPS error/failure
+  Heading/velocity error
+  Battery drain
+
+----------------------------------------------
+Assumptions  
+ moving up/down v dt -- 
+    newloc = computed loc +/- err0
+    energy used = energy computed +/- err1
+ similarly for traveling at velocity v     
