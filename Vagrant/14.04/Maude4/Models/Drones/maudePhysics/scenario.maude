@@ -7,16 +7,16 @@ mod SCENARIO is
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
 
 vars n n' t t0 m t1 : Nat .
-vars i j x y z : Int .
+vars i j x y z x0 y0 z0 : Int .
 vars sx sy sz dx dy dz v e c dt te : FiniteFloat .
 var dir : Dir .
 vars wkb kb lkb ekb : KB .
-var aconf : Conf .
+var aconf conf : Conf .
 var attrs : AttributeSet .
 var id eid : Id .
 var ids : IdSet .
 var cl : Class .
-var l home loc : Loc .
+var l l0 home loc loc0 : Loc .
 var a : Int .
 var locs : LocList .
 
@@ -94,7 +94,7 @@ eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) =
     mkBekb(n,sx,sy,sz,v,e)  (targetVel(b(n),v) @ 0) 
     myAlt(b(n),a) (caution(b(n),c) @ 0)
     myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
-    (visited(b(n),nil) @ 0) 
+***    (visited(b(n),nil) @ 0) 
     (lastVisit(b(n),mkLoc(sx,sy,sz),0.0) @ 0)
     (mkCountVisits(n,locs)) (countLate(b(n),0) @ 0)
      clock(0) .
@@ -116,7 +116,7 @@ eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)] .
 eq mkE2(n,sx,sy,sz,v,e) = 
       [eI | clock(0) (rand(0) @ 0) (wind(0.0,1.0,0.0) @ 0) (timeElapsed(0.0) @ 0)
             mkBekb(n,sx,sy,sz,v,e) 
-            mkBekb(s n,sx + 5.0,sy,sz,v,e)] .
+            mkBekb(s n,sx + 10.0,sy + 10.0, sz,v,e)] .
 
 
 ops locs1 locs2 locs1p : -> LocList .
@@ -129,9 +129,9 @@ eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
 --- energy parameter is not yet useful
 ops conf1 conf2 conf3 conf4 : -> Conf .
 ****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
-
+****          (n,sx, sy, sz, v,  e,    c,   a,locs)
 eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
-           mkB(1,5.0,0.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
            mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
 
 op asys1 : -> ASystem .
@@ -163,7 +163,54 @@ eq updateTE(clock(t1) (timeElapsed(te) @ t) kb, dt)
            = clock(t1) (timeElapsed(te + dt) @ t1) kb .
 ****
 eq updateConf([ eI | ekb ] aconf) = 
-    [ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf .
+    updateMaxSep(updateMinSep([ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf)) .
+
+
+op minSep : Nat Loc Loc -> ConfElt [ctor] .
+op maxSep : Nat Loc Loc -> ConfElt [ctor] .
+
+
+op updateMinSep : Conf -> Conf .
+eq updateMinSep([ eI | ekb ] aconf minSep(n,l,l0)) =
+                ([ eI | ekb ] aconf updateMinSep(n,l,l0,ekb)) .
+eq updateMinSep(conf) = conf [owise] .
+
+
+**** quick and dirty for 2 drone case
+op updateMinSep : Nat Loc Loc KB -> ConfElt .
+ceq updateMinSep(n,l,l0,(atloc(b(0),loc) @ t0) (atloc(b(1),loc0) @ t1) kb) = 
+            (if n' < n 
+            then minSep(n',loc,loc0)
+            else minSep(n,l,l0)
+            fi)
+if n' := hdistance(loc,loc0) .
+
+eq updateMinSep(n,l,l0,kb) = minSep(n,l,l0) [owise] .
+
+op updateMaxSep : Conf -> Conf .
+eq updateMaxSep([ eI | ekb ] aconf maxSep(n,l,l0)) =
+                ([ eI | ekb ] aconf updateMaxSep(n,l,l0,ekb)) .
+eq updateMaxSep(conf) = conf [owise] .
+
+
+op updateMaxSep : Nat Loc Loc KB -> ConfElt .
+ceq updateMaxSep(n,l,l0,(atloc(b(0),loc) @ t0) (atloc(b(1),loc0) @ t1) kb) = 
+            (if n < n' 
+            then maxSep(n',loc,loc0)
+            else maxSep(n,l,l0)
+            fi)
+if n' := hdistance(loc,loc0) .
+
+eq updateMaxSep(n,l,l0,kb) = maxSep(n,l,l0) [owise] .
+
+
+op hdistance : Loc Loc -> Nat .
+eq hdistance(pt(x,y,z),pt(x0,y0,z0)) = abs(x - x0) + abs(y - y0) .
+
+op asys2 : -> ASystem .
+eq asys2 = { conf1 minSep(20,pt(0,0,0),pt(10,10,0))
+                   maxSep(20,pt(0,0,0),pt(10,10,0)) } .
+
 
 
 endm

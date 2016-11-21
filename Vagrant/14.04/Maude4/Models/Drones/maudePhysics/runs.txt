@@ -1,0 +1,302 @@
+eq act(id,kb) = actSimple(id,kb) .
+
+Maude> red asys1 .
+reduce in SCENARIO : asys1 .
+rewrites: 290 in 0ms cpu (0ms real) (3052631 rewrites/second)
+result ASystem: {
+[eI
+	| clock(0) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
+    rand(0) @ 0) (atloc(b(0), pt(0, 0, 0)) @ 0) (atloc(b(1), pt(5, 0, 0)) @ 0)
+    (energy(b(0), 1.0e+2) @ 0) (energy(b(1), 1.0e+2) @ 0) (vel(b(0), 5.0) @ 0)
+    (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(0) class(b(0), Bot) (atloc(b(0), pt(0, 0, 0)) @ 0) (countLate(b(
+    0), 0) @ 0) (visited(b(0), nil) @ 0) (energy(b(0), 1.0e+2) @ 0) (caution(b(
+    0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(
+    b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil)
+    @ 0) (lastVisit(b(0), pt(0, 0, 0), 0.0) @ 0) (countVisit(b(0), pt(10, 30,
+    5), 0) @ 0) (countVisit(b(0), pt(50, 10, 5), 0) @ 0) (countVisit(b(0), pt(
+    -20, 50, 5), 0) @ 0) (countVisit(b(0), pt(-40, 5, 5), 0) @ 0) myHome(b(0),
+    pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : none,
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(0) class(b(1), Bot) (atloc(b(1), pt(5, 0, 0)) @ 0) (countLate(b(
+    1), 0) @ 0) (visited(b(1), nil) @ 0) (energy(b(1), 1.0e+2) @ 0) (caution(b(
+    1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(
+    b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30,
+    10), nil) @ 0) (lastVisit(b(1), pt(5, 0, 0), 0.0) @ 0) (countVisit(b(1),
+    pt(10, -30, 10), 0) @ 0) (countVisit(b(1), pt(40, -10, 10), 0) @ 0) (
+    countVisit(b(1), pt(-35, -5, 10), 0) @ 0) (countVisit(b(1), pt(-40, -40,
+    10), 0) @ 0) myHome(b(1), pt(5, 0, 0)) myAlt(b(1), 10)),
+  ckb : none,
+  evs : (tick @ 0)]}
+
+Maude> rew [300] asys1 .
+rewrite [300] in SCENARIO : asys1 .
+rewrites: 206827 in 248ms cpu (260ms real) (831157 rewrites/second)
+result ASystem: {
+[eI
+	| clock(100) class(b(0), Bot) class(b(1), Bot) (timeElapsed(1.0e+2) @
+    100) (rand(400) @ 100) (atloc(b(0), pt(45, 9, 5)) @ 100) (atloc(b(1), pt(
+    26, -14, 5)) @ 100) (energy(b(0), 7.475e+1) @ 100) (energy(b(1), 7.45e+1) @
+    100) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(100) class(b(0), Bot) (timeElapsed(9.9e+1) @ 99) (rand(495) @
+    99) (atloc(b(0), pt(40, 9, 5)) @ 99) (pending(b(0), goToW(b(0), pt(50, 10,
+    5), 5.0)) @ 84) (countLate(b(0), 0) @ 0) (visited(b(0), nil) @ 0) (energy(
+    b(0), 7.5e+1) @ 99) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0)
+    (vel(b(0), 5.0) @ 0) (wind(0.0, 1.0, 0.0) @ 0) 
+    (targets(b(0), pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), 
+                   pt(50, 10, 5)) @ 84) 
+    (lastVisit(b(0), pt(0, 0, 0), 0.0) @ 0)
+    (lastVisit(b(0), pt(10, 30, 5), 6.4e+1) @ 64) 
+    (lastVisit(b(0), pt(50, 10, 5), 5.6e+1) @ 56) 
+    (lastVisit(b(0), pt(-20, 50,5), 7.1e+1) @ 71) 
+    (lastVisit(b(0), pt(-40, 5, 5), 8.3e+1) @ 83) 
+    (countVisit(b(0), pt(10, 30, 5), 2) @ 64) 
+    (countVisit(b(0), pt(50, 10, 5), 2) @ 56)
+    (countVisit(b(0), pt(-20, 50, 5), 2) @ 71) 
+    (countVisit(b(0), pt(-40, 5, 5), 2) @ 83) 
+    myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(40, 9, 5)) @ 99),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(100) class(b(1), Bot) (timeElapsed(9.9e+1) @ 99) (rand(594) @
+    99) (atloc(b(1), pt(26, -14, 10)) @ 99) (pending(b(1), land(b(1))) @ 100) (
+    countLate(b(1), 0) @ 0) (visited(b(1), nil) @ 0) (energy(b(1), 7.475e+1) @
+    99) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0)
+    @ 0) (wind(0.0, 1.0, 0.0) @ 0) 
+    (targets(b(1), pt(-35, -5, 10) ; pt(10, -30, 10),
+                   pt(40, -10, 10) ; pt(-40, -40, 10)) @ 97) 
+    (lastVisit(b(1), pt(5, 0, 0), 0.0) @ 0) 
+    (lastVisit(b(1), pt(10, -30, 10), 8.9e+1) @ 89) 
+    (lastVisit(b(1), pt(40, -10, 10), 9.6e+1) @ 96) 
+    (lastVisit(b(1), pt(-35, -5, 10), 7.9e+1) @ 79) 
+    (lastVisit(b(1), pt(-40, -40, 10), 7.2e+1) @ 72) 
+    (countVisit(b(1), pt(10, -30, 10), 2) @ 89) 
+    (countVisit(b(1), pt(40, -10, 10), 3) @ 96)
+    (countVisit(b(1), pt(-35, -5, 10), 2) @ 79) 
+    (countVisit(b(1), pt(-40, -40,10), 2) @ 72) 
+    myHome(b(1), pt(5, 0, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(26, -14, 10)) @ 99),
+  evs : (tick @ 0)]}
+  
+  
+  -------  -------  -------  -------  -------  -------  -------  -------  -------
+  eq act(id,kb) = actSCP(id,kb) .
+  
+  Maude> rew [300] asys1 .
+  rewrite [300] in SCENARIO : asys1 .
+  rewrites: 1446037 in 1859ms cpu (1870ms real) (777611 rewrites/second)
+  result ASystem: {
+  [eI
+  	| clock(100) class(b(0), Bot) class(b(1), Bot) (timeElapsed(1.0e+2) @
+      100) (rand(400) @ 100) (atloc(b(0), pt(36, 16, 5)) @ 100) (atloc(b(1), pt(
+      -35, -11, 10)) @ 100) (energy(b(0), 7.475e+1) @ 100) (energy(b(1),
+      7.475e+1) @ 100) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0,
+      0.0) @ 0]
+  [b(0) : Bot |
+    lkb : (clock(100) class(b(0), Bot) (timeElapsed(9.9e+1) @ 99) (rand(495) @
+      99) (atloc(b(0), pt(31, 19, 5)) @ 99) (pending(b(0), goToW(b(0), pt(50, 10,
+      5), 5.0)) @ 100) (countLate(b(0), 0) @ 0) (energy(b(0), 7.5e+1) @ 99) (
+      caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0)
+      (wind(0.0, 1.0, 0.0) @ 0) 
+      (targets(b(0),pt(50,10,5) ; pt(10,30,5) ; pt(-20,50,5) ; pt(-40,5,5), 
+                    nil) @ 0) 
+      (lastVisit(b(0), pt(0, 0, 0), 0.0) @ 0) 
+      (lastVisit(b(0), pt(10, 30, 5), 9.5e+1) @ 95) 
+      (lastVisit(b(0), pt(50, 10, 5), 4.6e+1) @ 46) 
+      (lastVisit(b(0), pt(-20, 50, 5), 8.7e+1) @ 87)
+      (lastVisit(b(0), pt(-40, 5, 5), 7.7e+1) @ 77) 
+      (countVisit(b(0), pt(10, 30, 5), 3) @ 95) 
+      (countVisit(b(0), pt(50, 10, 5), 2) @ 46) 
+      (countVisit(b(0), pt(-20, 50, 5), 3) @ 87) 
+      (countVisit(b(0), pt(-40, 5, 5), 3) @ 77) 
+      myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+    ckb : (class(b(0), Bot) atloc(b(0), pt(31, 19, 5)) @ 99),
+    evs : (tick @ 0)]
+  [b(1) : Bot |
+    lkb : (clock(100) class(b(1), Bot) (timeElapsed(9.9e+1) @ 99) (rand(594) @
+      99) (atloc(b(1), pt(-35, -7, 10)) @ 99) (pending(b(1), goToW(b(1), pt(-40,
+      -40, 10), 5.0)) @ 100) (countLate(b(1), 0) @ 0) (energy(b(1), 7.5e+1) @ 99)
+      (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0)
+      (wind(0.0, 1.0, 0.0) @ 0) 
+      (targets(b(1), pt(40,-10,10); pt(-40,-40,10); pt(-35,-5,10); pt(10,-30,10),
+                     nil) @ 0) 
+      (lastVisit(b(1), pt(5, 0, 0), 0.0) @ 0) 
+      (lastVisit(b(1), pt(10, -30, 10), 7.7e+1) @ 77) 
+      (lastVisit(b(1), pt(40, -10, 10), 7.0e+1) @ 70) 
+      (lastVisit(b(1), pt(-35, -5, 10), 9.9e+1) @ 99) 
+      (lastVisit(b(1), pt(-40, -40, 10), 8.9e+1) @ 89)
+      (countVisit(b(1), pt(10, -30, 10), 3) @ 77) 
+      (countVisit(b(1), pt(40, -10, 10), 3) @ 70)
+      (countVisit(b(1), pt(-35, -5, 10), 4) @ 99) 
+      (countVisit(b(1), pt(-40, -40,10), 3) @ 89) 
+      myHome(b(1), pt(5, 0, 0)) myAlt(b(1), 10)),
+    ckb : (class(b(1), Bot) atloc(b(1), pt(-35, -7, 10)) @ 99),
+    evs : (tick @ 0)]}
+  Maude>
+  
+eq act(id,kb) = actSCP(id,kb) .
+  
+Maude> red asys2 .
+reduce in SCENARIO : asys2 .
+rewrites: 291 in 0ms cpu (0ms real) (3548780 rewrites/second)
+result ASystem: {minSep(100)
+[eI
+	| clock(0) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
+    rand(0) @ 0) (atloc(b(0), pt(0, 0, 0)) @ 0) (atloc(b(1), pt(10, 10, 0)) @
+    0) (energy(b(0), 1.0e+2) @ 0) (energy(b(1), 1.0e+2) @ 0) (vel(b(0), 5.0) @
+    0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(0) class(b(0), Bot) (atloc(b(0), pt(0, 0, 0)) @ 0) (countLate(b(
+    0), 0) @ 0) (energy(b(0), 1.0e+2) @ 0) (caution(b(0), 2.0e+1) @ 0) (
+    targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(50, 10, 5)
+    ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (lastVisit(b(
+    0), pt(0, 0, 0), 0.0) @ 0) (countVisit(b(0), pt(10, 30, 5), 0) @ 0) (
+    countVisit(b(0), pt(50, 10, 5), 0) @ 0) (countVisit(b(0), pt(-20, 50, 5),
+    0) @ 0) (countVisit(b(0), pt(-40, 5, 5), 0) @ 0) myHome(b(0), pt(0, 0, 0))
+    myAlt(b(0), 5)),
+  ckb : none,
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(0) class(b(1), Bot) (atloc(b(1), pt(10, 10, 0)) @ 0) (countLate(
+    b(1), 0) @ 0) (energy(b(1), 1.0e+2) @ 0) (caution(b(1), 2.0e+1) @ 0) (
+    targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40, -10,
+    10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (
+    lastVisit(b(1), pt(10, 10, 0), 0.0) @ 0) (countVisit(b(1), pt(10, -30, 10),
+    0) @ 0) (countVisit(b(1), pt(40, -10, 10), 0) @ 0) (countVisit(b(1), pt(
+    -35, -5, 10), 0) @ 0) (countVisit(b(1), pt(-40, -40, 10), 0) @ 0) myHome(b(
+    1), pt(10, 10, 0)) myAlt(b(1), 10)),
+  ckb : none,
+  evs : (tick @ 0)]}
+
+  red hdistance(pt(0, 0, 0), pt(10, 10, 0)) .
+  20 
+  
+  Maude> rew [300] asys2 .
+  rewrite [300] in SCENARIO : asys2 .
+  rewrites: 1442893 in 1822ms cpu (1832ms real) (791870 rewrites/second)
+  result ASystem: {minSep(9)
+  [eI
+  	| clock(100) class(b(0), Bot) class(b(1), Bot) (timeElapsed(1.0e+2) @
+      100) (rand(400) @ 100) (atloc(b(0), pt(36, 16, 5)) @ 100) (atloc(b(1), pt(
+      -35, -8, 10)) @ 100) (energy(b(0), 7.475e+1) @ 100) (energy(b(1), 7.475e+1)
+      @ 100) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+  [b(0) : Bot |
+    lkb : (clock(100) class(b(0), Bot) (timeElapsed(9.9e+1) @ 99) (rand(495) @
+      99) (atloc(b(0), pt(31, 19, 5)) @ 99) (pending(b(0), goToW(b(0), pt(50, 10,
+      5), 5.0)) @ 100) (countLate(b(0), 0) @ 0) (energy(b(0), 7.5e+1) @ 99) (
+      caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0)
+      (wind(0.0, 1.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ;
+      pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0)
+      (lastVisit(b(0), pt(0, 0, 0),0.0) @ 0) 
+      (lastVisit(b(0), pt(10, 30, 5), 9.5e+1) @ 95) 
+      (lastVisit(b(0), pt(50, 10, 5), 4.6e+1) @ 46) 
+      (lastVisit(b(0), pt(-20, 50, 5), 8.7e+1) @ 87)
+      (lastVisit(b(0), pt(-40, 5, 5), 7.7e+1) @ 77) 
+      (countVisit(b(0), pt(10, 30, 5), 3) @ 95) 
+      (countVisit(b(0), pt(50, 10, 5), 2) @ 46) 
+      (countVisit(b(0), pt(-20, 50, 5), 3) @ 87) 
+      (countVisit(b(0), pt(-40, 5, 5), 3) @ 77) 
+      myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+    ckb : (class(b(0), Bot) atloc(b(0), pt(31, 19, 5)) @ 99),
+    evs : (tick @ 0)]
+  [b(1) : Bot |
+    lkb : (clock(100) class(b(1), Bot) (timeElapsed(9.9e+1) @ 99) (rand(594) @
+      99) (atloc(b(1), pt(-35, -4, 10)) @ 99) (pending(b(1), goToW(b(1), pt(-40,
+      -40, 10), 5.0)) @ 100) (countLate(b(1), 0) @ 0) (energy(b(1), 7.5e+1) @ 99)
+      (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0)
+      (wind(0.0, 1.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10)
+      ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) 
+      (lastVisit(b(1), pt(10, 10, 0), 0.0) @ 0) 
+      (lastVisit(b(1), pt(10, -30, 10), 8.0e+1) @ 80) 
+      (lastVisit(b(1), pt(40, -10, 10), 7.3e+1) @ 73) 
+      (lastVisit(b(1), pt(-35, -5, 10), 9.9e+1) @ 99) 
+      (lastVisit(b(1), pt(-40, -40, 10), 9.2e+1) @ 92) 
+      (countVisit(b(1), pt(10, -30, 10), 3) @ 80) 
+      (countVisit(b(1), pt(40, -10, 10), 3) @ 73)
+      (countVisit(b(1), pt(-35, -5, 10), 3) @ 99) 
+      (countVisit(b(1), pt(-40, -40, 10), 3) @ 92) 
+      myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+    ckb : (class(b(1), Bot) atloc(b(1), pt(-35, -4, 10)) @ 99),
+    evs : (tick @ 0)]}
+    
+    
+    
+    ===========================
+    
+    Maude> red asys2 .
+    reduce in SCENARIO : asys2 .
+    rewrites: 291 in 0ms cpu (0ms real) (3506024 rewrites/second)
+    result ASystem: {
+    [eI
+    	| clock(0) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
+        rand(0) @ 0) (atloc(b(0), pt(0, 0, 0)) @ 0) (atloc(b(1), pt(10, 10, 0)) @
+        0) (energy(b(0), 1.0e+2) @ 0) (energy(b(1), 1.0e+2) @ 0) (vel(b(0), 5.0) @
+        0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+    [b(0) : Bot |
+      lkb : (clock(0) class(b(0), Bot) (atloc(b(0), pt(0, 0, 0)) @ 0) (countLate(b(
+        0), 0) @ 0) (energy(b(0), 1.0e+2) @ 0) (caution(b(0), 2.0e+1) @ 0) (
+        targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(50, 10, 5)
+        ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (lastVisit(b(
+        0), pt(0, 0, 0), 0.0) @ 0) (countVisit(b(0), pt(10, 30, 5), 0) @ 0) (
+        countVisit(b(0), pt(50, 10, 5), 0) @ 0) (countVisit(b(0), pt(-20, 50, 5),
+        0) @ 0) (countVisit(b(0), pt(-40, 5, 5), 0) @ 0) myHome(b(0), pt(0, 0, 0))
+        myAlt(b(0), 5)),
+      ckb : none,
+      evs : (tick @ 0)]
+    [b(1) : Bot |
+      lkb : (clock(0) class(b(1), Bot) (atloc(b(1), pt(10, 10, 0)) @ 0) (countLate(
+        b(1), 0) @ 0) (energy(b(1), 1.0e+2) @ 0) (caution(b(1), 2.0e+1) @ 0) (
+        targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40, -10,
+        10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (
+        lastVisit(b(1), pt(10, 10, 0), 0.0) @ 0) (countVisit(b(1), pt(10, -30, 10),
+        0) @ 0) (countVisit(b(1), pt(40, -10, 10), 0) @ 0) (countVisit(b(1), pt(
+        -35, -5, 10), 0) @ 0) (countVisit(b(1), pt(-40, -40, 10), 0) @ 0) myHome(b(
+        1), pt(10, 10, 0)) myAlt(b(1), 10)),
+      ckb : none,
+      evs : (tick @ 0)] minSep(20, pt(0, 0, 0), pt(10, 10, 0)) maxSep(20, pt(0, 0,
+        0), pt(10, 10, 0))}
+    Maude> rew [300] asys2 .
+    rewrite [300] in SCENARIO : asys2 .
+    rewrites: 1443993 in 1812ms cpu (1817ms real) (796798 rewrites/second)
+    result ASystem: {
+    [eI
+    	| clock(100) class(b(0), Bot) class(b(1), Bot) (timeElapsed(1.0e+2) @
+        100) (rand(400) @ 100) (atloc(b(0), pt(36, 16, 5)) @ 100) (atloc(b(1), pt(
+        -35, -8, 10)) @ 100) (energy(b(0), 7.475e+1) @ 100) (energy(b(1), 7.475e+1)
+        @ 100) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+    [b(0) : Bot |
+      lkb : (clock(100) class(b(0), Bot) (timeElapsed(9.9e+1) @ 99) (rand(495) @
+        99) (atloc(b(0), pt(31, 19, 5)) @ 99) (pending(b(0), goToW(b(0), pt(50, 10,
+        5), 5.0)) @ 100) (countLate(b(0), 0) @ 0) (energy(b(0), 7.5e+1) @ 99) (
+        caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0)
+        (wind(0.0, 1.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ;
+        pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (lastVisit(b(0), pt(0, 0, 0),
+        0.0) @ 0) (lastVisit(b(0), pt(10, 30, 5), 9.5e+1) @ 95) (lastVisit(b(0),
+        pt(50, 10, 5), 4.6e+1) @ 46) (lastVisit(b(0), pt(-20, 50, 5), 8.7e+1) @ 87)
+        (lastVisit(b(0), pt(-40, 5, 5), 7.7e+1) @ 77) (countVisit(b(0), pt(10, 30,
+        5), 3) @ 95) (countVisit(b(0), pt(50, 10, 5), 2) @ 46) (countVisit(b(0),
+        pt(-20, 50, 5), 3) @ 87) (countVisit(b(0), pt(-40, 5, 5), 3) @ 77) myHome(
+        b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+      ckb : (class(b(0), Bot) atloc(b(0), pt(31, 19, 5)) @ 99),
+      evs : (tick @ 0)]
+    [b(1) : Bot |
+      lkb : (clock(100) class(b(1), Bot) (timeElapsed(9.9e+1) @ 99) (rand(594) @
+        99) (atloc(b(1), pt(-35, -4, 10)) @ 99) (pending(b(1), goToW(b(1), pt(-40,
+        -40, 10), 5.0)) @ 100) (countLate(b(1), 0) @ 0) (energy(b(1), 7.5e+1) @ 99)
+        (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0)
+        (wind(0.0, 1.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10)
+        ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (lastVisit(b(1), pt(10, 10,
+        0), 0.0) @ 0) (lastVisit(b(1), pt(10, -30, 10), 8.0e+1) @ 80) (lastVisit(b(
+        1), pt(40, -10, 10), 7.3e+1) @ 73) (lastVisit(b(1), pt(-35, -5, 10),
+        9.9e+1) @ 99) (lastVisit(b(1), pt(-40, -40, 10), 9.2e+1) @ 92) (countVisit(
+        b(1), pt(10, -30, 10), 3) @ 80) (countVisit(b(1), pt(40, -10, 10), 3) @ 73)
+        (countVisit(b(1), pt(-35, -5, 10), 3) @ 99) (countVisit(b(1), pt(-40, -40,
+        10), 3) @ 92) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+      ckb : (class(b(1), Bot) atloc(b(1), pt(-35, -4, 10)) @ 99),
+      evs : (tick @ 0)] 
+      minSep(9, pt(2, 5, 5), pt(10, 6, 6))
+      maxSep(140, pt(46, 13, 5), pt(-41, -40, 10))}
