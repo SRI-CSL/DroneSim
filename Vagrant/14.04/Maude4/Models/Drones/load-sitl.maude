@@ -4,7 +4,7 @@ load load-maude
 load sitl
 
 load model-checker 
-load /home/vagrant/imaude/ilib/load-lib
+load ~/Repositories/imaude/ilib/load-lib
 load ../../Lib/meta-cp-e 
 loop init .
 

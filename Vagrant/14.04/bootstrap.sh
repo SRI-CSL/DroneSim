@@ -11,6 +11,7 @@ sudo apt-get install -y ipython
 sudo apt-get install -y libtool automake autoconf libexpat1-dev
 sudo apt-get install -y software-properties-common python-software-properties
 sudo apt-get install -y pkg-config
+sudo apt-get install -y zip
 
 
 
@@ -34,25 +35,38 @@ echo "Silencing libdc1394 complaints."
 
 sudo ln /dev/null /dev/raw1394
 
-echo "Installing PLambda"
+mkdir -p /home/vagrant/Repositories
 
+echo "Installing Maude"
+cd /home/vagrant/Repositories
+mkdir -p /home/vagrant/bin/Maude
+wget http://maude.cs.illinois.edu/w/images/5/5d/Maude-2.7.1-linux.zip
+unzip Maude-2.7.1-linux.zip -d /home/vagrant/bin/Maude
+chmod a+x /home/vagrant/bin/Maude/maude.linux64
+ln -s /home/vagrant/bin/Maude/maude.linux64 /home/vagrant/bin/Maude/maude
+rm Maude-2.7.1-linux.zip
+
+
+echo "Installing PLambda"
+cd /home/vagrant/Repositories
 pip install antlr4-python2-runtime
 git clone https://github.com/SRI-CSL/PLambda
 cd PLambda
 make develop
-cd ..
+
+
 
 echo "Installing IOP"
-
+cd /home/vagrant/Repositories
 export IOPBINDIR=/home/vagrant/bin/IOP
 mkdir -p /home/vagrant/bin/IOP
 git clone https://github.com/SRI-CSL/iopc
 cd iopc
 make
 make install
-cd ..
 
 echo "Installing IMaude"
+cd /home/vagrant/Repositories
 git clone https://github.com/SRI-CSL/imaude
 
 
@@ -72,7 +86,7 @@ echo "Installing MAVProxy"
 pip install pymavlink MAVProxy
 
 echo "Cloning jsbsim"
-
+cd /home/vagrant/Repositories
 git clone git://github.com/tridge/jsbsim.git
 
 echo "Building jsbsim"
@@ -80,7 +94,6 @@ echo "Building jsbsim"
 cd jsbsim
 ./autogen.sh --enable-libraries
 make
-cd ..
 
 
 #
@@ -95,6 +108,7 @@ echo "Cloning ardupilot"
 
 pip install future
 
+cd /home/vagrant/Repositories
 git clone git://github.com/ArduPilot/ardupilot.git
 
 

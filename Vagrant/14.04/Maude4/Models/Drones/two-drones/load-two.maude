@@ -7,13 +7,14 @@ load ../../../Lib/cp-e-rules
 load ../../../Lib/pretty
 load ../knowledge
 load scp
-load tasks-wind
+***** load tasks-wind
+load tasks
 load scenario
 load sitl
 load analysis-stats
 
 load model-checker 
-load /home/vagrant/imaude/ilib/load-lib
+load ~/Repositories/imaude/ilib/load-lib
 load ../../../Lib/meta-cp-e 
 loop init .
 
