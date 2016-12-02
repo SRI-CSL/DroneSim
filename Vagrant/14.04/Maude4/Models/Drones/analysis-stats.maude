@@ -52,14 +52,6 @@ var locs : LocList .
   op getObsKB : KB KB -> Bool .
   eq getObs({aconf}) = br(true,getObsN(aconf)) .
 
-  ***(
-
-  eq getObs({[ b(0) : Bot | lkb : lkb, attrs] [eid | ekb ] aconf }) =
-     getObsKB(lkb,ekb)  .
-  eq getObsKB(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home) , 
-              ( atloc(b(0),loc) @ t0) ekb) = distance(home,loc) < 6 .
-  eq getObs({ aconf }) = false [owise] .
-  )
   op getObsVisited : ASystem -> Nat .
   op getObsEnergy : ASystem -> FiniteFloat .
   eq getObsVisited({[ b(0) : Bot | lkb : ((visited(b(0),locs) @ t0) lkb), attrs] [eid | ekb ] aconf }) 

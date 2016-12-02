@@ -7,14 +7,12 @@ fmod MODEL-TASKS is
 	var cl : Class .
 	vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
   vars l loc loc0 home locR loc1 loc2 : Loc .
-  vars senl0 senl1 senlR senlD : SenLoc .
-  vars gl0 gl1 : GridLoc .
   vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 lkb4 : KB .
   vars evs evs' ievs devs : EventSet . 
   var dir dir1 : Dir .
   var act act0 act1  : Action .
 	vars acts acts0 pact : ActSet .
-	var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 dt wsp sp ffx ffy ffz ffx1 ffy1 ffz1 : FiniteFloat .
+	var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 dt wsp sp ffx ffy ffz ffx1 ffy1 ffz1 dt2 dt1 : FiniteFloat .
   vars alt ix iy iz ix0 iy0 iz0 : Int .
   var r j n j1 : Nat .
   
@@ -160,17 +158,27 @@ ceq actSCP(id,kb) =
   else 
    (if (e < stopSimulation and not (pact == land(id) or pact == stop(id)))
     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-    else {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
-  fi) fi )
+    else (if pact == stop(id) then {stop(id),kb} 
+         else 
+           (if pact == land(id) and done(pact,loc) then
+           {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+            else
+             (if isGoTo(pact,home) and done(pact,loc) 
+              then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+              else {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
+   fi) fi ) fi) fi) fi )
 if (class(id,cl)) (clock(t)) myAlt(id,alt) 
     (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
     (rand(r) @ t2) (energy(id,e) @ t3) (timeElapsed(dt) @ t6) 
     kb0 := kb
  /\ pact := getPending(id,kb0)
  /\ kb1 := (if isGoTo(pact)
-            then (if close(getLoc(pact),loc) 
-                  then addK(lastVisit(id,getLoc(pact),dt) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
-                  else kb fi)
+            then (if close(getLoc(pact),loc) and recentVisit(getLoc(pact),kb,dt)
+                  then addK(lastVisit(id,getLoc(pact),dt) @ t,kb) --- do not update countVisit
+                  else 
+                   (if close(getLoc(pact),loc)
+                    then addK(lastVisit(id,getLoc(pact),dt) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
+                    else kb fi) fi)
             else kb fi)
  /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
  /\ goTo(id,loc2) := (if acts == none then goTo(id,home) else pickOne(acts) fi) .
@@ -202,11 +210,20 @@ eq getPending(id, kb) = none [owise] .
 op pickOne : ActSet -> Action .
 eq pickOne(act acts) = act .
 
-op notDone : Action Loc -> Bool .
+op isGoTo : Action Loc -> Bool .
+eq isGoTo(goToW(id,loc,v), loc) = true .
+eq isGoTo(goTo(id,loc), loc) = true .
+eq isGoTo(act,loc) = false [owise] .
+
+op recentVisit : Loc KB FiniteFloat -> Bool .
+eq recentVisit(loc,(lastVisit(id,loc,dt1) @ t) kb,dt2) = dt2 - dt1 < 3.0 .
+eq recentVisit(loc,kb,dt2) = false .
+
+ops done notDone : Action Loc -> Bool .
+eq done(act,loc) = not notDone(act,loc) .
 
 eq notDone(takeOff(id,alt), pt(ix,iy,iz))  = abs(alt - iz) > 1 .
-eq notDone(land(id), pt(ix,iy,iz))  = false .
---- eq notDone(land(id), pt(ix,iy,iz))  = abs(iz) > 3 
+eq notDone(land(id), pt(ix,iy,iz))  = abs(iz) > 3 .
 eq notDone(goTo(id,loc0), loc)  =  not close(loc0,loc) .
 eq notDone(goToW(id,loc0,v), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .

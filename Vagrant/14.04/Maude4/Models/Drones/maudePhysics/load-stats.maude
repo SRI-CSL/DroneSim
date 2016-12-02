@@ -2,14 +2,14 @@ load load-maudephysics
 
 load model-checker 
 **** load ../../../../../imaude/ilib/load-lib
-load ../../../../../../../imaude/ilib/load-lib.maude
+load /home/vagrant/Repositories/imaude/ilib/load-lib
 load ../../../Lib/meta-cp-e 
 loop init .
 
 
 
 (seq
-(loadg2dlib g2d ../../../../../../../imaude/jlib/jl-util.lsp)
+(loadg2dlib g2d /home/vagrant/Repositories/imaude/jlib/jl-util.lsp)
 (loadg2dlib g2d ../../../Lib/stats-funs.lsp)
 
 (initAgentEset maude g2d g2d none ANALYSIS asys1 true) 

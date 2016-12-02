@@ -139,7 +139,7 @@ eq asys1 = { conf1 } .
 
 --- eq windThresh = round(float(rand.25) / 2.0) .
 eq windThresh = 0 .
-eq stopSimulation = 75.0 .
+eq stopSimulation = 5.0 .
 
 
 ops asys asys2 : Nat -> ASystem .

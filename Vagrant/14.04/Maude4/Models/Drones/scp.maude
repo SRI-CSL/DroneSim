@@ -321,7 +321,7 @@ ceq benefit2(id,kb,goTo(id,loc)) = 0.0
   eq countVisits(kb) = 0 [owise] .
 
   eq val-pics(id,kb,act) 
-   = {benefit2(id,kb,act),cost(id,kb,act)} .
+   = {benefit(id,kb,act),cost(id,kb,act)} .
 
 endfm
 
