@@ -55,12 +55,12 @@ controller  maps
 *** Controller level actions
 op doControl : Action KB -> ActionKB .
 ceq doControl(goToW(id,loc,sp),kb) 
- = {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,2.0 * sampleTime),kb} 
+ = {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,200.0 * sampleTime),kb} 
  if dir(ffx,ffy,ffz) := windEffect(kb)
  /\ dir(ffx1,ffy1,ffz1) := getNormVec(getLoc(id,kb),loc) .
  
 ceq doControl(continue(id), (pending(id,goToW(id,loc,sp)) @ t) kb) =
-  {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,2.0 * sampleTime),
+  {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,200.0 * sampleTime),
    (pending(id,goToW(id,loc,sp)) @ t) kb}
  if dir(ffx,ffy,ffz) := windEffect(kb)
  /\ dir(ffx1,ffy1,ffz1) := getNormVec(getLoc(id,kb),loc) . 

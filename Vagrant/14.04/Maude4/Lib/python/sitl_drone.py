@@ -214,11 +214,13 @@ class SimpleDrone(object):
             return 'Uninitialized'
     
     def goToW(self,vx,vy,vz,wx,wy,wz,dur):
-         sys.stderr.write("HERE\n") 
-         # sys.stderr.write('{0} {1} {2} {3} {4} {5} {6}'.format(vx,vy,vz,wx,wy,wz,dur)) 
-         # self.send_ned_velocity(float(vx) + float(wx),float(vy) + float(wy),float(vz) + float(wz),2)
-         self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)), 0.0,2)
-         # self.send_global_velocity(-1.0,1.0,0.0,2)
+         sys.stderr.write("GOTOW-START\n") 
+         # sys.stderr.write('{0} {1} {2} {3} {4} {5} {6}\n'.format(vx,vy,vz,wx,wy,wz,dur)) 
+         self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)),0.0,dur)
+         # self.send_global_velocity(-1.0,1.0,0.0,2000)
+         # self.send_ned_velocity2(1.0,1.0,0.0)
+         sys.stderr.write("GOTOW-END\n") 
+
 
     def __str__(self):
         if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
@@ -238,6 +240,24 @@ class SimpleDrone(object):
             return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
+
+
+    def send_ned_velocity2(self,velocity_x, velocity_y, velocity_z):
+        """
+        Move vehicle in direction based on specified velocity vectors.
+        """
+        msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
+            0,       # time_boot_ms (not used)
+            0, 0,    # target system, target component
+            mavutil.mavlink.MAV_FRAME_BODY_NED, # frame
+            0b0000111111000111, # type_mask (only speeds enabled)
+            0, 0, 0, # x, y, z positions (not used)
+            velocity_x, velocity_y, velocity_z, # x, y, z velocity in m/s
+            0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+            0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+        # send command to vehicle
+        self.vehicle.send_mavlink(msg)
+        self.vehicle.flush()
 
     def send_ned_velocity(self,velocity_x, velocity_y, velocity_z, duration):
         """
@@ -281,6 +301,7 @@ class SimpleDrone(object):
         # send command to vehicle on 1 Hz cycle
         # for x in range(0,duration):
         self.vehicle.send_mavlink(msg)
+        self.vehicle.flush()
             # time.sleep(1)
 
 """
