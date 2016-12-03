@@ -218,7 +218,6 @@ class SimpleDrone(object):
          # sys.stderr.write('{0} {1} {2} {3} {4} {5} {6}\n'.format(vx,vy,vz,wx,wy,wz,dur)) 
          self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)),0.0,dur)
          # self.send_global_velocity(-1.0,1.0,0.0,2000)
-         # self.send_ned_velocity2(1.0,1.0,0.0)
          sys.stderr.write("GOTOW-END\n") 
 
 
