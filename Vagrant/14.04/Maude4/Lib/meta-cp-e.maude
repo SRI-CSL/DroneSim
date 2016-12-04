@@ -664,6 +664,7 @@ op actTemplate : -> String .
 eq actTemplate  =
 "(seq \
   (invoke %id %act %args)\
+  (apply time.sleep (int 1))\
   (apply send %mname %dname (concat %id \" \" (apply getTimeElapsed)))\
   (if logging (apply writeLog %id))\
 )"
