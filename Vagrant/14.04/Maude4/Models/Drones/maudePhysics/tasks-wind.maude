@@ -110,8 +110,8 @@ op actSCP : Id KB -> ActionKB .
 *** from the intended position
 
 --- eq sitlAct(id,kb) = sitlTest(id,kb) .
---- eq act(id,kb) = actSimple(id,kb) .
-eq act(id,kb) = actSCP(id,kb) .
+eq act(id,kb) = actSimple(id,kb) .
+--- eq act(id,kb) = actSCP(id,kb) .
 
 ceq actSimple(id,kb)  =
   (if pact == none   ***** haven't started

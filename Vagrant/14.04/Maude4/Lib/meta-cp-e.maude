@@ -114,11 +114,11 @@ ceq qid2NatT(q) =
 ****   initname should refer to a Conf not an ASystem
 **********************************************************************
  
-op initAgentEset : ESet Qid Qid Qid Qid Qid Qid Qid -> ESet .
+op initAgentEset : ESet Qid Qid Qid Qid Qid Qid Qid QidList -> ESet .
 ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
-                     amodname,initname,mphysics) =
+                     amodname,initname,mphysics,toks) =
      addEntry(addEntry( addEntry( addEntry(
-      addEntry( addEntry( addEntry(
+      addEntry( addEntry( addEntry( addEntry(
        addEntry( addEntry( addEntry(
         addEntry(es, 
                 'qval, 'maudeName, ql(maudename)), 
@@ -129,6 +129,7 @@ ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
                 'sval, 'globalCounter,sv("0")),
                 'qval, 'MaudePhysics, ql(mphysics)),
                 'qval, 'simStatus, ql('init)),
+                'qval, 'simSteps, ql(nq)),
                 'tval, 'agentConf, tm(amodname,aconfT)),
                 'tval, 'envKB, tm(amodname,ekbT)),
                 'tval, 'time, tm(amodname,timeT))
@@ -142,6 +143,7 @@ ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
  /\ timeT :=  (if res12?? :: ResultPair 
                 then getTerm(res12??) 
                 else 'infty.TimeInf fi)
+ /\ nq := (if (toks :: NeQidList) then head(toks) else '1000 fi)  
 .
  
 eq isReq('initAgentEset) = true .
@@ -167,7 +169,7 @@ crl[initAgentEset]:
        es',
        log), 
        outQ  ] 
- if es' := initAgentEset(es,mname,g2dname,g2dvname, pyname, amodname,initname,mphysics)
+ if es' := initAgentEset(es,mname,g2dname,g2dvname, pyname, amodname,initname,mphysics,toks)
 .
 
 
@@ -1105,12 +1107,13 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
                     'qval, 'simStatus, ql('init))
 /\ pyname := getPyName(es)
 /\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+/\ ql(nq) := getVal(es,'qval,'simSteps,ql('1000))          
 /\ reqQ0 := (if q == 'true
-             then req('doMaudeSimRound, ql('1000),
+             then req('doMaudeSimRound, ql(nq),
                       req('runOd,ql(g2dvname sname),
                           reqQ'))
              else req('resetSitl, ql(pyname), 
-                   req('doSimRound, ql(pyname '1000),
+                   req('doSimRound, ql(pyname nq),
                     req('runOd,ql(g2dvname sname),
                      reqQ')))
             fi)  .

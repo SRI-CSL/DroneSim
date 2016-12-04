@@ -166,8 +166,8 @@ eq updateConf([ eI | ekb ] aconf) =
     updateMaxSep(updateMinSep([ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf)) .
 
 
-op minSep : Nat Loc Loc -> ConfElt [ctor] .
-op maxSep : Nat Loc Loc -> ConfElt [ctor] .
+op minSep : Nat Loc Loc -> ConfElt [ctor format(n t)] .
+op maxSep : Nat Loc Loc -> ConfElt [ctor format(n t)] .
 
 
 op updateMinSep : Conf -> Conf .
@@ -218,64 +218,7 @@ endm
 
 ***(
 May want to use higher speed or more energy usage
-
-rew [300] asys1 .
-
-result ASystem: {
-[eI
-	| clock(100) class(b(0), Bot) class(b(1), Bot) (timeElapsed(1.0e+2) @
-    100) (rand(400) @ 100) (atloc(b(0), {senLoc(4.5022809024120846e+1,
-    1.2229466183677902e+1, 5.0),pt(45, 12, 5)}) @ 100) (atloc(b(1), {senLoc(
-    1.1136011148639966, -2.4763778176530945e+1, 5.0),pt(1, -24, 5)}) @ 100) (
-    energy(b(0), 7.475e+1) @ 100) (energy(b(1), 7.45e+1) @ 100) (vel(b(0), 5.0)
-    @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
-[b(0) : Bot |
-  lkb : (clock(100) class(b(0), Bot) (timeElapsed(9.9e+1) @ 99) (rand(495) @
-    99) (atloc(b(0), {senLoc(4.9481670880124874e+1, 9.9670447045824719, 5.0),
-    pt(49, 10, 5)}) @ 99) (pending(b(0), goToW(b(0), {senLoc(1.0e+1, 3.0e+1,
-    5.0),pt(10, 30, 5)}, 5.0)) @ 100) (countLate(b(0), 0) @ 0) (visited(b(0),
-    nil) @ 0) (energy(b(0), 7.5e+1) @ 99) (caution(b(0), 2.0e+1) @ 0) (
-    targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (wind(0.0, 1.0, 0.0) @ 0) (
-    targets(b(0), {senLoc(-2.0e+1, 5.0e+1, 5.0),pt(-20, 50, 5)} ; {senLoc(
-    -4.0e+1, 5.0, 5.0),pt(-40, 5, 5)}, {senLoc(5.0e+1, 1.0e+1, 5.0),pt(50, 10,
-    5)} ; {senLoc(1.0e+1, 3.0e+1, 5.0),pt(10, 30, 5)}) @ 100) (lastVisit(b(0),
-    {senLoc(-4.0e+1, 5.0, 5.0),pt(-40, 5, 5)}, 8.1e+1) @ 81) (lastVisit(b(0), {
-    senLoc(-2.0e+1, 5.0e+1, 5.0),pt(-20, 50, 5)}, 7.1e+1) @ 71) (lastVisit(b(
-    0), {senLoc(0.0, 0.0, 0.0),pt(0, 0, 0)}, 0.0) @ 0) (lastVisit(b(0), {
-    senLoc(1.0e+1, 3.0e+1, 5.0),pt(10, 30, 5)}, 6.4e+1) @ 64) (lastVisit(b(0),
-    {senLoc(5.0e+1, 1.0e+1, 5.0),pt(50, 10, 5)}, 9.9e+1) @ 99) (countVisit(b(
-    0), {senLoc(-4.0e+1, 5.0, 5.0),pt(-40, 5, 5)}, 2) @ 81) (countVisit(b(0), {
-    senLoc(-2.0e+1, 5.0e+1, 5.0),pt(-20, 50, 5)}, 2) @ 71) (countVisit(b(0), {
-    senLoc(1.0e+1, 3.0e+1, 5.0),pt(10, 30, 5)}, 2) @ 64) (countVisit(b(0), {
-    senLoc(5.0e+1, 1.0e+1, 5.0),pt(50, 10, 5)}, 3) @ 99) myHome(b(0), {senLoc(
-    0.0, 0.0, 0.0),pt(0, 0, 0)}) myAlt(b(0), 5)),
-  ckb : (class(b(0), Bot) atloc(b(0), {senLoc(4.9481670880124874e+1,
-    9.9670447045824719, 5.0),pt(49, 10, 5)}) @ 99),
-  evs : (tick @ 0)]
-[b(1) : Bot |
-  lkb : (clock(100) class(b(1), Bot) (timeElapsed(9.9e+1) @ 99) (rand(594) @
-    99) (atloc(b(1), {senLoc(1.1136011148639966, -2.4763778176530945e+1,
-    1.0e+1),pt(1, -24, 10)}) @ 99) (pending(b(1), land(b(1))) @ 100) (
-    countLate(b(1), 0) @ 0) (visited(b(1), nil) @ 0) (energy(b(1), 7.475e+1) @
-    99) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0)
-    @ 0) (wind(0.0, 1.0, 0.0) @ 0) (targets(b(1), {senLoc(-3.5e+1, -5.0,
-    1.0e+1),pt(-35, -5, 10)} ; {senLoc(1.0e+1, -3.0e+1, 1.0e+1),pt(10, -30,
-    10)}, {senLoc(4.0e+1, -1.0e+1, 1.0e+1),pt(40, -10, 10)} ; {senLoc(-4.0e+1,
-    -4.0e+1, 1.0e+1),pt(-40, -40, 10)}) @ 92) (lastVisit(b(1), {senLoc(-4.0e+1,
-    -4.0e+1, 1.0e+1),pt(-40, -40, 10)}, 6.7e+1) @ 67) (lastVisit(b(1), {senLoc(
-    -3.5e+1, -5.0, 1.0e+1),pt(-35, -5, 10)}, 7.4e+1) @ 74) (lastVisit(b(1), {
-    senLoc(5.0, 0.0, 0.0),pt(5, 0, 0)}, 0.0) @ 0) (lastVisit(b(1), {senLoc(
-    1.0e+1, -3.0e+1, 1.0e+1),pt(10, -30, 10)}, 8.4e+1) @ 84) (lastVisit(b(1), {
-    senLoc(4.0e+1, -1.0e+1, 1.0e+1),pt(40, -10, 10)}, 9.1e+1) @ 91) (
-    countVisit(b(1), {senLoc(-4.0e+1, -4.0e+1, 1.0e+1),pt(-40, -40, 10)}, 2) @
-    67) (countVisit(b(1), {senLoc(-3.5e+1, -5.0, 1.0e+1),pt(-35, -5, 10)}, 2) @
-    74) (countVisit(b(1), {senLoc(1.0e+1, -3.0e+1, 1.0e+1),pt(10, -30, 10)}, 2)
-    @ 84) (countVisit(b(1), {senLoc(4.0e+1, -1.0e+1, 1.0e+1),pt(40, -10, 10)},
-    3) @ 91) myHome(b(1), {senLoc(5.0, 0.0, 0.0),pt(5, 0, 0)}) myAlt(b(1),
-    10)),
-  ckb : (class(b(1), Bot) atloc(b(1), {senLoc(1.1136011148639966,
-    -2.4763778176530945e+1, 1.0e+1),pt(1, -24, 10)}) @ 99),
-  evs : (tick @ 0)]}
+see runs files
 
 
 )
