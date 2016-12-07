@@ -17,7 +17,6 @@ fmod MODEL-TASKS is
   var r j n j1 : Nat .
   
   vars locs locs0 locs1 locs2 locs3 : LocList .
-  var times : TimesList .
  
   op sampleTime : -> FiniteFloat .
   eq sampleTime = 1.0 .
@@ -146,16 +145,12 @@ ceq actSimple(id,kb)  =
        (timeElapsed(dt) @ t6) kb0 ) := kb
    /\ pact := getPending(id,kb0)
    /\ kb1 := (if isGoTo(pact)
-            then (if (close(getLoc(pact),loc) 
-						         and not(recentVisitT(getLoc(pact),kb,dt)))
-                  then incVisitTimes(id,getLoc(pact),t,kb)
+            then (if close(getLoc(pact),loc) 
+                  then addK(lastVisit(id,getLoc(pact),dt) @ t, 
+                            incLateVisit(getTimeVisit(id,getLoc(pact),kb),dt,t,
+                            incCountVisit(id,getLoc(pact),t,kb))) 
                   else kb fi)
             else kb fi)  .
-
-**** old kb1 then clause
-****				 addK(lastVisit(id,getLoc(pact),dt) @ t, 
-****  						incLateVisit(getTimeVisit(id,getLoc(pact),kb), dt,t,
-****                           incCountVisit(id,getLoc(pact),t,kb))) 
 
 ceq actSCP(id,kb) = 
  (if pact == none then 
@@ -178,25 +173,16 @@ if (class(id,cl)) (clock(t)) myAlt(id,alt)
     kb0 := kb
  /\ pact := getPending(id,kb0)
  /\ kb1 := (if isGoTo(pact)
-            then (if (close(getLoc(pact),loc) 
-								       and not(recentVisitT(getLoc(pact),kb,dt)))
-						      then incVisitTimes(id,getLoc(pact),t,kb)
-						      else kb fi)
-						
+            then (if close(getLoc(pact),loc) and recentVisit(getLoc(pact),kb,dt)
+                  then addK(lastVisit(id,getLoc(pact),dt) @ t,kb) --- do not update countVisit
+                  else 
+                   (if close(getLoc(pact),loc)
+                    then addK(lastVisit(id,getLoc(pact),dt) @ t, incCountVisit(id,getLoc(pact),t,kb)) 
+                    else kb fi) fi)
             else kb fi)
  /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
  /\ goTo(id,loc2) := (if acts == none then goTo(id,home) else pickOne(acts) fi) .
 
-***(
-**** replaced kb1 then
-	 (if close(getLoc(pact),loc) and recentVisit(getLoc(pact),kb,dt)
-    then addK(lastVisit(id,getLoc(pact),dt) @ t,kb) --- do not update countVisit
-     else 
-        (if close(getLoc(pact),loc)
-         then addK(lastVisit(id,getLoc(pact),dt) @ t, 
-		              incCountVisit(id,getLoc(pact),t,kb)) 
-         else kb fi) fi)
-)
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
@@ -229,16 +215,9 @@ eq isGoTo(goToW(id,loc,v), loc) = true .
 eq isGoTo(goTo(id,loc), loc) = true .
 eq isGoTo(act,loc) = false [owise] .
 
-****!!!! owise tag missing!!!!
 op recentVisit : Loc KB FiniteFloat -> Bool .
 eq recentVisit(loc,(lastVisit(id,loc,dt1) @ t) kb,dt2) = dt2 - dt1 < 3.0 .
-eq recentVisit(loc,kb,dt2) = false [owise] .
-
-op recentVisitT : Loc KB FiniteFloat -> Bool .
-eq recentVisitT(loc,(visitTimes(id,loc, times ; t1) @ t) kb,dt2) 
-        = dt2 - float(t1) < 3.0 .
-eq recentVisitT(loc,kb,dt2) = false [owise] .
-
+eq recentVisit(loc,kb,dt2) = false .
 
 ops done notDone : Action Loc -> Bool .
 eq done(act,loc) = not notDone(act,loc) .

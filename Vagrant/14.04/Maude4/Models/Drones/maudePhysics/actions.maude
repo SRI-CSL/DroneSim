@@ -34,7 +34,8 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
 **** performs actions for one-time unit -- but SEQUENTIALLY!! see below
 ****  op doUnitEnvAct : Time KB EventSet -> KB .
 
- ceq doUnitEnvAct(t, ekb, (mv(id,dir,v) @ 0 ; nzt) evs)
+ ceq doUnitEnvAct(t, ekb, _@_;_(mv(id, dir, v), 0, nzt) evs)
+**** (mv(id,dir,v) @ 0 ; nzt) 
    = doUnitEnvAct(t, addK(ekb,(atloc(id,l3) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
    if l0 := getLoc(id,ekb)
@@ -46,7 +47,7 @@ eq timeEffectA(act,t) = none .  ---- controller deals with this.
       (if occupied(l1,ekb) then l0 else (if occupied(l2,ekb) then l1 else l2 fi) fi)
   .
 
- ceq doUnitEnvAct(t, ekb, (charge(id) @ 0 ; nzt) evs)
+ ceq doUnitEnvAct(t, ekb, _@_;_(charge(id), 0, nzt) evs)
    = doUnitEnvAct(t,
       addK(ekb,energy(id,min(e + chargeUnit,maxCharge)) @ s t), evs)
    if (energy(id,e) @ t0) (atloc(id,l0) @ t1) 

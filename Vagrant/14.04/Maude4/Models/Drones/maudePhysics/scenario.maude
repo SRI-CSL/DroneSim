@@ -216,6 +216,36 @@ op asys2 : -> ASystem .
 eq asys2 = { conf1 minSep(20,pt(0,0,0),pt(10,10,0))
                    maxSep(20,pt(0,0,0),pt(10,10,0)) } .
 
+***********  init configs with visit counting simplified
+op mkBBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
+           FiniteFloat Int LocList -> KB .
+eq mkBBkb(n,sx,sy,sz,v,e,c,a,locs) = 
+    mkBekb(n,sx,sy,sz,v,e)  (targetVel(b(n),v) @ 0) 
+    myAlt(b(n),a) (caution(b(n),c) @ 0)
+    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
+    mkVisitTimes(n,locs) clock(0) .
+
+op mkVisitTimes : Nat LocList -> KB .
+eq mkVisitTimes(n,loc ; locs) 
+ = (visitTimes(b(n),loc,nil) @ 0) mkVisitTimes(n,locs) .
+eq mkVisitTimes(n,nil) = none .
+
+
+
+op mkBB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat
+          Int LocList -> Agent .
+eq mkBB(n,sx,sy,sz,v,e,c,a,locs) =
+ [b(n) : Bot | lkb : mkBBkb(n,sx,sy,sz,v,e,c,a,locs),
+               ckb : none, evs : (tick @ 0)] .
+
+op conf3 : -> Conf .
+eq conf3 = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
+
+op asys3 : -> ASystem .
+eq asys3 = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
+                   maxSep(20,pt(0,0,0),pt(10,10,0)) } .
 
 
 endm

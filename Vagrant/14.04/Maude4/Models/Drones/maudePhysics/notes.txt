@@ -75,3 +75,42 @@ Assumptions
     newloc = computed loc +/- err0
     energy used = energy computed +/- err1
  similarly for traveling at velocity v     
+ 
+     
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+
+documenting assumptions/conventions
+
+vel(v)  -- the measured velocity --- retrieved by getCurVel(id,kb)
+targetVel(v)  -- the intended velocity --- retrieved by getVel(id,kb)
+
+points pt(x,y,z) are in integral grid units
+gridStep<X,Y,Z>  is the physical measure -- in meters
+
+sen<X,Y,Z>Low ---- what does this model?  Is it a coordinate translation
+   between SITL and Maude?  
+
+costMv(v) is intended to be the cost for horizontal flight at speed v for 1 sec (1 time unit)
+
+the equation cost2loc(l0,l1,v) = distanceFF(l0,l1) * costMv(v) 
+seems inconsistant with the above, maybe
+
+  cost2loc(l0,l1,v) = timeToLoc(l0,l1,v) * costMv(v) 
+
+where timeToLoc = (distanceFF(l0,l1) / v)
+
+
+costMvZ(v,dt) -- is the cost of vertial motion at speed v for time dt
+--- is declared in actions.maude -- probably should be in knowledge?
+
+Question -- these are used for the maude Physics,  do we want
+the same ones to be used in reasoning about what action to take?
+
+
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+replace 
+ op countVisit : Id Loc Nat -> Info .
+by
+
+**** track visitTimes, the rest can be computed
+  op visitTimes : Id Loc NatList -> Info .  -- list initially nil

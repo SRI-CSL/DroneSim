@@ -2,6 +2,7 @@ fmod MODEL-KNOWLEDGE is
   inc SOFT-AGENTS .
 	inc CONVERSION .
 
+
   vars t t0 t1 t2 : Time .
   vars alt x y x1 y1 x0 y0 z0 z1 z : Int .
   vars id id0 id1 : Id .
@@ -13,7 +14,7 @@ fmod MODEL-KNOWLEDGE is
   vars locs locs0 locs1 locs2 locs3 : LocList .
   var act act0 act1  : Action .
   vars n n0 n1 r j : Nat .
-	
+	var times : TimesList .
 
   op b : Nat -> Id .
   op st : Nat -> Id .
@@ -69,12 +70,12 @@ op equiv : Loc Loc -> Bool .
   eq first(loc ; locs) = loc .
   eq rest(loc ; locs) = locs .
   op len : LocList -> Nat .
-  eq len(nil) = 0 .
+  eq len((nil).LocList) = 0 .
   eq len(loc ; locs) = s (len(locs)) .
 
  op diff : Loc Loc -> Loc .
   eq diff(pt(x0,y0,z0),pt(x1,y1,z1)) 
-   = pt(x1 - x0,y1 - y0,z1 - z0) .
+   = pt((x1 - x0),(y1 - y0),(z1 - z0)) .
 
   --- Here we are using locs as vectors. So do not use (0,0,0).
   op angle : Loc Loc -> FiniteFloat .
@@ -341,4 +342,46 @@ op equiv : Loc Loc -> Bool .
   op getLKB : Id Conf -> KB .
   eq getLKB(id:Id,[id:Id : cl:Class | lkb : kb:KB, attrs:AttributeSet] pc:Conf) = kb:KB .
 	
+
+*********16dec06 clt new stuff
+***** using NAT-LIST causes ambiguity -- Maude thinks (n - m) could be
+***** the list (n -m)   which is silly becuase -m is not a Nat, but ....
+
+sort TimesList .
+subsort Nat < TimesList .
+op nil : -> TimesList .
+op _;_ : TimesList TimesList -> TimesList [ctor assoc id: nil] .
+
+op len : TimesList -> Nat .
+eq len((nil).TimesList) = 0 .
+eq len( n ; times) = s (len(times)) .
+
+op first : TimesList ~> Nat .
+eq first( n ; times) = n .
+op rest : TimesList -> TimesList .
+eq rest( n ; times) = times .
+eq rest(times) = nil [owise] .
+
+**** track visitTimes, the rest can be computed
+  op visitTimes : Id Loc TimesList -> Info .  --- list initially nil
+  eq hasId(id,visitTimes(id,loc,times) @ t) = true .
+
+*** managed by update function, no need for partial order
+*** var times : TimesList .
+
+  op incVisitTimes : Id Loc Time KB -> KB .
+  eq incVisitTimes(id,loc,t1,(visitTimes(id,loc,times) @ t) kb) = 
+	                (visitTimes(id,loc,(times ; t1)) @ t1) kb .
+  eq incVisitTimes(id,loc,t1,kb) = kb [owise] .
+	
+
+**** The drone should remember the expected time to visit a location
+ op eLoc : Id Loc TimesList -> Info .
+ eq hasId(id,eLoc(id,loc,times) @ t) = true .
+
+ op updateELoc : Id Loc Time KB -> KB .
+ eq updateELoc(id,loc,t1,(eLoc(id,loc,times) @ t) kb) = 
+	              (eLoc(id,loc, (times ; t1)) @ t1) kb .
+ eq updateELoc(id,loc,t1,kb) = kb [owise] .
+
 endfm
