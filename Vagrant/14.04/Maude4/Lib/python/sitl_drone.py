@@ -26,32 +26,6 @@ latitude  longitude   altitude yaw
 
 
 
-global_trace = []
-
-global_start_time = time.time()
-
-global_trace_enabled = True
-
-def gtrace(fn):
-    if not global_trace_enabled:
-        return fn
-    else:
-        def gtraced():
-            global_trace.append(('>', fn.func_name, time.time() - global_start_time, args, kwargs))
-            fn()
-            global_trace.append(('<', fn.func_name, time.time() - global_start_time, args, kwargs))
-        return gtraced
-
-
-
-
-
-def printTrace():
-    sys.stderr.write('tracing {0}\n'.format('enabled' if global_trace_enabled else 'not enabled'))
-    for elem in global_trace:
-        sys.stderr.write(str(elem))
-        sys.stderr.write('\n')
-
 
 
 
