@@ -114,3 +114,21 @@ by
 
 **** track visitTimes, the rest can be computed
   op visitTimes : Id Loc NatList -> Info .  -- list initially nil
+
+
+     
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+Spatial Coordination 
+
+Consider invariant dist(b0,b1) > n meters.
+When b0 (or b1) evaluates an action the preference should be minimal
+if the resulting state (could) violate the invariant.
+We assume b0 knows the location l1 of b1 at t1 and knows the max speed s1 of b1.
+So at t (current time) + 1 b0 should avoid a circle centered at l1 of radius 
+(t - t0 + 1) * s1.  
+If b0 plans to goTo l2 from l0 in time dt then the path from l0 to l2
+should not intersect a circle at l1 of radius (t - t0 + dt) * s1. 
+
+
+
+doAct needs fixing as does VAL-PICS for use with visitTimes.  
