@@ -1,4 +1,4 @@
-**** load load 
+**** load load
 
 load ../../../Lib/time
 load ../../../Lib/soft-agents
@@ -7,24 +7,24 @@ load ../../../Lib/cp-e-rules
 load ../../../Lib/pretty
 load ../knowledge
 load scp
-load tasks-wind
---- load tasks
+--- load tasks-wind
+load tasks
 load scenario
 load sitl
 load analysis-stats
 
-load model-checker 
+load model-checker
 load ~/Repositories/imaude/ilib/load-lib
-load ../../../Lib/meta-cp-e 
+load ../../../Lib/meta-cp-e
 loop init .
 
 (seq
  (pyexe plambda (load "../../../Lib/drone.lsp"))
- (pyexe plambda (define b0 (apply mkdrone "b0" (int 0) (boolean true) 
+ (pyexe plambda (define b0 (apply mkdrone "b0" (int 0) (boolean true)
                                           (boolean true) "log1.txt" )))
- (pyexe plambda (define b1 (apply mkdrone "b1" (int 1) (boolean true) 
+ (pyexe plambda (define b1 (apply mkdrone "b1" (int 1) (boolean true)
                                           (boolean true) "log2.txt" )))
  (pyexe plambda (apply setStartTime))
  ****           maude local remote plambda module conf maudephyscs?
- (initAgentEset maude g2d g2d plambda SITL asys1 false) 
+ (initAgentEset maude g2d g2d plambda SITL asys1 false)
 )

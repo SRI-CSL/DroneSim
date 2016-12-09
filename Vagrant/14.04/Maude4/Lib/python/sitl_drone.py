@@ -5,7 +5,7 @@ from pymavlink import mavutil
 import subprocess
 from pymavlink import fgFDM
 import util
- 
+
 
 from subprocess import *
 
@@ -24,11 +24,42 @@ latitude  longitude   altitude yaw
 
 """
 
+
+
+global_trace = []
+
+global_start_time = time.time()
+
+global_trace_enabled = True
+
+def gtrace(fn):
+    if not global_trace_enabled:
+        return fn
+    else:
+        def gtraced():
+            global_trace.append(('>', fn.func_name, time.time() - global_start_time, args, kwargs))
+            fn()
+            global_trace.append(('<', fn.func_name, time.time() - global_start_time, args, kwargs))
+        return gtraced
+
+
+
+
+
+def printTrace():
+    sys.stderr.write('tracing {0}\n'.format('enabled' if global_trace_enabled else 'not enabled'))
+    for elem in global_trace:
+        sys.stderr.write(str(elem))
+        sys.stderr.write('\n')
+
+
+
+
 class SimpleDrone(object):
     """
     plambda lesson:
 
-    after 
+    after
 
     (import "sitl_drone")
 
@@ -39,7 +70,7 @@ class SimpleDrone(object):
     and get the defaults for instance_no, debug, and speedup.
 
     or:
-    
+
     (let ((largs (mklist "drone_0"))
           (dargs (mkdict "instance_no" (int 666) "debug" (boolean False) "speedup" (int 6))))
        (kwapply sitl_drone.SimpleDrone largs dargs))
@@ -60,19 +91,19 @@ class SimpleDrone(object):
 
         if self.debug:
             sys.stderr.write("SimpleDrone with name {0} and instance number {1}\n".format(self.name, self.ino))
-        
+
         self.x = 0
         self.y = 0
         self.z = 0
         self.v = 0
         self.e = 10.0
         self.altitude = 5
-        
+
         self.vehicle = None
 
         self.dronekit = None
         self.mavproxy = None
-    
+
     def getName(self):
         return self.name
 
@@ -86,13 +117,13 @@ class SimpleDrone(object):
 
     def sitl_ip(self):
         return '127.0.0.1:{0}'.format(14550 + self.pipeincr)
-    
+
     def drokekit_args(self):
         return [ 'dronekit-sitl',
                  'copter-3.3',
                  '--instance',
                  '{0}'.format(self.ino),
-                 '--speedup={0}'.format(self.speedup),      
+                 '--speedup={0}'.format(self.speedup),
                  '--home=-7.162675,-34.817705,36,250' ]
 
     def mavproxy_args(self):
@@ -106,8 +137,13 @@ class SimpleDrone(object):
         if self.debug:
             mpargs.extend(['--map', '--console'])
         return mpargs
-    
-    
+
+
+    def trace(self, name):
+        sys.stderr.write("{0}.{1} mode = {2}\n".format(self.ino, name, self.vehicle.mode))
+
+
+
     def spawn(self):
         dkargs = self.drokekit_args()
         if self.debug:
@@ -122,8 +158,8 @@ class SimpleDrone(object):
         if self.debug:
             sys.stderr.write("slept\n")
 
-        mpargs = self.mavproxy_args()    
-            
+        mpargs = self.mavproxy_args()
+
         if self.debug:
             sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
         self.mavproxy =  SandBox('mavproxy', mpargs, True)
@@ -131,7 +167,9 @@ class SimpleDrone(object):
         if self.debug:
             sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
 
+
     def takeOff(self, altitude):
+        self.trace("takeOff")
         self.altitude = float(altitude)
         while not self.vehicle.is_armable:
            time.sleep(1)
@@ -143,6 +181,7 @@ class SimpleDrone(object):
         self.vehicle.simple_takeoff(self.altitude)
 
     def mv(self, x, y, z, v):
+        self.trace("mv")
         currentLocation = self.vehicle.location.global_relative_frame
         if self.debug:
             sys.stderr.write('Current: {0}\n'.format(currentLocation))
@@ -157,10 +196,12 @@ class SimpleDrone(object):
         return True
 
     def charge(self, amt):
+        self.trace("charge")
         self.e += float(amt)
         return True
 
     def land(self):
+        self.trace("land")
         #self.send_global_velocity(0,0,0,1)
         # http://python.dronekit.io/examples/guided-set-speed-yaw-demo.html
         self.vehicle.groundspeed=0
@@ -168,17 +209,21 @@ class SimpleDrone(object):
         return True
 
     def stop(self):
+        self.trace("stop")
         return True
 
     def rtl(self):
+        self.trace("rtl")
         self.vehicle.mode = VehicleMode("RTL")
 
     def reset(self):
+        self.trace("reset")
         self.shutdown()
         self.initialize()
         return True
 
     def shutdown(self):
+        self.trace("shutdown")
         if self.vehicle is not None:
             self.vehicle.close()
             self.vehicle = None
@@ -212,13 +257,11 @@ class SimpleDrone(object):
             return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
-    
+
     def goToW(self,vx,vy,vz,wx,wy,wz,dur):
-         sys.stderr.write("GOTOW-START\n") 
-         # sys.stderr.write('{0} {1} {2} {3} {4} {5} {6}\n'.format(vx,vy,vz,wx,wy,wz,dur)) 
-         self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)),0.0,dur)
-         # self.send_global_velocity(-1.0,1.0,0.0,2000)
-         sys.stderr.write("GOTOW-END\n") 
+        self.trace("goToW")
+        self.send_global_velocity( (float(vy) + float(wy)),(float(vx) + float(wx)),0.0,dur)
+
 
 
     def __str__(self):
@@ -258,7 +301,7 @@ class SimpleDrone(object):
         # send command to vehicle on 1 Hz cycle
         for x in range(0,duration):
             self.vehicle.send_mavlink(msg)
-            time.sleep(1)            
+            time.sleep(1)
 
     def send_global_velocity(self,velocity_x, velocity_y, velocity_z, duration):
         """
@@ -286,16 +329,16 @@ class SimpleDrone(object):
             # time.sleep(1)
 
 """
-x.vehicle.location.local_frame.north        
+x.vehicle.location.local_frame.north
 from sitl_drone import *
-      
+
 x = SimpleDrone("hello")
 x.initialize()
 x.takeOff(5)
 
 #"Start Position: "
 x.vehicle.location.local_frame
-        
+
 #"Go to Destination 1"
 x.mv(10,0,5,3)
 
@@ -338,5 +381,3 @@ print "Battery: ", x.vehicle.battery.level
 
 
 """
-
-
