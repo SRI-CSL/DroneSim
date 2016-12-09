@@ -257,7 +257,8 @@ fmod VAL-PICS is
   vars dir dir1 : Dir .
   vars t t0 t1 : Time .
   vars st1 st2 v dt : FiniteFloat .
-
+  var times : TimesList .
+	
   op valueCS : Id KB -> FiniteFloat .
   op valueCS2 : Id KB -> Nat .
   ops benefit benefit2 : Id KB Action -> FiniteFloat .
@@ -265,25 +266,23 @@ fmod VAL-PICS is
   op val-pics : Id KB Action  -> FF .
 
   ceq benefit(id,kb,goTo(id,loc)) = st2 - st1
-   if kb1 := doAct(id,kb,goTo(id,loc))
-   /\ t := getTime(kb1)
+   if kb1 := doActT(id,kb,goTo(id,loc))
    /\ st1 := valueCS(id,kb)
    /\ st2 := valueCS(id,kb1) .
 
-  eq valueCS(id,(clock(t)) (lastVisit(id,loc,dt) @ t1) kb)
-   = if t - t1 > periodicity 
-     then valueCS(id,(clock(t)) kb)
-     else timeFactor(t1,t) +
-          valueCS(id,(clock(t)) kb) fi .
+  eq valueCS(id,(clock(t)) (visitTimes(id,loc, times ; t0) @ t1) kb)
+   = valueCS(id,(clock(t)) kb)
+	   + 
+		 (if t - t0 > periodicity then 0.0 else timeFactor(t1,t) fi) .
 
-  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have maximum priority          
+  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have maximum priority  ???        
 ---           photo time, current time
   op timeFactor : Nat Nat -> FiniteFloat . 
   eq timeFactor(t1,t) = if 2 * (t - t1) > periodicity
                         then 0.1 * float((t - t1) / periodicity) else 1.0 fi .
 
 
- ceq cost(id,kb,goTo(id,loc)) = cost2loc(loc0,loc,v) 
+ ceq cost(id,kb,goTo(id,loc)) = cost2locT(loc0,loc,v,time2Loc(loc0,loc,v)) 
    if v := getVel(id,kb) 
    /\ loc0 := getLoc(id,kb) .
 
@@ -292,33 +291,29 @@ ceq benefit2(id,kb,goTo(id,loc)) = 0.0
    /\ close(loc1,loc) .
 
  ceq benefit2(id,kb,goTo(id,loc)) = float(n - m) 
-   if kb1 := doAct(id,kb,goTo(id,loc))
-   /\ t := getTime(kb1)
+   if kb1 := doActT(id,kb,goTo(id,loc))
    /\ m := valueCS2(id,kb)
    /\ n := valueCS2(id,kb1) .
 
   *** Completing a round should be more desirable
   ceq valueCS2(id,kb) =  (n * 100) + m
    if n := findMin(id,kb,100000) 
-   /\ kb1 := subtractVisit(kb,n)
-   /\ m := countVisits(kb1) .
+   /\ m := countVisitsAbove(kb,n) .
 
+**** the least # of visits any loc has
   op findMin : Id KB Nat -> Nat .
-  ceq findMin(id,(countVisit(id,loc,n) @ t) kb, m)
-   = findMin(id,kb, n)
-   if n < m .
+  ceq findMin(id,(visitTimes(id,loc,times) @ t) kb, m)
+   = (if n < m then findMin(id,kb, n) else findMin(id,kb,m) fi)
+   if n := len(times) .
   eq findMin(id,kb, m) = m [owise] .
 
-  op subtractVisit : KB Nat -> KB .
-  eq subtractVisit((countVisit(id,loc,n) @ t) kb, m) = 
-   (countVisit(id,loc,n monus m) @ t) subtractVisit(kb, m) .
-  eq subtractVisit(kb, m) = kb [owise] .
+****???? should this only look at visits for the deciding drone?
+**** how many locs have more than n visits 
+  op countVisitsAbove : KB Nat -> Nat .
+  eq countVisitsAbove((visitTimes(id,loc,times ) @ t) kb,n) 
+   = countVisitsAbove(kb,n) + (if len(times) > n then 1 else 0 fi) .
+  eq countVisitsAbove(kb,n) = 0 [owise] .
 
-  op countVisits : KB -> Nat .
-  ceq countVisits(((countVisit(id,loc,n) @ t) kb)) 
-   = s (countVisits(kb)) 
-   if n > 0 .
-  eq countVisits(kb) = 0 [owise] .
 
   eq val-pics(id,kb,act) 
    = {benefit(id,kb,act),cost(id,kb,act)} .

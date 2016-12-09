@@ -375,6 +375,38 @@ eq rest(times) = nil [owise] .
   eq incVisitTimes(id,loc,t1,kb) = kb [owise] .
 	
 
+****** using visit times
+
+	op doActT : Id KB Action -> KB .
+	
+  ceq doActT(id,kb,charge(id)) = kb1
+   if e0 := getEnergy(id,kb) + chargeUnit
+   /\ e := min(e0, maxCharge)
+   /\ t := getTime(kb)
+   /\ kb1 := addK(kb, clock(s t) (energy(id,e) @ s t)) .
+
+  ceq doActT(id,kb,goTo(id,loc)) = kb1
+   if t0 := getTime(kb)
+   /\ l0 := getLoc(id,kb)
+   /\ v := getVel(id,kb)
+   /\ ff := distanceFF(l0,loc)
+   /\ timeElapsed(dt0) @ t2 := getTimeElapsed(kb)
+   --- Once we are able to link the model's timestamp with SITL's 
+   --- This is a very rough estimate of arrival time
+   /\ dt1 := (ff / v) + dt0
+   /\ e0 := getEnergy(id,kb) - cost2locT(l0,loc,v,(ff / v)) 
+****   /\ t1 := s t0
+	 /\ t1 := round(dt1)
+   /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
+                  (energy(id,e0) @ t1),
+									incVisitTimes(id,loc,t1,kb) ).
+
+  op time2Loc : Loc Loc FiniteFloat -> FiniteFloat .
+	eq time2Loc(l0,loc,v) = distanceFF(l0,loc) / v .
+
+  op cost2locT : Loc Loc FiniteFloat FiniteFloat -> FiniteFloat .
+  eq cost2locT(l0,l1,v,dt) = costMv(v) * dt .
+
 **** The drone should remember the expected time to visit a location
  op eLoc : Id Loc TimesList -> Info .
  eq hasId(id,eLoc(id,loc,times) @ t) = true .
