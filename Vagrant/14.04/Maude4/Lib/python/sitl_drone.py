@@ -25,7 +25,7 @@ latitude  longitude   altitude yaw
 """
 
 
-
+tracing = True
 
 
 
@@ -79,6 +79,7 @@ class SimpleDrone(object):
         self.mavproxy = None
 
     def getName(self):
+        self.trace("getName")
         return self.name
 
     def initialize(self):
@@ -114,8 +115,12 @@ class SimpleDrone(object):
 
 
     def trace(self, name):
-        sys.stderr.write("{0}.{1} mode = {2}\n".format(self.ino, name, self.vehicle.mode))
-
+        if tracing:
+            d = self.data()
+            if len(d) > 0:
+                sys.stderr.write("{0}.{1} mode = {2} vel = {3} alt = {4}\n".format(self.ino, name, self.vehicle.mode, d['vel'], d['alt']))
+            else:
+                sys.stderr.write("{0}.{1} mode = {2} vel = {3} alt = {4}\n".format(self.ino, name, self.vehicle.mode, 'U', 'U'))
 
 
     def spawn(self):
@@ -211,24 +216,12 @@ class SimpleDrone(object):
             if self.debug:
                 sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
-        # sys.stderr.write('STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \n STOP STOP STOP STOP \nSTOP STOP STOP STOP \n')
 
     def log(self):
-        if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
-            north =  self.vehicle.location.local_frame.north
-            east =  self.vehicle.location.local_frame.east
-            alt =  -self.vehicle.location.local_frame.down
-            auxVel = self.vehicle.velocity
-            bat = self.vehicle.battery.level
-            dx = auxVel[0]
-            dy = auxVel[1]
-            dz = auxVel[2]
-            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
-            if vel != 0:
-                dx = dx / vel
-                dy = dy / vel
-                dz = dz / vel
-            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
+        self.trace("log")
+        d = self.data()
+        if len(d) > 0:
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(d['east'], d['north'], d['alt'], d['dx'], d['dy'], d['dz'], d['vel'], d['bat'])
         else:
             return 'Uninitialized'
 
@@ -238,22 +231,31 @@ class SimpleDrone(object):
 
 
 
-    def __str__(self):
+    def data(self):
+        retval = {}
         if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
-            north =  self.vehicle.location.local_frame.north
-            east =  self.vehicle.location.local_frame.east
-            alt =  -self.vehicle.location.local_frame.down
-            auxVel = self.vehicle.velocity
-            bat = self.vehicle.battery.level
-            dx = auxVel[0]
-            dy = auxVel[1]
-            dz = auxVel[2]
-            vel = math.sqrt(math.pow(dx,2) + math.pow(dy,2) + math.pow(dz,2))
-            if vel != 0:
-                dx = dx / vel
-                dy = dy / vel
-                dz = dz / vel
-            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(east, north, alt, dx, dy, dz, vel, bat)
+            retval['north'] = self.vehicle.location.local_frame.north
+            retval['east'] = self.vehicle.location.local_frame.east
+            retval['alt'] =  -self.vehicle.location.local_frame.down
+            retval['auxVel'] = self.vehicle.velocity
+            retval['bat'] = self.vehicle.battery.level
+            retval['dx'] = retval['auxVel'][0]
+            retval['dy'] = retval['auxVel'][1]
+            retval['dz'] = retval['auxVel'][2]
+            retval['vel'] = math.sqrt(math.pow(retval['dx'],2) +
+                                      math.pow(retval['dy'],2) +
+                                      math.pow(retval['dz'],2))
+            if retval['vel'] != 0:
+                retval['dx'] /= retval['vel']
+                retval['dy'] /= retval['vel']
+                retval['dz'] /= retval['vel']
+        return retval
+
+    #ian says: why do we have log and __str__?? log is superfluous: log(self) == str(self)
+    def __str__(self):
+        d = self.data()
+        if len(d) > 0:
+            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(d['east'], d['north'], d['alt'], d['dx'], d['dy'], d['dz'], d['vel'], d['bat'])
         else:
             return 'Uninitialized'
 
@@ -261,6 +263,7 @@ class SimpleDrone(object):
         """
         Move vehicle in direction based on specified velocity vectors.
         """
+        self.trace("send_ned_velocity")
         msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
             0,       # time_boot_ms (not used)
             0, 0,    # target system, target component
@@ -281,6 +284,7 @@ class SimpleDrone(object):
         """
         Move vehicle in direction based on specified velocity vectors.
         """
+        self.trace("send_global_velocity")
         msg = self.vehicle.message_factory.set_position_target_global_int_encode(
             0,       # time_boot_ms (not used)
             0, 0,    # target system, target component

@@ -7,9 +7,16 @@
 (user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
 (user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
 
+(pyexe plambda (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
+(pyexe plambda (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
+
+
 **** turn off IOP/plambda VERBOSITY
 (user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
 (user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
+
+(pyexe plambda (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
+(pyexe plambda  (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
 
 **** speaking to plambda
 
