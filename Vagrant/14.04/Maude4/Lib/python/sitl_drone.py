@@ -54,7 +54,7 @@ class SimpleDrone(object):
 
     """
 
-    def __init__(self, name, instance_no=0, debug=False, speedup=3):
+    def __init__(self, name, instance_no=0, debug=False, speedup=1):
         """Creates a drone with given name and default state.
         """
         self.name = name
@@ -217,13 +217,13 @@ class SimpleDrone(object):
                 sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
 
-    def log(self):
-        self.trace("log")
-        d = self.data()
-        if len(d) > 0:
-            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(d['east'], d['north'], d['alt'], d['dx'], d['dy'], d['dz'], d['vel'], d['bat'])
-        else:
-            return 'Uninitialized'
+#    def log(self):
+#        self.trace("log")
+#        d = self.data()
+#        if len(d) > 0:
+#            return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(d['east'], d['north'], d['alt'], d['dx'], d['dy'], d['dz'], d['vel'], d['bat'])
+#        else:
+#            return 'Uninitialized'
 
     def goToW(self,vx,vy,vz,wx,wy,wz,dur):
         self.trace("goToW")
