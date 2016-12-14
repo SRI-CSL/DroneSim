@@ -1,9 +1,9 @@
 ;; maude sends the time.sleep to us, so we have better know about it
-(import 'time') 
+(import 'time')
 
-(import "sitl_drone")
+(import "simple_drone")
 
-(define SimpleDrone sitl_drone.SimpleDrone)
+(define SimpleDrone simple_drone.SimpleDrone)
 
 ;; at some stage the x y z v e will be used.
 ;; currently we drop them on the floor.
@@ -48,4 +48,3 @@
   )
 
 (invoke sys.stderr "write"  "loaded drone.lsp\n")
-

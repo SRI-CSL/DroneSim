@@ -30,11 +30,11 @@ class SimplePlane(object):
 
     after
 
-    (import "sitl_drone")
+    (import "simple_plane")
 
     can make a drone like so:
 
-    (apply sitl_drone.SimplePlane  "drone_0")
+    (apply simple_plane.SimplePlane  "drone_0")
 
     and get the defaults for instance_no, debug, and speedup.
 
@@ -42,7 +42,7 @@ class SimplePlane(object):
 
     (let ((largs (mklist "drone_0"))
           (dargs (mkdict "instance_no" (int 666) "debug" (boolean False) "speedup" (int 6))))
-       (kwapply sitl_drone.SimplePlane largs dargs))
+       (kwapply simple_drone.SimplePlane largs dargs))
 
     and get a customized drone whose battery will run out quicker.
     kw stands for keyword.
@@ -289,7 +289,7 @@ class SimplePlane(object):
 
 """
 x.vehicle.location.local_frame.north
-from sitl_drone import *
+from simple_plane import *
 
 x = SimplePlane("hello")
 x.initialize()

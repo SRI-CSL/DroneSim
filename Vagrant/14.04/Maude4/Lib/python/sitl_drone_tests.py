@@ -6,7 +6,7 @@ from pymavlink import mavutil
 import subprocess
 from pymavlink import fgFDM
 import util
- 
+
 
 from subprocess import *
 
@@ -14,7 +14,7 @@ from sandbox import *
 from tmpglob import *
 
 dkargs = [ 'dronekit-sitl',
-           'copter',  
+           'copter',
            '--home=-7.162675,-34.817705,36,250' ]
 
 dkargs2 = [ 'dronekit-sitl',
@@ -77,7 +77,7 @@ class SimpleDrone(object):
         self.dronekit2 = None
         self.mavproxy2 = None
 
-        
+
     def initialize(self):
 
         self.spawn()
@@ -99,7 +99,7 @@ class SimpleDrone(object):
         time.sleep(2)
         sys.stderr.write("slept\n")
 
-        
+
         sys.stderr.write("Spawning mavproxy\n")
         self.mavproxy =  SandBox('mavproxy', mpargs_map, True)
         self.mavproxy.start()
@@ -115,7 +115,7 @@ class SimpleDrone(object):
         time.sleep(2)
         sys.stderr.write("slept\n")
 
-        
+
         sys.stderr.write("Spawning mavproxy\n")
         self.mavproxy2 =  SandBox('mavproxy', mpargs_map2, True)
         self.mavproxy2.start()
@@ -133,7 +133,7 @@ class SimpleDrone(object):
             self.dronekit.stop()
             sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
             self.dronekit = None
-        
+
         if self.mavproxy2 is not None:
             self.mavproxy2.stop()
             sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy2.getpid()))
@@ -154,7 +154,7 @@ class SimpleDrone(object):
             time.sleep(1)
 
         vh.simple_takeoff(self.altitude)
- 
+
     def mv(self, vh, x, y, z, v):
         # while True:
         #     print " Altitude: ", self.vehicle.location.global_relative_frame.alt
@@ -194,16 +194,16 @@ class SimpleDrone(object):
     def send_global_velocity(self,vh,velocity_x, velocity_y, velocity_z, duration):
         """
         Move vehicle in direction based on specified velocity vectors.
-        This uses the SET_POSITION_TARGET_GLOBAL_INT command with type mask enabling only 
-        velocity components 
+        This uses the SET_POSITION_TARGET_GLOBAL_INT command with type mask enabling only
+        velocity components
         (http://dev.ardupilot.com/wiki/copter-commands-in-guided-mode/#set_position_target_global_int).
-        
+
         Note that from AC3.3 the message should be re-sent every second (after about 3 seconds
         with no message the velocity will drop back to zero). In AC3.2.1 and earlier the specified
-        velocity persists until it is canceled. The code below should work on either version 
+        velocity persists until it is canceled. The code below should work on either version
         (sending the message multiple times does not cause problems).
-        
-        See the above link for information on the type_mask (0=enable, 1=ignore). 
+
+        See the above link for information on the type_mask (0=enable, 1=ignore).
         At time of writing, acceleration and yaw bits are ignored.
         """
         msg = vh.message_factory.set_position_target_global_int_encode(
@@ -219,7 +219,7 @@ class SimpleDrone(object):
             velocity_y, # Y velocity in NED frame in m/s
             velocity_z, # Z velocity in NED frame in m/s
             0, 0, 0, # afx, afy, afz acceleration (not supported yet, ignored in GCS_Mavlink)
-            0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink) 
+            0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
 
         # send command to vehicle on 1 Hz cycle
         for x in range(0,duration):
@@ -244,7 +244,7 @@ class SimpleDrone(object):
             return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
         else:
             return 'Uninitialized'
-                
+
     def vivek__str__(self):
         pos =  re.findall('[-+]?\d+[\.]?\d*', str(self.vehicle.location.local_frame))
         auxVel = self.vehicle.velocity
@@ -259,12 +259,12 @@ class SimpleDrone(object):
         return '{0} {1} {2} {3} {4} {5} {6} {7}'.format(pos[0], pos[1], pos[2], dx, dy, dz, vel, bat)
 
 """
-from sitl_drone_tests import *
-      
+from simple_drone_tests import *
+
 x = SimpleDrone("hello")
 x.initialize()
 
-x.takeOff(x.vehicle,5)        
+x.takeOff(x.vehicle,5)
 #"Go to Destination 1"
 x.mv(x.vehicle,100,0,5,3)
 
@@ -316,5 +316,3 @@ print "Battery: ", x.vehicle.battery.level
 
 
 """
-
-

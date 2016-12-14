@@ -1,4 +1,4 @@
-from sitl_drone import SimpleDrone
+from simple_drone import SimpleDrone
 
 drone0 = SimpleDrone("drone0", 0)
 
@@ -16,7 +16,7 @@ str(drone0.vehicle.location.local_frame)
 
 drone0.rtl()
 
-#essentially 
+#essentially
 
 drone0.reset()
 
@@ -30,9 +30,8 @@ drone0.initialize()
 # -7.1624048,-34.8174353
 
 
-#has no effect 
+#has no effect
 def recharge(drone):
     drone.vehicle.battery.voltage = 12.587
     drone.vehicle.battery.current = 0.0
     drone.vehicle.battery.level = 100
-

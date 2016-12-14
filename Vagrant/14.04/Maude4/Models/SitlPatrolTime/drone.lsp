@@ -1,6 +1,6 @@
-(import "sitl_drone")
+(import "simple_drone")
 
-(define SimpleDrone sitl_drone.SimpleDrone)
+(define SimpleDrone simple_drone.SimpleDrone)
 
 ;; at some stage the x y z v e will be used.
 ;; currently we drop them on the floor.
@@ -45,5 +45,3 @@
   )
 
 (import "time")
-
-

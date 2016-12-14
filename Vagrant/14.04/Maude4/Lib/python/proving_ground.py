@@ -9,7 +9,15 @@ PARAMS = '/home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/cop
 
 sitl = SITL(instance=0, path=BINARY, defaults_filepath=PARAMS)
 
-print sitl
+sitl.launch(['--home=-7.162675,-34.817705,36,250'], verbose=True)
+
+sitl.block_until_ready(verbose=False) # explicitly wait until receiving commands
+
+code = sitl.complete(verbose=False) # wait until exit
+
+sitl.poll() # returns None or return code
+
+sitl.stop() # terminates SITL
 
 
 

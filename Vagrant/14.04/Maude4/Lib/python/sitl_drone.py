@@ -1,17 +1,19 @@
-from dronekit import connect, VehicleMode, LocationGlobalRelative, LocationGlobal, Command
-import time, math, sys, os, re
+import dronekit
+import time
+import math
+import sys
+import os
+import re
 import argparse
-from pymavlink import mavutil
+import pymavlink
 import subprocess
-from pymavlink import fgFDM
 import util
+import sandbox
+import tmpglob
 
+from dronekit_sitl import SITL
 
-from subprocess import *
-
-from sandbox import *
-from tmpglob import *
-
+from threading import Thread
 
 """
 At some stage we want to pass in the position, altitude and yaw to
@@ -24,12 +26,38 @@ latitude  longitude   altitude yaw
 
 """
 
-
 tracing = True
 
+binary_path = '/home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter-quad'
+
+params_path = '/home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm'
+
+home_default = '-7.162675,-34.817705,36,250'
+
+init_squark = """
+SitlDrone:
+\tname:             {0}
+\tinstance number:  {1}
+\tbinary:           {2}
+\tparams:           {3}
+\tdebug:            {4}
+\tspeedup:          {5}
+"""
 
 
-class SimpleDrone(object):
+
+def sitl_main(drone):
+    sitl = drone.sitl
+    args = [ '--home={0}'.format(drone.home)]
+    sitl.launch(args, verbose=drone.debug)
+    sitl.block_until_ready(verbose=drone.debug)   # explicitly wait until receiving commands
+    #sys.stderr.write('before sitl.complete\n')
+    #code = sitl.complete(verbose=drone.debug)     # wait until exit
+    #sitl.poll()                                   # returns None or return code
+
+
+
+class SitlDrone(object):
     """
     plambda lesson:
 
@@ -39,33 +67,35 @@ class SimpleDrone(object):
 
     can make a drone like so:
 
-    (apply sitl_drone.SimpleDrone  "drone_0")
+    (apply sitl_drone.SitlDrone  "drone_0")
 
-    and get the defaults for instance_no, debug.
+    and get the defaults for instance_no, binary, params, home, debug, and speedup.
 
     or:
 
     (let ((largs (mklist "drone_0"))
           (dargs (mkdict "instance_no" (int 666) "debug" (boolean False))))
-       (kwapply sitl_drone.SimpleDrone largs dargs))
+       (kwapply sitl_drone.SitlDrone largs dargs))
 
     and get a customized drone whose battery will run out quicker.
     kw stands for keyword.
 
     """
 
-    def __init__(self, name, instance_no=0, debug=False, speedup=None):
+
+    def __init__(self, name, instance_no=0, binary=binary_path, params=params_path, home=home_default, debug=False, speedup=None):
         """Creates a drone with given name and default state.
         """
         self.name = name
         self.debug = debug
+        self.home = home
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
-        self.speedup = speedup
-
+        self.speedup = int(speedup) if speedup is not None else None
+        self.sitl = SITL(instance=self.ino, path=binary, defaults_filepath=params)
 
         if self.debug:
-            sys.stderr.write("SimpleDrone with name {0} and instance number {1}\n".format(self.name, self.ino))
+            sys.stderr.write(init_squark.format(self.name, self.ino, binary, params, debug, speedup))
 
         self.x = 0
         self.y = 0
@@ -76,7 +106,6 @@ class SimpleDrone(object):
 
         self.vehicle = None
 
-        self.dronekit = None
         self.mavproxy = None
 
     def getName(self):
@@ -87,28 +116,33 @@ class SimpleDrone(object):
 
         self.spawn()
 
-        self.vehicle = connect(self.sitl_ip() , wait_ready=True)
+        self.vehicle = dronekit.connect(self.sitl_ip(14550) , wait_ready=True)
+
+        if self.speedup is not None:
+            while True:
+                self.vehicle.parameters['SIM_SPEEDUP'] = self.speedup
+                sys.stderr.write('Setting SIM_SPEEDUP to {0}\n'.format(self.speedup))
+                if self.vehicle.parameters['SIM_SPEEDUP'] == self.speedup:
+                    break
+                time.sleep(0.1)
 
         return True
 
-    def sitl_ip(self):
-        return '127.0.0.1:{0}'.format(14550 + self.pipeincr)
+    def sitl_ip(self, base_port):
+        return '127.0.0.1:{0}'.format(base_port + self.pipeincr)
 
-    def drokekit_args(self):
-        dkargs = [ 'dronekit-sitl',
-                   'copter-3.3',
-                   '--instance',
-                   '{0}'.format(self.ino),
-                   '--home=-7.162675,-34.817705,36,250' ]
-        if self.speedup is not None:
-            dkargs.append('--speedup={0}'.format(self.speedup))
-        return dkargs
+    def spawn_sitl(self):
+        thread = Thread(target=sitl_main, name='sitl_main_of_{0}'.format(self.name), args=(self, ))
+        #thread needs to be a daemon so that the actor itself can die in peace.
+        thread.daemon = True
+        thread.start()
+
 
     def mavproxy_args(self):
         mpargs = [ 'mavproxy.py',
                    '--master',
                    'tcp:127.0.0.1:{0}'.format(5760 + self.pipeincr),
-                   '--sitl=127.0.0.1:{0}'.format(5501 + self.pipeincr),
+                   '--sitl={0}'.format(self.sitl_ip(5501)),
                    '--out=127.0.0.1:{0}'.format(14550 + self.pipeincr),
                    '--aircraft',
                    '/tmp/drone_{0}'.format(self.ino) ]
@@ -120,21 +154,18 @@ class SimpleDrone(object):
     def trace(self, name):
         if tracing:
             d = self.data()
+            f = '{0}.{1} mode = {2} vel = {3} alt = {4}\n'
             if len(d) > 0:
-                sys.stderr.write("{0}.{1} mode = {2} vel = {3} alt = {4}\n".format(self.ino, name, self.vehicle.mode, d['vel'], d['alt']))
+                sys.stderr.write(f.format(self.ino, name, self.vehicle.mode, d['vel'], d['alt']))
             else:
-                sys.stderr.write("{0}.{1} mode = {2} vel = {3} alt = {4}\n".format(self.ino, name, self.vehicle.mode, 'U', 'U'))
+                sys.stderr.write(f.format(self.ino, name, self.vehicle.mode, 'U', 'U'))
 
 
     def spawn(self):
-        dkargs = self.drokekit_args()
         if self.debug:
-            sys.stderr.write("Spawning dronekit {0}\n".format(dkargs))
-        self.dronekit = SandBox('dronekit', dkargs, False)
-        self.dronekit.start()
-        if self.debug:
-            sys.stderr.write("dronekit with pid {0} spawned\n".format(self.dronekit.getpid()))
-            sys.stderr.write("sleeping\n")
+            sys.stderr.write('Spawning sitl\n')
+
+        self.spawn_sitl()
 
         time.sleep(2)
         if self.debug:
@@ -144,7 +175,7 @@ class SimpleDrone(object):
 
         if self.debug:
             sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
-        self.mavproxy =  SandBox('mavproxy', mpargs, True)
+        self.mavproxy =  sandbox.SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()
         if self.debug:
             sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
@@ -155,7 +186,7 @@ class SimpleDrone(object):
         self.altitude = float(altitude)
         while not self.vehicle.is_armable:
            time.sleep(1)
-        self.vehicle.mode = VehicleMode("GUIDED")
+        self.vehicle.mode = dronekit.VehicleMode("GUIDED")
         self.vehicle.armed = True
         while not self.vehicle.armed:
             time.sleep(1)
@@ -167,10 +198,10 @@ class SimpleDrone(object):
         currentLocation = self.vehicle.location.global_relative_frame
         if self.debug:
             sys.stderr.write('Current: {0}\n'.format(currentLocation))
-        targetLocation = get_location_metres(currentLocation, float(y), float(x))
+        targetLocation = tmpglob.get_location_metres(currentLocation, float(y), float(x))
         if self.debug:
             sys.stderr.write('Target: {0}\n'.format(targetLocation))
-        targetDistance = get_distance_metres(currentLocation, targetLocation)
+        targetDistance = tmpglob.get_distance_metres(currentLocation, targetLocation)
         if self.debug:
             sys.stderr.write('Target Distance: {0}\n'.format(targetDistance))
         self.vehicle.airspeed=float(v)
@@ -187,7 +218,7 @@ class SimpleDrone(object):
         #self.send_global_velocity(0,0,0,1)
         # http://python.dronekit.io/examples/guided-set-speed-yaw-demo.html
         self.vehicle.groundspeed=0
-        self.vehicle.mode = VehicleMode("LAND")
+        self.vehicle.mode = dronekit.VehicleMode("LAND")
         return True
 
     def stop(self):
@@ -196,7 +227,7 @@ class SimpleDrone(object):
 
     def rtl(self):
         self.trace("rtl")
-        self.vehicle.mode = VehicleMode("RTL")
+        self.vehicle.mode = dronekit.VehicleMode("RTL")
 
     def reset(self):
         self.trace("reset")
@@ -214,11 +245,9 @@ class SimpleDrone(object):
             if self.debug:
                 sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
             self.mavproxy = None
-        if self.dronekit is not None:
-            self.dronekit.stop()
-            if self.debug:
-                sys.stderr.write("dronekit with pid {0} killed\n".format(self.dronekit.getpid()))
-            self.dronekit = None
+        self.dronekit = None
+        self.sitl.stop()    # terminates SITL
+
 
     def goToW(self,vx,vy,vz,wx,wy,wz,dur):
         self.trace("goToW")
@@ -260,7 +289,7 @@ class SimpleDrone(object):
         msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
             0,       # time_boot_ms (not used)
             0, 0,    # target system, target component
-            mavutil.mavlink.MAV_FRAME_LOCAL_NED, # frame
+            pymavlink.mavutil.mavlink.MAV_FRAME_LOCAL_NED, # frame
             0b0000111111000111, # type_mask (only speeds enabled)
             0, 0, 0, # x, y, z positions (not used)
             velocity_x, velocity_y, velocity_z, # x, y, z velocity in m/s
@@ -281,7 +310,7 @@ class SimpleDrone(object):
         msg = self.vehicle.message_factory.set_position_target_global_int_encode(
             0,       # time_boot_ms (not used)
             0, 0,    # target system, target component
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # frame
+            pymavlink.mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # frame
             0b0000111111000111, # type_mask (only speeds enabled)
             0, # lat_int - X Position in WGS84 frame in 1e7 * meters
             0, # lon_int - Y Position in WGS84 frame in 1e7 * meters
@@ -303,7 +332,7 @@ class SimpleDrone(object):
 x.vehicle.location.local_frame.north
 from sitl_drone import *
 
-x = SimpleDrone("hello")
+x = SitlDrone("hello")
 x.initialize()
 
 x.takeOff(5)
