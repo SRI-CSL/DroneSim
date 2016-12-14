@@ -10,21 +10,8 @@ import subprocess
 import util
 import sandbox
 import tmpglob
-
-from dronekit_sitl import SITL
-
-from threading import Thread
-
-"""
-At some stage we want to pass in the position, altitude and yaw to
-the constructor. But currently we are hardcode with
-
-7.162675, -34.817705, 36,      250
-latitude  longitude   altitude yaw
-
-
-
-"""
+import dronekit_sitl
+import threading
 
 tracing = True
 
@@ -43,8 +30,6 @@ SitlDrone:
 \tdebug:            {4}
 \tspeedup:          {5}
 """
-
-
 
 def sitl_main(drone):
     sitl = drone.sitl
@@ -92,7 +77,7 @@ class SitlDrone(object):
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
         self.speedup = int(speedup) if speedup is not None else None
-        self.sitl = SITL(instance=self.ino, path=binary, defaults_filepath=params)
+        self.sitl = dronekit_sitl.SITL(instance=self.ino, path=binary, defaults_filepath=params)
 
         if self.debug:
             sys.stderr.write(init_squark.format(self.name, self.ino, binary, params, debug, speedup))
@@ -132,7 +117,7 @@ class SitlDrone(object):
         return '127.0.0.1:{0}'.format(base_port + self.pipeincr)
 
     def spawn_sitl(self):
-        thread = Thread(target=sitl_main, name='sitl_main_of_{0}'.format(self.name), args=(self, ))
+        thread = threading.Thread(target=sitl_main, name='sitl_main_of_{0}'.format(self.name), args=(self, ))
         #thread needs to be a daemon so that the actor itself can die in peace.
         thread.daemon = True
         thread.start()
@@ -273,7 +258,6 @@ class SitlDrone(object):
                 retval['dz'] /= retval['vel']
         return retval
 
-    #ian says: why do we have log and __str__?? log is superfluous: log(self) == str(self)
     def __str__(self):
         d = self.data()
         if len(d) > 0:

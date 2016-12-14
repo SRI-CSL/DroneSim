@@ -81,7 +81,7 @@ echo "Installing dronekit-sitl"
 
 cd /home/vagrant/Repositories
 git clone https://github.com/dronekit/dronekit-sitl.git
-cd dronekit-sit
+cd dronekit-sitl
 pip install -e .
 
 #
