@@ -114,7 +114,7 @@ ops mkE2 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> En
 eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)] .
 
 eq mkE2(n,sx,sy,sz,v,e) = 
-      [eI | clock(0) (rand(0) @ 0) (wind(0.0,1.0,0.0) @ 0) (timeElapsed(0.0) @ 0)
+      [eI | clock(0) (rand(0) @ 0) (wind(1.0,0.0,0.0) @ 0) (timeElapsed(0.0) @ 0)
             mkBekb(n,sx,sy,sz,v,e) 
             mkBekb(s n,sx + 10.0,sy + 10.0, sz,v,e)] .
 
@@ -137,9 +137,9 @@ eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
 op asys1 : -> ASystem .
 eq asys1 = { conf1 } .
 
---- eq windThresh = rand.25 .
+eq windThresh = 2 * rand.25 .
 --- eq windThresh = round(float(rand.25) / 2.0) .
-eq windThresh = 0 .
+--- eq windThresh = 0 .
 eq stopSimulation = 5.0 .
 
 --- eq act(id,kb) = actSimple(id,kb) .

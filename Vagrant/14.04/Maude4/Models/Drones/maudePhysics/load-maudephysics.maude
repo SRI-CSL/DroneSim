@@ -6,7 +6,7 @@ load ../../../Lib/pretty
 load knowledge
 
 load ../scp
-load tasks-wind
+load tasks-wind-vn
 load actions
 load scenario
 load analysis-stats

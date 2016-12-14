@@ -1,9 +1,38 @@
 mod TEST is
  inc SCENARIO .
+ inc ANALYSIS .
  
 op ekb0 : -> KB .
 ops acts : -> ActSet . 
 ops lkb0 lkb1 ekb1  : -> KB .
+op conf : -> Conf .
+
+eq conf = [eI
+    | clock(333) class(b(0), Bot) class(b(1), Bot) (timeElapsed(3.33e+2) @ 333) (rand(1332) @ 333) (atloc(b(0), pt(3, 0, 0))
+    @ 328) (atloc(b(1), pt(11, 10, 0)) @ 324) (energy(b(0), 1.7949999999999999e+1) @ 328) (energy(b(1), 1.8949999999999999e+1) @
+    324) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(0.0, 1.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(333) class(b(0), Bot) (timeElapsed(3.33e+2) @ 333) (rand(1665) @ 333) (atloc(b(0), pt(3, 0, 0)) @ 328) (pending(b(
+    0), stop(b(0))) @ 329) (countLate(b(0), 0) @ 0) (energy(b(0), 1.7949999999999999e+1) @ 328) (caution(b(0), 2.0e+1) @ 0) (
+    targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (wind(0.0, 1.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(
+    -20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (lastVisit(b(0), pt(0, 0, 0), 0.0) @ 0) (lastVisit(b(0), pt(10, 30, 5), 2.46e+2) @
+    246) (lastVisit(b(0), pt(50, 10, 5), 3.16e+2) @ 316) (lastVisit(b(0), pt(-20, 50, 5), 1.93e+2) @ 193) (lastVisit(b(0), pt(
+    -40, 5, 5), 2.35e+2) @ 235) (countVisit(b(0), pt(10, 30, 5), 7) @ 246) (countVisit(b(0), pt(50, 10, 5), 6) @ 257) (
+    countVisit(b(0), pt(-20, 50, 5), 4) @ 193) (countVisit(b(0), pt(-40, 5, 5), 4) @ 235) myHome(b(0), pt(0, 0, 0)) myAlt(b(0),
+    5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(3, 0, 0)) @ 328),
+  evs : ((tick @ 1) stop(b(0)) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(333) class(b(1), Bot) (timeElapsed(3.32e+2) @ 332) (rand(1992) @ 332) (atloc(b(1), pt(11, 10, 0)) @ 324) (pending(
+    b(1), stop(b(1))) @ 325) (countLate(b(1), 0) @ 0) (energy(b(1), 1.8949999999999999e+1) @ 324) (caution(b(1), 2.0e+1) @ 0) (
+    targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (wind(0.0, 1.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ;
+    pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (lastVisit(b(1), pt(10, 10, 0), 0.0) @ 0) (lastVisit(b(1), pt(10, -30, 10),
+    2.54e+2) @ 254) (lastVisit(b(1), pt(40, -10, 10), 3.15e+2) @ 315) (lastVisit(b(1), pt(-35, -5, 10), 2.39e+2) @ 239) (
+    lastVisit(b(1), pt(-40, -40, 10), 2.01e+2) @ 201) (countVisit(b(1), pt(10, -30, 10), 7) @ 254) (countVisit(b(1), pt(40, -10,
+    10), 7) @ 261) (countVisit(b(1), pt(-35, -5, 10), 4) @ 239) (countVisit(b(1), pt(-40, -40, 10), 3) @ 201) myHome(b(1), pt(10,
+    10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(11, 10, 0)) @ 324),
+  evs : (tick @ 0)] .
 
 eq acts = myActs(Bot,b(0),lkb1) .
 

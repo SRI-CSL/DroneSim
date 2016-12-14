@@ -76,7 +76,7 @@ ceq windEffect((rand(r) @ t) (wind(ffx,ffy,ffz) @ t1) kb) =
   else dir(0.0,0.0,0.0) fi
  if j := random(r)
  /\ j1 := random(s r)
- /\ wsp := (3.0 * float(j1) / float(randMax)) + 2.0 .
+ /\ wsp := (3.0 * float(j1) / float(randMax)) + 5.0 .
 
 *** bot reads mail, reads and processes sensors to get current lkb
 *** then solves the botSCP restricted to available moves
