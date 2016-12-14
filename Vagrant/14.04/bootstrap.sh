@@ -77,9 +77,19 @@ sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect 
 sudo apt-get install  -y  python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
 
 
-echo "Installing dronekit"
+echo "Installing dronekit-sitl"
 
-pip install dronekit-sitl -UI
+cd /home/vagrant/Repositories
+git clone https://github.com/dronekit/dronekit-sitl.git
+cd dronekit-sit
+pip install -e .
+
+#
+# 12/13/2016 the pip package is too old, and the API is quite different.
+#
+#echo "Installing dronekit"
+#
+#pip install dronekit-sitl -UI
 
 echo "Installing MAVProxy"
 
@@ -129,6 +139,8 @@ echo "Building arducopter"
 
 #
 # plane is not yet ready for prime time?
+#
+#  12/13/2016: It could be now that we can point to a binary
 #
 # https://github.com/dronekit/dronekit-sitl/issues/79
 #
