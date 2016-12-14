@@ -1,0 +1,188 @@
+Asys1 + SCP
+(augAgentEsetStats Patrol 400 nGenericApprox .25 .25 5)
+(wind(0.0,1.0,0.0) @ 0)
+wsp := (3.0 * float(j1) / float(randMax)) + 2.0
+
+Run 1: No Wind
+average_1 ===> 25.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 25.0, 3.0, 42.0, 0.0]
+count ===> 17
+accumulator ===> [D@b02f9fc
+average_3 ===> 42.0
+average_2 ===> 3.0
+rounds ===> 17
+average_4 ===> 0.0
+
+Run 2: windThresh = round(float(rand.25) / 2.0) .
+average_1 ===> 27.294117647058822
+average_0 ===> 0.0
+averages ===> [ 0.0, 27.294117647058822, 3.0, 45.35294117647059, 0.0]
+count ===> 17
+accumulator ===> [D@5da83683
+average_3 ===> 45.35294117647059
+average_2 ===> 3.0
+rounds ===> 17
+average_4 ===> 0.0
+
+Run 3: eq windThresh = rand.25 .
+average_1 ===> 28.235294117647058
+average_0 ===> 0.0
+averages ===> [ 0.0, 28.235294117647058, 3.176470588235294, 44.411764705882355, 0.0]
+count ===> 17
+accumulator ===> [D@5da83683
+average_3 ===> 44.411764705882355
+average_2 ===> 3.176470588235294
+rounds ===> 17
+average_4 ===> 0.0
+
+Run 4: windThresh = 2 * rand.25 .
+average_1 ===> 28.88235294117647
+average_0 ===> 0.0
+averages ===> [ 0.0, 28.88235294117647, 2.8823529411764706, 43.94117647058823, 0.0]
+count ===> 17
+accumulator ===> [D@302231a2
+average_3 ===> 43.94117647058823
+average_2 ===> 2.8823529411764706
+rounds ===> 17
+
+Changing:
+
+Asys1
+(augAgentEsetStats Patrol 400 nGenericApprox .25 .25 5)
+(wind(0.0,1.0,0.0) @ 0)
+wsp := (3.0 * float(j1) / float(randMax)) + 20.0
+
+Run 5: windThresh = 2 * rand.25 .
+Patrol:
+average_1 ===> 25.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 25.0, 0.0, 0.35294117647058826, 0.0]
+count ===> 17
+accumulator ===> [D@5da83683
+average_3 ===> 0.35294117647058826
+average_2 ===> 0.0
+rounds ===> 17
+average_4 ===> 0.0
+
+So wind has some effect.
+
+Using actSimple
+and 
+wsp := (3.0 * float(j1) / float(randMax)) + 2.0
+
+Run 6: 
+eq windThresh = 0 .
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 6.0, 52.0, 0.0]
+count ===> 17
+accumulator ===> [D@3c123266
+average_3 ===> 52.0
+average_2 ===> 6.0
+rounds ===> 17
+average_4 ===> 0.0
+
+Run 7:
+eq windThresh = round(float(rand.25) / 2.0)
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 6.0, 52.05882352941177, 0.0]
+count ===> 17
+accumulator ===> [D@a80f6f2
+average_3 ===> 52.05882352941177
+average_2 ===> 6.0
+rounds ===> 17
+average_4 ===> 0.0
+
+Run 8: 
+eq windThresh = 2 * rand.25 .
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 5.0588235294117645, 46.35294117647059, 0.47058823529411764]
+count ===> 17
+accumulator ===> [D@3c123266
+average_3 ===> 46.35294117647059
+average_2 ===> 5.0588235294117645
+rounds ===> 17
+average_4 ===> 0.47058823529411764
+
+Changing wind
+wsp := (3.0 * float(j1) / float(randMax)) + 20.0 .
+Run 9: 
+windThresh = 2 * rand.25 .
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 0.0, 0.058823529411764705, 0.0]
+count ===> 17
+accumulator ===> [D@3c123266
+average_3 ===> 0.058823529411764705
+average_2 ===> 0.0
+rounds ===> 17
+
+------------
+
+Changed wind to:
+wind(1.0,0.0,0.0)
+
+Run 10: runResult: [D@6f96a215
+Patrol:
+wsp := (3.0 * float(j1) / float(randMax)) + 20.0 .
+eq windThresh = 2 * rand.25 .
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 5.0, 44.8235294117647, 0.4117647058823529]
+count ===> 17
+accumulator ===> [D@3c123266
+average_3 ===> 44.8235294117647
+average_2 ===> 5.0
+rounds ===> 17
+average_4 ===> 0.4117647058823529
+
+Run 11: 
+wsp := (3.0 * float(j1) / float(randMax)) + 20.0 .
+eq windThresh = 2 * rand.25 .
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 0.0, 0.17647058823529413, 0.0]
+count ===> 17
+accumulator ===> [D@27e47b0c
+average_3 ===> 0.17647058823529413
+average_2 ===> 0.0
+rounds ===> 17
+average_4 ===> 0.0
+
+--------------------------------
+
+wind(1.0,0.0,0.0)
+wsp := (3.0 * float(j1) / float(randMax)) + 5.0 .
+
+with simple
+
+runResult: [D@6f96a215
+Patrol:
+eq windThresh = 2 * rand.25 .
+average_1 ===> 24.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 24.0, 2.588235294117647, 24.529411764705884, 20.352941176470587]
+count ===> 17
+accumulator ===> [D@3c123266
+average_3 ===> 24.529411764705884
+average_2 ===> 2.588235294117647
+rounds ===> 17
+average_4 ===> 20.352941176470587
+
+
+with SCP
+eq windThresh = 2 * rand.25 .
+average_1 ===> 27.176470588235293
+average_0 ===> 0.0
+averages ===> [ 0.0, 27.176470588235293, 0.7647058823529411, 31.470588235294116, 0.0]
+count ===> 17
+accumulator ===> [D@5da83683
+average_3 ===> 31.470588235294116
+average_2 ===> 0.7647058823529411
+rounds ===> 17
+average_4 ===> 0.0
+
+
