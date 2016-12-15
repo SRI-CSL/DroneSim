@@ -163,6 +163,7 @@ class SitlDrone(object):
         -- speedup the factor by which we speed up.
 
         """
+        self.trace("takeOff")
         self.speedup = int(speedup) if speedup is not None else None
         if self.speedup is not None:
             while True:

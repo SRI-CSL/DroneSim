@@ -154,7 +154,7 @@ class SimpleDrone(object):
 
         Note Bene: It will NOT work while the drone_kit binaries are out of date.
         """
-
+        self.trace("takeOff")
         try:
             self.speedup = int(speedup) if speedup is not None else None
             if self.speedup is not None:
