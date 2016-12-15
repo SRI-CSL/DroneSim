@@ -71,7 +71,9 @@ class SitlDrone(object):
         self.home = home
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
+
         self.speedup = int(speedup) if speedup is not None else None
+
         self.sitl = dronekit_sitl.SITL(instance=self.ino, path=binary, defaults_filepath=params)
 
         if self.debug:
@@ -98,13 +100,7 @@ class SitlDrone(object):
 
         self.vehicle = dronekit.connect(self.sitl_ip(14550), wait_ready=True)
 
-        if self.speedup is not None:
-            while True:
-                self.vehicle.parameters['SIM_SPEEDUP'] = self.speedup
-                sys.stderr.write('Setting SIM_SPEEDUP to {0}\n'.format(self.speedup))
-                if self.vehicle.parameters['SIM_SPEEDUP'] == self.speedup:
-                    break
-                time.sleep(0.1)
+        self.setSpeedup(self.speedup)
 
         return True
 
@@ -159,6 +155,17 @@ class SitlDrone(object):
         self.mavproxy.start()
         if self.debug:
             sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+
+
+    def setSpeedup(self, speedup):
+        self.speedup = int(speedup) if speedup is not None else None
+        if self.speedup is not None:
+            while True:
+                self.vehicle.parameters['SIM_SPEEDUP'] = self.speedup
+                sys.stderr.write('Setting SIM_SPEEDUP to {0}\n'.format(self.speedup))
+                if self.vehicle.parameters['SIM_SPEEDUP'] == self.speedup:
+                    break
+                time.sleep(0.1)
 
 
     def takeOff(self, altitude):

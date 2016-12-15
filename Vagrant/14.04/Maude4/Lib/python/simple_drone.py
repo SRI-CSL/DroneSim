@@ -55,8 +55,8 @@ class SimpleDrone(object):
         self.debug = debug
         self.ino = instance_no
         self.pipeincr = 10 * self.ino
-        self.speedup = speedup
 
+        self.speedup = int(speedup) if speedup is not None else None
 
         if self.debug:
             msg = 'SimpleDrone with name {0} and instance number {1}\n'
@@ -83,6 +83,8 @@ class SimpleDrone(object):
         self.spawn()
 
         self.vehicle = dronekit.connect(self.sitl_ip(), wait_ready=True)
+
+        self.setSpeedup(self.speedup)
 
         return True
 
@@ -143,6 +145,20 @@ class SimpleDrone(object):
         self.mavproxy.start()
         if self.debug:
             sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+
+
+    def setSpeedup(self, speedup):
+        try:
+            self.speedup = int(speedup) if speedup is not None else None
+            if self.speedup is not None:
+                while True:
+                    self.vehicle.parameters['SIM_SPEEDUP'] = self.speedup
+                    sys.stderr.write('Setting SIM_SPEEDUP to {0}\n'.format(self.speedup))
+                    if self.vehicle.parameters['SIM_SPEEDUP'] == self.speedup:
+                        break
+                    time.sleep(0.1)
+        except Exception as e:
+            sys.stderr.write('simple_drone.SimpleDrone.setSpeedup FAILED (as EXPECTED), USE sitl_drone.SitlDrone\n')
 
 
     def takeOff(self, altitude):
