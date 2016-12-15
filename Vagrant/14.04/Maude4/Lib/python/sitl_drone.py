@@ -158,6 +158,11 @@ class SitlDrone(object):
 
 
     def setSpeedup(self, speedup):
+        """Set the speedup of the simulation.
+
+        -- speedup the factor by which we speed up.
+
+        """
         self.speedup = int(speedup) if speedup is not None else None
         if self.speedup is not None:
             while True:
