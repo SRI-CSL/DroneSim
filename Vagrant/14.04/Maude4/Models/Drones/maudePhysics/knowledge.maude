@@ -375,6 +375,14 @@ eq rest(times) = nil [owise] .
   eq incVisitTimes(id,loc,t1,kb) = kb [owise] .
 	
 
+  op distanceDir : Loc Loc -> FiniteFloat .
+  ceq distanceDir(pt(x0,y0,z0),pt(x1,y1,z1)) = ffn
+   if fdx := float(x1 - x0) / gridStepX
+   /\ fdy := float(y1 - y0) / gridStepY
+   /\ fdz := float(z1 - z0) / gridStepZ
+   /\ ffn := sqrt(fdx ^ 2.0 + fdy ^ 2.0 + fdz ^ 2.0) .
+  
+
 ****** using visit times
 
 	op doActT : Id KB Action -> KB .
@@ -389,7 +397,7 @@ eq rest(times) = nil [owise] .
    if t0 := getTime(kb)
    /\ l0 := getLoc(id,kb)
    /\ v := getVel(id,kb)
-   /\ ff := distanceFF(l0,loc)
+   /\ ff := distanceDir(l0,loc)
    /\ timeElapsed(dt0) @ t2 := getTimeElapsed(kb)
    --- Once we are able to link the model's timestamp with SITL's 
    --- This is a very rough estimate of arrival time
@@ -402,7 +410,7 @@ eq rest(times) = nil [owise] .
 									incVisitTimes(id,loc,t1,kb) ).
 
   op time2Loc : Loc Loc FiniteFloat -> FiniteFloat .
-	eq time2Loc(l0,loc,v) = distanceFF(l0,loc) / v .
+	eq time2Loc(l0,loc,v) = distanceDir(l0,loc) / v .
 
   op cost2locT : Loc Loc FiniteFloat FiniteFloat -> FiniteFloat .
   eq cost2locT(l0,l1,v,dt) = costMv(v) * dt .
@@ -416,4 +424,16 @@ eq rest(times) = nil [owise] .
 	              (eLoc(id,loc, (times ; t1)) @ t1) kb .
  eq updateELoc(id,loc,t1,kb) = kb [owise] .
 
+**** eLoc item added upon first attempt to visit rather than initial state
+ op updateELocKB : Id Loc FiniteFloat KB -> KB .
+ eq updateELocKB(id,loc,v, (eLoc(id,loc,times) @ t0) clock(t) kb) =
+     ((eLoc(id,loc,
+        times ; round(float(t) + time2Loc(getLoc(id,kb),loc,v)) ) @ t)
+      clock(t) kb)  .  
+
+ eq updateELocKB(id,loc,v, clock(t) kb) =
+      ((eLoc(id,loc, 
+             round(float(t) + time2Loc(getLoc(id,kb),loc,v))) @ t) 
+      clock(t) kb)  .
+            
 endfm

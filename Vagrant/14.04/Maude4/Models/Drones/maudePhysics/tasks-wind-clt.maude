@@ -56,9 +56,11 @@ controller  maps
 *** Controller level actions
 op doControl : Action KB -> ActionKB .
 ceq doControl(goToW(id,loc,sp),kb) 
- = {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,2.0 * sampleTime),kb} 
+ = {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,2.0 * sampleTime),kb1} 
  if dir(ffx,ffy,ffz) := windEffect(kb)
- /\ dir(ffx1,ffy1,ffz1) := getNormVec(getLoc(id,kb),loc) .
+ /\ dir(ffx1,ffy1,ffz1) := getNormVec(getLoc(id,kb),loc)
+ /\ kb1 := updateELocKB(id,loc,sp,kb) 
+  .
  
 ceq doControl(continue(id), (pending(id,goToW(id,loc,sp)) @ t) kb) =
   {goToW(id,ffx1 * sp,ffy1 * sp,ffz1 * sp,ffx,ffy,ffz,2.0 * sampleTime),
@@ -77,7 +79,10 @@ ceq windEffect((rand(r) @ t) (wind(ffx,ffy,ffz) @ t1) kb) =
   else dir(0.0,0.0,0.0) fi
  if j := random(r)
  /\ j1 := random(s r)
- /\ wsp := (3.0 * float(j1) / float(randMax)) + 2.0 .
+--- /\ wsp := (3.0 * float(j1) / float(randMax)) + 2.0 
+ /\ wsp := (3.0 * float(j1) / float(randMax)) + 5.0 
+--- /\ wsp := (3.0 * float(j1) / float(randMax)) + 20.0 
+  .
 
 *** bot reads mail, reads and processes sensors to get current lkb
 *** then solves the botSCP restricted to available moves
@@ -112,7 +117,7 @@ op actSCP : Id KB -> ActionKB .
 
 --- eq sitlAct(id,kb) = sitlTest(id,kb) .
 --- eq act(id,kb) = actSimple(id,kb) .
-eq act(id,kb) = actSCP(id,kb) .
+--- eq act(id,kb) = actSCP(id,kb) .
 
 ceq actSimple(id,kb)  =
   (if pact == none   ***** haven't started
@@ -163,15 +168,17 @@ ceq actSCP(id,kb) =
   else 
    (if (e < stopSimulation and not (pact == land(id) or pact == stop(id)))
     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+    else (if notDone(pact,loc) then {continue(id),kb} ---- clt added
     else (if pact == stop(id) then {stop(id),kb} 
-         else 
-           (if pact == land(id) and done(pact,loc) then
-           {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
-            else
-             (if isGoTo(pact,home) and done(pact,loc) 
-              then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-              else {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
+     else 
+       (if pact == land(id) and done(pact,loc) then
+       {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+        else
+         (if isGoTo(pact,home) and done(pact,loc) 
+          then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+          else {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
    fi) fi ) fi) fi) fi )
+    fi)  --- one more fi
 if (class(id,cl)) (clock(t)) myAlt(id,alt) 
     (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
     (rand(r) @ t2) (energy(id,e) @ t3) (timeElapsed(dt) @ t6) 
@@ -197,6 +204,76 @@ if (class(id,cl)) (clock(t)) myAlt(id,alt)
 		              incCountVisit(id,getLoc(pact),t,kb)) 
          else kb fi) fi)
 )
+
+******** simplifying only gotos differ in strategy
+op actBasic : Id KB -> ActionKB .
+op nextLoc : Id KB -> ActionKB .
+op nextLocSimple : Id KB -> ActionKB .
+op nextLocSCP : Id KB -> ActionKB .
+
+ceq actBasic(id,kb)  =
+  (if pact == none   ***** haven't started
+   then  {takeOff(id,alt), (pending(id,takeOff(id,alt)) @ s t) kb}
+   else (if (e < stopSimulation and 
+             not (pact == land(id) or pact == stop(id))) 
+             --- Force to land whenever the energy is too low
+     then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+       else (if notDone(pact,loc) 
+         then {continue(id),kb} 
+           else (if pact == land(id) --- if landing, then stop
+            then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+              else (if pact == goToW(id,home,v)
+                then {land(id), addK(pending(id,land(id)) @ s t,kb)}
+                 else (if e < c 
+                  then {goToW(id,home,v), 
+                       addK(pending(id,goToW(id,home,v)) @ s t,kb)}
+                  else nextLoc(id,kb)
+           fi ) fi) fi) fi) fi) fi) 
+  if ((atloc(id,loc) @ t0) (energy(id,e) @ t1) clock(t)
+      (caution(id,c) @ t4) myAlt(id,alt) myHome(id,home) 
+      (targetVel(id,v) @ t2) kb0) := kb
+ /\ pact := getPending(id,kb0) .
+             
+
+ceq nextLocSimple(id,kb) =
+  (if locs == nil    
+  then {goToW(id,first(locs0),v),
+        addK((pending(id,goToW(id,first(locs0),v)) @ s t)
+             (targets(id,rest(locs0), first(locs0)) @ s t),
+            kb1)}
+  else {goToW(id,first(locs),v), 
+        addK((targets(id,rest(locs), locs0 ; first(locs)) @ s t) 
+             (pending(id,goToW(id,first(locs),v)) @ s t),
+               kb1)}
+    fi )
+  if  ((atloc(id,loc) @ t0) clock(t) (targetVel(id,v) @ t2) 
+      (targets(id,locs,locs0) @ t3) 
+       (timeElapsed(dt) @ t6) kb0 ) := kb
+  /\  pact := getPending(id,kb0) 
+  /\ kb1 := (if isGoTo(pact)
+              then (if (close(getLoc(pact),loc) 
+   						         and not(recentVisitT(getLoc(pact),kb,dt)))
+                  then incVisitTimes(id,getLoc(pact),t,kb)
+                  else kb fi)
+            else kb fi)  .
+
+
+ceq nextLocSCP(id,kb) =
+  {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
+
+if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0) 
+   (targetVel(id,v) @ t1) (timeElapsed(dt) @ t2) kb0 := kb
+ /\ pact := getPending(id,kb0)
+ /\ kb1 := (if isGoTo(pact)
+            then (if (close(getLoc(pact),loc) 
+								       and not(recentVisitT(getLoc(pact),kb,dt)))
+						      then incVisitTimes(id,getLoc(pact),t,kb)
+						      else kb fi)
+            else kb fi)
+ /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
+ /\ goTo(id,loc2) := 
+    (if acts == none then goTo(id,home) else pickOne(acts) fi) .
+
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .

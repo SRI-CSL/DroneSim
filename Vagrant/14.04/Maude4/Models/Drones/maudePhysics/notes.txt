@@ -107,6 +107,11 @@ Question -- these are used for the maude Physics,  do we want
 the same ones to be used in reasoning about what action to take?
 
 
+!!!!
+gridStep   means steps per meter not meters per step
+according to getNormVec
+
+
 %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
 replace 
  op countVisit : Id Loc Nat -> Info .
