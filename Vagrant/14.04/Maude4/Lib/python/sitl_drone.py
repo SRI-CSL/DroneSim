@@ -11,7 +11,7 @@ import dronekit_sitl
 import dronekit
 import pymavlink
 
-tracing = True
+tracing = False
 
 binary_path = '/home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter-quad'
 
@@ -63,7 +63,7 @@ class SitlDrone(object):
     """
 
 
-    def __init__(self, name, instance_no=0, binary=binary_path, params=params_path, home=home_default, debug=False, speedup=5):
+    def __init__(self, name, instance_no=0, binary=binary_path, params=params_path, home=home_default, debug=False, speedup=None):
         """Creates a drone with given name and default state.
         """
         self.name = name

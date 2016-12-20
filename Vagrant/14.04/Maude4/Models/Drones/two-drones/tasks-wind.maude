@@ -12,7 +12,7 @@ fmod MODEL-TASKS is
   var dir dir1 : Dir .
   var act act0 act1  : Action .
   vars acts acts0 pact : ActSet .
-  var e v c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 dt wsp sp ffx ffy ffz ffx1 ffy1 ffz1 dt2 dt1 : FiniteFloat .
+  var e v v1 c x y z sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 dt wsp sp ffx ffy ffz ffx1 ffy1 ffz1 dt2 dt1 : FiniteFloat .
   vars alt ix iy iz ix0 iy0 iz0 : Int .
   var r j n j1 : Nat .
   
@@ -165,7 +165,7 @@ ceq actSCP(id,kb) =
             else
              (if isGoTo(pact,home) and done(pact,loc) 
               then {land(id), addK(pending(id,land(id)) @ s t,kb)}
-              else {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
+              else {goToW(id,loc2,v1),addK(pending(id,goToW(id,loc2,v1)) @ s t,kb1)} 
    fi) fi ) fi) fi) fi )
 if (class(id,cl)) (clock(t)) myAlt(id,alt) 
     (atloc(id,loc) @ t0) (targetVel(id,v) @ t1) myHome(id,home)
@@ -181,8 +181,13 @@ if (class(id,cl)) (clock(t)) myAlt(id,alt)
                     else kb fi) fi)
             else kb fi)
  /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
- /\ goTo(id,loc2) := (if acts == none then goTo(id,home) else pickOne(acts) fi) .
+ /\ goTo(id,loc2) := (if acts == none then goTo(id,home) else pickOne(acts) fi) 
+ /\ v1 := if almostThere(loc,loc2) then 1.0 else v fi .
 
+op almostThere : Loc Loc -> Bool .
+eq almostThere(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
+  =  abs(ix0 - ix) + abs(iy0 - iy) < 15 .
+eq almostThere(loc0,loc) = false [owise] .
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
