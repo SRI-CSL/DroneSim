@@ -195,24 +195,12 @@ should not intersect a circle at l1 of radius (t - t0 + dt) * s1.
 
 %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
 16dec26  
-runs16dec24-clt.txt, runs-sum16dec24-clt.txt  contains resulsts of some
-experiments looking for circling in maudePhysics.
+maudePhysics/runs16dec24-clt.txt, runs-sum16dec24-clt.txt  
+contains resulsts of some experiments looking for circling in maudePhysics.
 runs16dec24-clt.txt -- the end state unedited
 runs-sum16dec24-clt.txt -- visitTimes, eLoc, track info only
 
-Made a copy, scenario-clt.maude of scenario so no surprises.
-
-Looked at wind 0, Rand.25 Rand.375, Rand.5
-
-Fixed bug in actBasic, nextLocSCP (in tasks-wind-clt.maude)
--- scp was choosing the current point to revisit, so I call solveSCP with
-the loc just visited removed from the possible actions.  
-
-Also fixed another missing [owise] (updateRks in scp-clt.maude).
- 
-Need to look at < on FF in FFVAL -- there is a potential divide by 0.0.
-I think the definition of isZero is quite consistent with < .
-Need to rethink scp and updateRks.
+I looked at wind 0, Rand.25 Rand.375, Rand.5
 
 New configs for testing 
 asys3 -- adds eLoc info  to the lkb -- the expected times to reach a loc.
@@ -223,3 +211,35 @@ asys3a -- add tracking -- the times near but not at a target loc
 asys3b asys3a with vel 10  --- serious oscillation with no wind
 asys3b asys3a with  vel 7.5 --- still some oscillation with no wind
 
+Also, 
+
+* Made a copy, scenario-clt.maude of scenario to avoid surprises.
+
+* Fixed bug in actBasic, nextLocSCP (in tasks-wind-clt.maude)
+-- scp was choosing the current point to revisit, so I call solveSCP with
+the loc just visited removed from the possible actions.  
+
+* Fixed another missing [owise] (updateRks in scp-clt.maude).
+ 
+* Need to look at < on FF in FFVAL -- there is a potential divide by 0.0.
+I think the definition of isZero is quite consistent with < .
+Need to rethink scp and updateRks.
+
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+Adjusting speed seems to help for velocities 7.5 and 10.0.
+I reduce the speed by half if near the target, and no wind or head wind.
+Otherwise speed is left alone.
+
+At velocity 5.0 there is no cycling, the drones eventually succeed even
+with wind, just may have delay.
+
+With no speed adjustment, at velocity 7.5 b(0) seems to be still ok, 
+no oscillation, but b(1) oscillates around  pt(10, -30, 10): 
+{66,pt(8, -28, 10)} ; {67,pt(13, -34, 10)} ....
+
+At velocity 10, b(0) oscillates around pt(-40, 5, 5): {20,pt(-38, 11, 5)} ; {21,pt(-42, 1, 5)}  ... and b(1) oscillates around pt(40, -10, 10):
+{6,pt(42, -12, 10)} ; {7, pt(34, -5, 10)} ...   
+(the odd times don't show in the track because they are not `near').
+
+With adjustment, neither drone oscillates at v 7.5 or v 10.0.    
+See end of runs-sum16dec24-clt.txt or runs16dec24-clt.txt

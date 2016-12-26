@@ -277,6 +277,9 @@ eq mkBB(n,sx,sy,sz,v,e,c,a,locs) =
  [b(n) : Bot | lkb : mkBBkb(n,sx,sy,sz,v,e,c,a,locs),
                ckb : none, evs : (tick @ 0)] .
 
+
+
+**** with elocs
 op conf3 : -> Conf .
 eq conf3 = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
            mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
@@ -286,6 +289,7 @@ op asys3 : -> ASystem .
 eq asys3 = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
                    maxSep(20,pt(0,0,0),pt(10,10,0)) } .
 
+**** with tracks
 op asys3a : -> ASystem .
 eq asys3a = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
                     maxSep(20,pt(0,0,0),pt(10,10,0)) 
@@ -293,7 +297,7 @@ eq asys3a = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
                     mkTLs(b(1),locs2)                   
                    } .
 
-
+**** vel 10.0
 op conf4 : -> Conf .
 eq conf4 = mkBB(0,0.0,0.0,0.0,10.0,100.0,20.0,5,locs1)
            mkBB(1,10.0,10.0,0.0,10.0,100.0,20.0,10,locs2)
@@ -306,11 +310,11 @@ eq asys3b = { conf4 minSep(20,pt(0,0,0),pt(10,10,0))
                     mkTLs(b(1),locs2)                   
                    } .
 
-
+**** vel 7.5
 op conf5 : -> Conf .
 eq conf5 = mkBB(0,0.0,0.0,0.0,7.5,100.0,20.0,5,locs1)
            mkBB(1,10.0,10.0,0.0,7.5,100.0,20.0,10,locs2)
-           mkE2(0,0.0,0.0,0.0,10.0,100.0) . 
+           mkE2(0,0.0,0.0,0.0,7.5,100.0) . 
 
 op asys3c : -> ASystem .
 eq asys3c = { conf5 minSep(20,pt(0,0,0),pt(10,10,0))
