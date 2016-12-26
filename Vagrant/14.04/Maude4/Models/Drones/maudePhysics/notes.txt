@@ -226,9 +226,11 @@ I think the definition of isZero is quite consistent with < .
 Need to rethink scp and updateRks.
 
 %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+I tweaked the controller in tasks-wind-clt.maude for the case
+of continuing a GoToW.  The speed is reduces by half if near the target,
+and no wind or a head wind. Otherwise speed is left alone.
+
 Adjusting speed seems to help for velocities 7.5 and 10.0.
-I reduce the speed by half if near the target, and no wind or head wind.
-Otherwise speed is left alone.
 
 At velocity 5.0 there is no cycling, the drones eventually succeed even
 with wind, just may have delay.
@@ -243,3 +245,7 @@ At velocity 10, b(0) oscillates around pt(-40, 5, 5): {20,pt(-38, 11, 5)} ; {21,
 
 With adjustment, neither drone oscillates at v 7.5 or v 10.0.    
 See end of runs-sum16dec24-clt.txt or runs16dec24-clt.txt
+
+I suspect some of the effects are due to the grid approximation of
+location.  Maybe the maude environment kb should keep locations
+in FiniteFloat coordinates?
