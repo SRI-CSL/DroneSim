@@ -40,7 +40,43 @@ How does maude implement goToW(id,vx,vy,vz,wx,wy,wz,dur)
 If landing decrement z until 0ish
 If takeOff increment z until reach altitude        
      
-     
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    
+two drones w sitl
+
+  Gets close, but not close enough -- goes in  a circle
+  Over shoots correction
+
+
+strategy 1 -- constant speed -- does maude circle?
+
+strategy 2 slow down
+need to slow down when get close
+Maude physics -- (v0 + v1) / 2  if close  --- controller job
+
+strategy 3 get close and issue goto
+
+THESE ARE CONTROLLER STRATEGIES, RIGHT?
+
+Need envkb to 
+ have real locs
+ local kb grid locs?
+env kb needs model actual velocity
+
+
+
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    
+
+What if pending action is stop?
+notDone(stop(id), loc) = false
+actBasic will attempt a nextLoc 
+Not good,  maybe
+       else (if pact == land(id) --- if landing, then stop
+        then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+>>>
+       else (if pact == land(id) or pact == stop(id) --- if landing, then stop
+        then {stop(id), addK(pending(id,stop(id)) @ s t,kb)}
+
+
 %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    
 
 Wind models
@@ -78,6 +114,24 @@ Assumptions
  
      
 %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+SCP issues
+
+Drones / maudePhysics
+  eq val-pics(id,kb,act) 
+   = {benefit(id,kb,act),cost(id,kb,act)} .
+
+two-drones
+  eq val-pics(id,kb,act) 
+   = {benefit2(id,kb,act),cost(id,kb,act)} .
+
+Currently SCP only invoked when current goal met.
++    else (if notDone(pact,loc) then {continue(id),kb} ---- clt added
+
+Need a way to check progress vs new goal.
+
+
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
 
 documenting assumptions/conventions
 
@@ -113,8 +167,13 @@ according to getNormVec
 
 
 %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
-replace 
- op countVisit : Id Loc Nat -> Info .
+Fixed paths to use ~/ rather than /home/...
+Fixed meta-cp-e so agentEsetInit can specify number of sim rounds for stats round.   Default is 1000
+
+In -clt versions replaced
+
+op countVisit : Id Loc Nat -> Info .
+
 by
 
 **** track visitTimes, the rest can be computed
@@ -134,6 +193,33 @@ So at t (current time) + 1 b0 should avoid a circle centered at l1 of radius
 If b0 plans to goTo l2 from l0 in time dt then the path from l0 to l2
 should not intersect a circle at l1 of radius (t - t0 + dt) * s1. 
 
+%%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%%    %%%%%%%%% 
+16dec26  
+runs16dec24-clt.txt, runs-sum16dec24-clt.txt  contains resulsts of some
+experiments looking for circling in maudePhysics.
+runs16dec24-clt.txt -- the end state unedited
+runs-sum16dec24-clt.txt -- visitTimes, eLoc, track info only
 
+Made a copy, scenario-clt.maude of scenario so no surprises.
 
-doAct needs fixing as does VAL-PICS for use with visitTimes.  
+Looked at wind 0, Rand.25 Rand.375, Rand.5
+
+Fixed bug in actBasic, nextLocSCP (in tasks-wind-clt.maude)
+-- scp was choosing the current point to revisit, so I call solveSCP with
+the loc just visited removed from the possible actions.  
+
+Also fixed another missing [owise] (updateRks in scp-clt.maude).
+ 
+Need to look at < on FF in FFVAL -- there is a potential divide by 0.0.
+I think the definition of isZero is quite consistent with < .
+Need to rethink scp and updateRks.
+
+New configs for testing 
+asys3 -- adds eLoc info  to the lkb -- the expected times to reach a loc.
+  
+asys3a -- add tracking -- the times near but not at a target loc
+  no osciallation at any wind just some struggleing.
+  
+asys3b asys3a with vel 10  --- serious oscillation with no wind
+asys3b asys3a with  vel 7.5 --- still some oscillation with no wind
+

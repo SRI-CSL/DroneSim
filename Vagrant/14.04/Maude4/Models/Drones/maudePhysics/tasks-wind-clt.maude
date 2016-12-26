@@ -6,7 +6,7 @@ fmod MODEL-TASKS is
   vars id : Id .
 	var cl : Class .
 	vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
-  vars l loc loc0 home locR loc1 loc2 : Loc .
+  vars l l0 loc loc0 home locR loc1 loc2 : Loc .
   vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 lkb4 : KB .
   vars evs evs' ievs devs : EventSet . 
   var dir dir1 : Dir .
@@ -52,7 +52,7 @@ controller  maps
    pending(land(id))   if maudePhysics then land(id) else continue(id)
 )
 
-**** Need to separat the unit vector and speed.
+**** Need to separate the unit vector and speed.
 *** Controller level actions
 op doControl : Action KB -> ActionKB .
 ceq doControl(goToW(id,loc,sp),kb) 
@@ -270,7 +270,9 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
 						      then incVisitTimes(id,getLoc(pact),t,kb)
 						      else kb fi)
             else kb fi)
- /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
+ /\ locs := (if isGoTo(pact) then getLoc(pact) else nil fi)
+ /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
+***** /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
  /\ goTo(id,loc2) := 
     (if acts == none then goTo(id,home) else pickOne(acts) fi) .
 
@@ -335,6 +337,12 @@ op isGoTo : ActSet -> Bool .
 eq isGoTo(goTo(id,loc)) = true .
 eq isGoTo(goToW(id,loc,v)) = true .
 eq isGoTo(acts) = false [owise] .
+
+
+op near : Loc Loc -> Bool .
+eq near(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
+  =  abs(ix0 - ix) + abs(iy0 - iy) < 10 .
+eq near(l,l0) = false [owise] .
 
 
   op tell : Id Action KB -> KB .

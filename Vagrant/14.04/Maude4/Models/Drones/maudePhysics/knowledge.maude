@@ -281,6 +281,19 @@ op equiv : Loc Loc -> Bool .
   eq goTos$(cl,id,loc ; locs) = goTo(id,loc) goTos$(cl,id,locs) .
   eq goTos$(cl,id,nil) = none .
 
+
+***** 16dec25  avoiding repeated visits to current loc
+op myActsA : Class Id LocList KB -> ActSet .
+eq myActsA(cl,id,locs,(targets(id,locs0,locs1) @ t) kb) = 
+      goTos$(cl,id, locsdiff(locs0 ; locs1, locs)) .
+
+op locsdiff : LocList LocList -> LocList .
+eq locsdiff(locs0 ; loc ; locs1,loc ; locs) = 
+     locsdiff(locs0 ; locs1, locs) .
+eq locsdiff(locs1, loc ; locs) =  locsdiff(locs1, locs) [owise] .
+eq locsdiff(locs1, nil)  = locs1 .
+
+
   op getLastVisits : Class Id KB -> KB .
   eq getLastVisits(cl,id,(lastVisit(id,loc,dt) @ t) kb)
    = (lastVisit(id,loc,dt) @ t) getLastVisits(cl,id,kb) .

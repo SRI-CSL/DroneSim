@@ -8,5 +8,5 @@ load knowledge
 load scp-clt
 load tasks-wind-clt
 load actions
-load scenario
+load scenario-clt
 **** load analysis-stats

@@ -40,7 +40,9 @@ fmod SOLVE-SCP{Z :: VALUATION} is
    if v0 < v1 .
   eq updateRks({v1,acts0} rks,act1,v1) = {v1,acts0 act1} rks .
   eq updateRks(rks,act1,v1) = 
-	    if equivZero(v1) then rks else {v1,act1} rks fi .
+	    if equivZero(v1) then rks else {v1,act1} rks fi [owise] .
+    
+****!!!! 16dec25 clt added owise in the above
     
 ****  op solveSCP : Id KB ActSet -> ActSet .
   eq solveSCP(id,kb,acts) = solveSCP$(id,kb,acts,none) .
@@ -216,6 +218,7 @@ fmod FFVAL is
   vars u1 u2 : FF .
   vars fb fc fb0 fc0 : FiniteFloat .
 
+*****!!! assume cost not 0.0
   op _<_ : FF FF -> Bool  .
   eq {fb,fc} < {fb0,fc0} 
    = (if (fb < fb0) or ((fb == fb0) and (fc > fc0))
