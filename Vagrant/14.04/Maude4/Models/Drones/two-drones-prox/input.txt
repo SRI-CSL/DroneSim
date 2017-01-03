@@ -1,0 +1,82 @@
+**** use doSimRound to step n units
+(show val tval agentConf)
+(doSimRound plambda 100)
+(show val qval simStatus)
+
+**** turn on IOP/plambda VERBOSITY
+(user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
+(user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
+
+(pyexe plambda (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean true))))
+(pyexe plambda (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean true))))
+
+
+**** turn off IOP/plambda VERBOSITY
+(user (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
+(user (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
+
+(pyexe plambda (seq (import "plambda.actors.actorlib") (setattr plambda.actors.actorlib "debug" (boolean false))))
+(pyexe plambda  (seq (import "plambda.actors.pyactor") (setattr plambda.actors.pyactor "debug" (boolean false))))
+
+**** speaking to plambda
+
+(user (load "drone.lsp"))
+(user (apply evalOK  "user"  (define b0 (apply mkdrone "b0" "3" "3" "20"))))
+(user (apply evalOK  "user"  b0))
+(invoke b0 "mv" "-7.163147" "-34.817705" "2" "23")
+
+
+**** launch the plambda console.
+(user (apply evalOK "user" (apply console)))
+
+**************
+*** setup drone
+(pyexe plambda (load "drone.lsp"))
+(pyexe plambda (define b0 (apply mkdrone "b0" "0" "0" "15")))
+
+**** check init
+(show val tval agentConf)
+(show val tval envKB)
+
+**** step by hand, 
+(rewTilDone timeStep)
+(show val tval agentConf)
+(rewTilDone  doTask)
+(show val tval agentConf)
+(doActs )
+(show val tval nzt)
+(show val tval acts)
+**** doTask again ...
+
+**** initialize stats runs
+(augAgentEsetStats Patrol 400 GenericApprox .25 .25)
+
+*** what is going on
+(show control)
+(show requests)
+(show wait4s)
+(show log)
+(show summary)
+
+(reset control)
+(reset wait4s)
+
+**** restore maudes state
+(graphics2d OK)
+(plambda OK)
+
+
+(show notes gval graph1)
+(show note selections gval graph2)
+(show entry gval graph1)
+(show val gval graph1)
+
+
+**** turn on IOP/g2d VERBOSITY
+(g2dexe graphics2d (supdate "g2d.util.ActorMsg" "VERBOSE" (boolean true)))
+(g2dexe graphics2d (supdate "g2d.Main" "DEBUG" (boolean true)))
+
+**** turn off IOP/g2d VERBOSITY
+(g2dexe graphics2d (supdate "g2d.util.ActorMsg" "VERBOSE" (boolean false)))
+(g2dexe graphics2d (supdate "g2d.Main" "DEBUG" (boolean false)))
+

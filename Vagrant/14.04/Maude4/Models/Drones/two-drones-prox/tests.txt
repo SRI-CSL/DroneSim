@@ -1,0 +1,89 @@
+(define clone_count (int 2))
+(define num_drones (int 2))
+
+(define generic_alpha "0.5")
+(define generic_beta "0.5")
+(define generic_num  "5")
+
+ops locs1 locs2 locs1p : -> LocList .
+eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
+           ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
+
+eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
+           ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
+
+--- energy parameter is not yet useful
+ops conf1 conf2 conf3 conf4 : -> Conf .
+****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
+
+eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkB(1,0.0,0.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
+
+op asys1 : -> ASystem .
+eq asys1 = { conf1 } .
+
+*****
+
+  op getObsN : Conf -> String .
+  ceq getObsN([eid | ekb ] aconf )
+      =  mkdouble(float(h)) + " " + mkdouble(e)  + " " + mkdouble(float(m)) + " " + mkdouble(float(n)) + " " + mkdouble(float(k))
+   if h := getObsHome([eid | ekb ] aconf)
+   /\ e := minEnergy(ekb,100.0)
+   /\ m := laps(aconf,1000) 
+   /\ n := visits(aconf)
+   /\ k := lates(aconf) .
+
+
+
+**** TEST RESULTS ***
+
+Stopsimulation = 75
+eq windThresh = 0 .
+eq periodicity = 60 .
+
+average_1 ===> 73.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 73.0, 1.0, 8.666666666666666, 0.0]
+count ===> 3
+accumulator ===> [D@7c42d54f
+average_3 ===> 8.666666666666666
+average_2 ===> 1.0
+rounds ===> 3
+average_4 ===> 0.0
+
+
+Stopsimulation = 5
+eq windThresh = 0 .
+eq periodicity = 60 .
+
+average_1 ===> 8.666666666666666
+average_0 ===> 1.0
+averages ===> [ 1.0, 8.666666666666666, 2.0, 25.0, 0.0]
+count ===> 3
+accumulator ===> [D@62f5681a
+average_3 ===> 25.0
+average_2 ===> 2.0
+rounds ===> 3
+average_4 ===> 0.0
+
+Stopsimulation = 5
+eq windThresh = round(float(rand.25) / 2.0) .
+eq periodicity = 60 .
+
+average_1 ===> 5.333333333333333
+average_0 ===> 0.6666666666666666
+averages ===> [ 0.6666666666666666, 5.333333333333333, 0.6666666666666666, 8.333333333333334, 0.0]
+count ===> 3
+accumulator ===> [D@62f5681a
+average_3 ===> 8.333333333333334
+average_2 ===> 0.6666666666666666
+rounds ===> 3
+average_4 ===> 0.0
+
+
+
+
+
+
+
