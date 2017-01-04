@@ -337,8 +337,8 @@ eq stopSimulation = 5.0 .
 --- eq act(id,kb) = actSCP(id,kb) .
 
 eq act(id,kb) = actBasic(id,kb) .
-eq nextLoc(id,kb) = nextLocSimple(id,kb) .
---- eq nextLoc(id,kb) = nextLocSCP(id,kb) .
+--- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
+eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
 
 endm

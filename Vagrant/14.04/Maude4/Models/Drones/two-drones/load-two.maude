@@ -11,7 +11,11 @@ load tasks-wind
 --- load tasks
 load scenario
 load sitl
+<<<<<<< HEAD
 **** load analysis-stats
+=======
+--- load analysis-stats
+>>>>>>> be30a585f7d9edc145a729bbc833452504fa83b6
 
 load model-checker
 load ~/Repositories/imaude/ilib/load-lib

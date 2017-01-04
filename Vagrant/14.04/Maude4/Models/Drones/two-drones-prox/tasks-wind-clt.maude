@@ -94,7 +94,7 @@ ceq doControl(continue(id), (pending(id,goToW(id,loc,sp)) @ t) kb) =
        then (if (ctheta > .5) 
              then sp / 2.0
              else sp fi)
-        else sp / 2.0 fi) .
+        else sp / 3.0 fi) .
 
 eq doControl(continue(id), (pending(id,act) @ t) kb) 
           = {act,(pending(id,act) @ t) kb} [owise] .
