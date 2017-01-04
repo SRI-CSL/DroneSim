@@ -15,6 +15,13 @@ var l home loc : Loc .
 var a : Int .
 var locs : LocList .
 
+sort BoolRes .
+**** bool indicates multi or single
+**** res is string rep of answer 
+op br : Bool String -> BoolRes .
+op getObs : ASystem -> BoolRes .
+
+
   op getObsHome : Conf -> Nat .
   eq getObsHome([eid | ekb ] [ id : Bot | lkb : lkb, attrs] aconf) = 
   getObsHome$(lkb,ekb) + getObsHome([eid | ekb ] aconf) .

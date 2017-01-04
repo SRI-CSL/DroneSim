@@ -1,7 +1,7 @@
 mod META-CP-E-AGENT is
   inc RFE  .   *** rewriter + filemanager
   inc PRETTY .
-  inc MODEL-KNOWLEDGE .
+****  inc MODEL-KNOWLEDGE .
 ****!!!! why inc MODEL-KNOWLEDGE   
   
 ***********************************************************************
