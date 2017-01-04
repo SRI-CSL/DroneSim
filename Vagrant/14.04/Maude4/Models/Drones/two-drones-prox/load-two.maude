@@ -10,7 +10,7 @@ load scp-clt
 load tasks-wind-clt
 load scenario-clt
 load sitl
-load analysis-stats
+*** load analysis-stats
 
 load model-checker
 load ~/Repositories/imaude/ilib/load-lib
