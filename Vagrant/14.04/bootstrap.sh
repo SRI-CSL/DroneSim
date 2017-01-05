@@ -155,15 +155,17 @@ echo "Building arducopter"
 #./waf plane
 
 
-echo "Time to build/testing ardupilot"
+echo "\n\nTime to build/testing ardupilot\n\n"
 #
 # Building bits:
 #
 #
-#sim_vehicle.py -v ArduCopter
-#sim_vehicle.py -v ArduPlane
+# sim_vehicle.py -v ArduCopter
+# sim_vehicle.py -v ArduPlane
 #
-#Once built you'll have to ^D to exit.
-#Then should be able to launch via:
+# Once built you'll have to ^D or ^C to exit (this is why they cannot be in the bootstrap.sh).
+# Then should be able to launch via:
 #
-#sim_vehicle.py -v ArduCopter --map --console
+# sim_vehicle.py -v ArduCopter --map --console
+#
+# Again you'll have to ^D or ^C to exit.

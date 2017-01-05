@@ -16,6 +16,10 @@ def main(args):
         verbose = bool(args[5])
         sitl.launch(largs, verbose=verbose)
         sitl.block_until_ready(verbose=verbose)
+        code = sitl.complete(verbose=verbose) # wait until exit
+        sitl.poll() # returns None or return code
+        sitl.stop() # terminates SITL
+
         sys.stderr.write('\n----> SITL exiting <----\n')
         return 0
 
