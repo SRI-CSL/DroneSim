@@ -77,8 +77,6 @@ class SitlDrone(object):
 
         self.pipeincr = 10 * self.ino
 
-        #self.sitl = dronekit_sitl.SITL(instance=self.ino, path=binary, defaults_filepath=params)
-
         if self.debug:
             sys.stderr.write(init_squark.format(self.name, self.ino, self.binary, self.params, self.debug, self.speedup))
 
@@ -113,13 +111,6 @@ class SitlDrone(object):
 
     def sitl_ip(self, base_port):
         return '127.0.0.1:{0}'.format(base_port + self.pipeincr)
-
-#    def spawn_sitl(self):
-#        thread = threading.Thread(target=sitl_main, name='sitl_main_of_{0}'.format(self.name), args=(self, ))
-#        #thread needs to be a daemon so that the actor itself can die in peace.
-#        thread.daemon = True
-#        thread.start()
-
 
     def sitl_args(self):
         sargs = ['launch_sitl', str(self.ino), self.binary, self.params, self.home, str(self.debug)]
