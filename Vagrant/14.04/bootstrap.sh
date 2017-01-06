@@ -78,13 +78,19 @@ sudo apt-get install  -y  python-matplotlib python-serial python-lxml
 sudo apt-get install  -y  python-scipy python-opencv ccache gawk python-pexpect libpython-all-dev
 sudo apt-get install  -y  python-dev python-numpy python-opencv python-pyparsing python-wxgtk2.8
 
-
 echo "Installing dronekit-sitl"
 
 cd /home/vagrant/Repositories
 git clone https://github.com/dronekit/dronekit-sitl.git
 cd dronekit-sitl
 pip install -e .
+
+echo "Installing our sitl launcher"
+cp /vagrant/launch_sitl /home/vagrant/bin/
+
+echo "Installing our bash_profile into  ~/.bashrc"
+echo '. /vagrant/bash_profile' >> /home/vagrant/.bashrc
+
 
 #
 # 12/13/2016 the pip package is too old, and the API is quite different.
@@ -127,7 +133,6 @@ git clone git://github.com/ArduPilot/ardupilot.git
 echo "Prepping the ardupilot build"
 
 export PATH=${PATH}:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
-echo '. /vagrant/bash_profile' >> /home/vagrant/.bashrc
 
 
 echo "Configuring ardupilot"
@@ -150,15 +155,17 @@ echo "Building arducopter"
 #./waf plane
 
 
-echo "Time to build/testing ardupilot"
+echo "\n\nTime to build/testing ardupilot\n\n"
 #
 # Building bits:
 #
 #
-#sim_vehicle.py -v ArduCopter
-#sim_vehicle.py -v ArduPlane
+# sim_vehicle.py -v ArduCopter
+# sim_vehicle.py -v ArduPlane
 #
-#Once built you'll have to ^D to exit.
-#Then should be able to launch via:
+# Once built you'll have to ^D or ^C to exit (this is why they cannot be in the bootstrap.sh).
+# Then should be able to launch via:
 #
-#sim_vehicle.py -v ArduCopter --map --console
+# sim_vehicle.py -v ArduCopter --map --console
+#
+# Again you'll have to ^D or ^C to exit.
