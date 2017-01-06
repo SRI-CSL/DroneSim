@@ -29,14 +29,6 @@ SitlDrone:
 \tspeedup:          {5}
 """
 
-def sitl_main(drone):
-    sitl = drone.sitl
-    args = ['--home={0}'.format(drone.home)]
-    sitl.launch(args, verbose=drone.debug)
-    sitl.block_until_ready(verbose=drone.debug)
-
-
-
 class SitlDrone(object):
     """
     plambda lesson:
@@ -146,8 +138,6 @@ class SitlDrone(object):
         if self.debug:
             sys.stderr.write('Spawning sitl: {0}\n'.format(sitl_args))
 
-        #self.spawn_sitl()
-
         self.sitl = sandbox.SandBox('sitl', sitl_args, True)
 
         self.sitl.start()
@@ -253,8 +243,6 @@ class SitlDrone(object):
             if self.debug:
                 sys.stderr.write("sitl with pid {0} killed\n".format(self.sitl.getpid()))
             self.sitl = None
-        #self.sitl.stop()    # terminates SITL
-
 
     def goToW(self, vx, vy, vz, wx, wy, wz, dur):
         self.trace("goToW")
