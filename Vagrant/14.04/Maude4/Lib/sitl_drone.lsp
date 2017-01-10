@@ -18,7 +18,13 @@
 
 (define send plambda.actors.actorlib.send)
 
+;;(setattr plambda.actors.actorlib "debug" (boolean true))
+
+
 (import "plambda.actors.pyactor")
+
+;;(setattr plambda.actors.pyactor "debug" (boolean true))
+
 
 (define myself (getattr plambda.actors.pyactor.Main "myself"))
 

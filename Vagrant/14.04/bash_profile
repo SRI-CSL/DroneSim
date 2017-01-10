@@ -1,10 +1,10 @@
 
-# DroneZone deprecated.
-export PYTHONPATH=/vagrant/Maude4/Lib/python:/vagrant/DroneZone
+export PYTHONPATH=/vagrant/Maude4/Lib/python
 
-export IOPBINDIR=${HOME}/bin/IOP
+export BINDIR=${HOME}/bin
 
-export MAUDE_LIB=${HOME}/bin/Maude
+export IOPBINDIR=${BINDIR}/IOP
+
+export MAUDE_LIB=${BINDIR}/Maude
 
 export PATH=${IOPBINDIR}:${MAUDE_LIB}:${HOME}/Repositories/jsbsim/src:${HOME}/Repositories/ardupilot/Tools/autotest:/usr/lib/ccache:${PATH}
-

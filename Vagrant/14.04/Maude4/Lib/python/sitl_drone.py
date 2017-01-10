@@ -29,14 +29,6 @@ SitlDrone:
 \tspeedup:          {5}
 """
 
-def sitl_main(drone):
-    sitl = drone.sitl
-    args = ['--home={0}'.format(drone.home)]
-    sitl.launch(args, verbose=drone.debug)
-    sitl.block_until_ready(verbose=drone.debug)
-
-
-
 class SitlDrone(object):
     """
     plambda lesson:
@@ -63,32 +55,37 @@ class SitlDrone(object):
     """
 
 
-    def __init__(self, name, instance_no=0, binary=binary_path, params=params_path, home=home_default, debug=False, speedup=None):
+    def __init__(self, name, instance_no=0, debug=True, speedup=None, binary=binary_path, params=params_path, home=home_default):
         """Creates a drone with given name and default state.
         """
         self.name = name
-        self.debug = debug
-        self.home = home
         self.ino = instance_no
+        self.debug = debug
+        self.speedup = int(speedup) if speedup is not None else None
+        self.binary = binary
+        self.params = params
+        self.home = home
+
+
         self.pipeincr = 10 * self.ino
 
-        self.speedup = int(speedup) if speedup is not None else None
-
-        self.sitl = dronekit_sitl.SITL(instance=self.ino, path=binary, defaults_filepath=params)
-
         if self.debug:
-            sys.stderr.write(init_squark.format(self.name, self.ino, binary, params, debug, speedup))
+            sys.stderr.write(init_squark.format(self.name, self.ino, self.binary, self.params, self.debug, self.speedup))
 
+        #<iam thinks these are  obsolete>
         self.x = 0
         self.y = 0
         self.z = 0
         self.v = 0
         self.e = 10.0
         self.altitude = 5
+        #</iam thinks these are  obsolete>
+
 
         self.vehicle = None
 
         self.mavproxy = None
+        self.sitl = None
 
     def getName(self):
         self.trace("getName")
@@ -107,12 +104,9 @@ class SitlDrone(object):
     def sitl_ip(self, base_port):
         return '127.0.0.1:{0}'.format(base_port + self.pipeincr)
 
-    def spawn_sitl(self):
-        thread = threading.Thread(target=sitl_main, name='sitl_main_of_{0}'.format(self.name), args=(self, ))
-        #thread needs to be a daemon so that the actor itself can die in peace.
-        thread.daemon = True
-        thread.start()
-
+    def sitl_args(self):
+        sargs = ['launch_sitl', str(self.ino), self.binary, self.params, self.home, str(self.debug)]
+        return sargs
 
     def mavproxy_args(self):
         mpargs = ['mavproxy.py',
@@ -138,23 +132,30 @@ class SitlDrone(object):
 
 
     def spawn(self):
-        if self.debug:
-            sys.stderr.write('Spawning sitl\n')
 
-        self.spawn_sitl()
+        sitl_args = self.sitl_args()
+
+        if self.debug:
+            sys.stderr.write('Spawning sitl: {0}\n'.format(sitl_args))
+
+        self.sitl = sandbox.SandBox('sitl', sitl_args, True)
+
+        self.sitl.start()
+        if self.debug:
+            sys.stderr.write('sitl with pid {0} spawned\n'.format(self.sitl.getpid()))
 
         time.sleep(2)
         if self.debug:
-            sys.stderr.write("slept\n")
+            sys.stderr.write('slept\n')
 
         mpargs = self.mavproxy_args()
 
         if self.debug:
-            sys.stderr.write("Spawning mavproxy {0}\n".format(mpargs))
+            sys.stderr.write('Spawning mavproxy: {0}\n'.format(mpargs))
         self.mavproxy = sandbox.SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()
         if self.debug:
-            sys.stderr.write("mavproxy with pid {0} spawned\n".format(self.mavproxy.getpid()))
+            sys.stderr.write('mavproxy with pid {0} spawned\n'.format(self.mavproxy.getpid()))
 
 
     def setSpeedup(self, speedup):
@@ -237,8 +238,11 @@ class SitlDrone(object):
             if self.debug:
                 sys.stderr.write("mavproxy with pid {0} killed\n".format(self.mavproxy.getpid()))
             self.mavproxy = None
-        self.sitl.stop()    # terminates SITL
-
+        if self.sitl is not None:
+            self.sitl.stop()
+            if self.debug:
+                sys.stderr.write("sitl with pid {0} killed\n".format(self.sitl.getpid()))
+            self.sitl = None
 
     def goToW(self, vx, vy, vz, wx, wy, wz, dur):
         self.trace("goToW")
@@ -287,7 +291,6 @@ class SitlDrone(object):
         drone_utils.send_global_velocity(self, velocity_x, velocity_y, velocity_z, duration)
 
 """
-x.vehicle.location.local_frame.north
 from sitl_drone import *
 
 x = SitlDrone("hello")
