@@ -142,7 +142,7 @@ eq asys1 = { conf1 } .
 
 --- eq windThresh = 2 * rand.25 .
 --- eq windThresh = round(float(rand.25) / 2.0) .
---- eq windThresh = 0 .
+eq windThresh = 0 .
 eq stopSimulation = 5.0 .
 
 --- eq act(id,kb) = actSimple(id,kb) .

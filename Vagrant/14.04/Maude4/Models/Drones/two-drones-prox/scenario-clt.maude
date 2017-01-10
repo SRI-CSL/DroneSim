@@ -328,8 +328,8 @@ eq asys3c = { conf5 minSep(20,pt(0,0,0),pt(10,10,0))
 
 --- eq windThresh = rand.25 + rand.25 .
 --- eq windThresh = rand.25 + rand.125 .
---- eq windThresh = rand.25 .
-eq windThresh = 0 .
+eq windThresh = rand.25 .
+--- eq windThresh = 0 .
 
 eq stopSimulation = 5.0 .
 
