@@ -1,6 +1,6 @@
 **** use doSimRound to step n units
 (show val tval agentConf)
-(doSimRound plambda 100)
+(doSimRound plambda 150)
 (show val qval simStatus)
 
 **** turn on IOP/plambda VERBOSITY
