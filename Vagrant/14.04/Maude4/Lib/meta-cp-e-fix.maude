@@ -1,0 +1,1305 @@
+mod META-CP-E-AGENT is
+  inc RFE  .   *** rewriter + filemanager
+  inc PRETTY .
+****  inc MODEL-KNOWLEDGE .
+****!!!! why inc MODEL-KNOWLEDGE   
+  
+***********************************************************************
+***********************************************************************
+var ctl : Control .
+var wait4s : Wait4Set .
+var reqQ reqQ' reqQ0 reqQ1 : RequestQ .
+var ee? : Entry? .
+vars log log'  : Log .
+vars es0 es es' es'' es1 : ESet .
+
+vars InQ OutQ outQ toks toks' rids args ql running : QidList .
+vars q modname initname aname amodname mname g2dname g2dvname pyname sname
+      maudename id reqid  gname  mphysics 
+      act dir x y z dx dy dz v e dt idchar amt  status
+      rid sysOp nq statsname statsOp randinc
+      epsilon delta threshold rounds alpha pval minrounds maxrounds rate 
+      vx vy vz wx wy wz dur : Qid .
+vars mod agentMod amod module : Module .
+vars ?string str idstr argstr createSOExp
+      dsize scale gx gy gz maxC chargeU costMv edgeX sx sy sz  : String .
+vars t t' t0 idT idterm sxT syT szT vT xT yT zT dxT dyT dzT 
+     gxT gyT gzT eT nT actT oneT
+      timeT timeT1 mteT nztT nztT1 actsT actsT1 ekbT ekbT' delayT durT
+      aconfT aconfT0 aconfT1 aconfT2 aconfT' confT sconfT edgeXT
+      idLocsT  maxCT chargeUT costMvT 
+      bT nT1 idsT dtT : Term .
+var tl idLocTL actTL : TermList .
+vars res? res?? res1? res1?? res0? 
+     res0?? res2?? res3?? res4?? res5?? res6?? res7??
+     res8?? res9?? res10?? res11?? res12?? : [ResultPair?] .
+var res4? : [Result4Tuple] .
+vars bindings : TBinds .
+
+var sort : Sort .
+
+var b done? isConst : Bool .
+var n : Nat .
+
+***********************************************************************
+***********************************************************************
+
+**** gensym hack for generating new ids 
+
+  op getGlobalCounter : ESet -> String .
+  op incGlobalCounter : ESet -> ESet .
+  op incGlobalCounter : ESet Nat -> ESet .
+
+  eq getGlobalCounter(es) = 
+          svalString(getVal(es,'sval,'globalCounter,sv("0"))) .
+  eq incGlobalCounter(es) = incGlobalCounter(es,1) .
+  eq incGlobalCounter(es,n) = 
+       addEntry(es,'sval,'globalCounter,
+                sv(string(rat(getGlobalCounter(es),10) + n,10))) .
+
+  op getPyName : ESet -> Qid .
+  eq getPyName(es) = qvalQidList(getVal(es,'qval,'pyname,ql('plambda))) .
+  
+
+  op stringInc : String -> String .
+  eq stringInc(str) = 
+      (if string(rat(str,10) + 1, 10) :: String
+       then string(rat(str,10) + 1, 10) 
+       else str fi) .
+
+
+  op stringDec : String -> String .
+  eq stringDec(str) = 
+      (if string((rat(str,10) + -1), 10) :: String
+       then string((rat(str,10) + -1), 10) 
+       else str fi) .
+
+
+op sqquote : Qid -> String .
+eq sqquote(q) = squote(string(q)) .
+
+op term2String : Module Term -> String .
+eq term2String(mod,t) 
+  = removeBQs(qidl2str(metaPrettyPrint(mod,t,mixfix flat number)),0,"") .
+
+
+*** sorting -- to get around sortLeq bug
+  op hasSort : Module Term Sort -> Bool .
+  eq hasSort(mod, t, sort) = sortLeq(mod, leastSort(mod, t), sort) .
+
+**** getting the arglist from an object list term of list or multiset sort
+****  singleton sort sort, a or ac constructor with identity id.
+****                 sort   a/acTerm 
+  op lterm2terml : Module Sort Term Term -> TermList .
+  ceq lterm2terml(module,sort,idterm,t) =
+      (if (not(res?? :: ResultPair) or (t' == idterm))
+       then empty
+       else (if hasSort(module,t',sort)
+             then t'
+             else getArgs(t') fi) fi) 
+    if res?? := metaReduce(module,t)
+    /\ t' := (if res?? :: ResultPair then getTerm(res??) else t fi)  .
+
+
+op qid2NatT :  Qid -> Term .
+ceq qid2NatT(q) =
+ (if hasSort(['MY-META-CNV],t0,'Nat) then t0 else '0.Zero fi)
+ if t0 :=  upTerm(rat(string(q),10)) .
+
+
+**********************************************************************
+**** initializing the MetaAgent environment
+***** initAgentEset
+****   initializes maudeName, g2dName, g2dVname 
+****   initname should refer to a Conf not an ASystem
+**********************************************************************
+
+****17jan18clt
+ 
+op getIdsQL : Qid Term -> QidList .
+ceq getIdsQL(amodname,aconfT) = idsT2idsQ(amodname,idsT)
+if res?? := metaReduce([amodname], 'getIds[aconfT])
+/\ idsT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+               else 'none.IdSet fi)
+.
+ 
+op initAgentEset : ESet Qid Qid Qid Qid Qid Qid Qid QidList -> ESet .
+ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
+                     amodname,initname,mphysics,toks) =
+     addEntry(addEntry( addEntry( addEntry(
+      addEntry( addEntry( addEntry( addEntry(
+       addEntry( addEntry( addEntry( addEntry(
+        addEntry(es, 
+                'qval, 'maudeName, ql(maudename)), 
+                'qval, 'g2dName, ql(g2dname)), 
+                'qval, 'g2dVName, ql(g2dvname)),
+                'qval, 'pyname, ql(pyname)),
+                'qval, 'agentModName, ql(amodname)),
+                'sval, 'globalCounter,sv("0")),
+                'qval, 'MaudePhysics, ql(mphysics)),
+                'qval, 'simStatus, ql('init)),
+                'qval, 'running, ql(running)),
+                'qval, 'simSteps, ql(nq)),
+                'tval, 'agentConf, tm(amodname,aconfT)),
+                'tval, 'envKB, tm(amodname,ekbT)),
+                'tval, 'time, tm(amodname,timeT))
+ if res?? := metaReduce([amodname],mkConst(initname,'ASystem))
+ /\ aconfT := 
+   (if res?? :: ResultPair then getTerm(res??) else '`{_`}['none.Conf] fi) 
+ /\ res11?? := metaReduce([amodname],'envKB[aconfT])
+ /\ ekbT := 
+   (if res11?? :: ResultPair then getTerm(res11??) else 'none.KB fi)
+ /\ res12?? := metaReduce([amodname],'getTime['getConf[aconfT]])
+ /\ timeT :=  (if res12?? :: ResultPair 
+                then getTerm(res12??) 
+                else 'infty.TimeInf fi)
+ /\ nq := (if (toks :: NeQidList) then head(toks) else '1000 fi)  
+ /\ running := getIdsQL(amodname,aconfT)
+.
+ 
+eq isReq('initAgentEset) = true .
+eq enabled(wait4s,
+           req('initAgentEset, 
+                   ql(maudename g2dname g2dvname pyname amodname 
+                       initname mphysics toks),reqQ)) = true .
+
+****(initAgentEset maude g2d g2d plambda SCENARIO asys1 OnePatrolBot) 
+crl[initAgentEset]:
+   [nil, 
+    st(processing(req('initAgentEset, 
+                      ql(mname g2dname g2dvname pyname 
+                      amodname initname mphysics toks),
+                       reqQ')),
+       wait4s,reqQ,es,log),
+     outQ]
+   =>
+   [nil, 
+    st(ready, 
+       wait4s, 
+       reqQ',
+       es',
+       log), 
+       outQ  ] 
+ if es' := initAgentEset(es,mname,g2dname,g2dvname, pyname, amodname,initname,mphysics,toks)
+.
+
+
+***********************************************************************
+**** begin statssetup
+***********************************************************************
+
+****************************************************************
+op augAgentEsetStats : ESet Qid Qid Qid  -> ESet .
+eq augAgentEsetStats(es,amodname, statsname,randinc) =
+       addEntry(  addEntry(   addEntry(  
+        addEntry(es, 
+                'tval, 'initConf,
+                   getVal(es,'tval,'agentConf, tm(amodname,'none.ASystem))),
+                'qval, 'statsName, ql(statsname)),
+                'tval, 'randIx, tm(amodname, '0.Zero)),
+                'tval, 'randInc, tm(amodname, qid2NatT(randinc))) .
+
+eq isReq('augAgentEsetStats) = true .
+eq enabled(wait4s,
+           req('augAgentEsetStats, 
+                 ql(statsname randinc statsOp toks),reqQ)) = true .
+
+
+**** this starts the stats rounds going!
+crl[augAgentEsetStats]:
+   [nil, 
+    st(processing(req('augAgentEsetStats, 
+                      ql(statsname randinc statsOp toks),
+                       reqQ')),
+       wait4s,reqQ,es,log),
+     outQ]
+   =>
+   [nil, 
+    st(ready, 
+       (wait4s !
+         wait4(statsname,nil, req('graphreq,ql(g2dvname),nil)) !
+         wait4(g2dvname,statsname,
+               req('logreq,ql('initStats g2dvname statsname),reqQ'))), 
+      reqQ,
+      es',
+      log), 
+      outQ  g2dvname '\n mname '\n toks' maudePrompt ]
+ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
+ /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+ /\ ql(mname) := getVal(es,'qval, 'maudeName, ql('g2d)) 
+ /\ es' := augAgentEsetStats(es, amodname, statsname, randinc)
+ /\ str := mkInitStatsExp([amodname],mname,g2dvname, statsname, statsOp,toks)
+ /\ toks' := str2toks(str) .
+
+
+eq isReq('augAgentEsetConcurrentStats) = true .
+eq enabled(wait4s,
+           req('augAgentEsetConcurrentStats, 
+                 ql(statsname randinc toks),reqQ)) = true .
+
+
+**** this tells Maude the stats params
+crl[augAgentEsetConcurrentStats]:
+   [nil, 
+    st(processing(req('augAgentEsetConcurrentStats, 
+                      ql(statsname randinc toks),
+                       reqQ')),
+       wait4s,reqQ,es,log),
+     outQ]
+   =>
+   [nil, 
+    st(ready, 
+       wait4s !
+       wait4(statsname,nil, req('graphreq,ql(g2dvname),nil)), 
+       reqQ,
+       augAgentEsetStats(es, amodname, statsname, randinc),
+       log), 
+      outQ ]
+  if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
+     /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+.
+
+
+op initStatsTemplate : -> String [ctor] .
+eq initStatsTemplate =
+"(let ((statsObj %createSOExp))\n\
+   (sinvoke \"g2d.util.ActorMsg\" \"send\" %maudename %g2dname \"OK\")\n\
+   (apply doStats %sname)\n\
+)"  .
+
+op mkInitStatsExp : Module Qid Qid  Qid Qid QidList -> String .
+ceq mkInitStatsExp(mod, maudename, g2dname, sname, statsOp,toks) =
+ fillTemplate(initStatsTemplate,bindings)
+if createSOExp := mkSOExp(statsOp,sname,toks) 
+/\ bindings := (
+    ("%maudename" :~ sqquote(maudename)), 
+    ("%g2dname" :~ sqquote(g2dname)), 
+    ("%sname" :~ sqquote(sname)), 
+    ("%createSOExp" :~ createSOExp)) .
+
+**** BlackboxApprox
+op mkSOExp : Qid Qid QidList -> String .
+***(
+eq mkSOExp(statsOp,sname, toks) =
+  (if (statsOp == 'GenericApprox) 
+   then mkGenericApproxSOExp(sname,toks)
+   else (if (statsOp == 'BlackboxApprox)
+         then mkBlackboxApproxSOExp(sname,toks) 
+   else (if (statsOp == 'QAApprox)
+         then mkQAApproxSOExp(sname,toks) 
+          else "(apply mkDefaultStatsObject)"
+   fi) fi) fi) .
+)
+eq mkSOExp(statsOp,sname, toks) =
+  (if (statsOp == 'GenericApprox) 
+   then mkGenericApproxSOExp(sname,toks)
+   else (if (statsOp == 'nGenericApprox) 
+         then mknGenericApproxSOExp(sname,toks)
+   else (if (statsOp == 'BlackboxApprox)
+         then mkBlackboxApproxSOExp(sname,toks) 
+   else (if (statsOp == 'QAApprox)
+         then mkQAApproxSOExp(sname,toks) 
+          else "(apply mkDefaultStatsObject)"
+   fi) fi) fi) fi) .
+
+op genericApproxTemplate : -> String [ctor] .
+eq genericApproxTemplate =
+"(object (\"g2d.stats.GenericApprox\" %sname (double %epsilon) (double %delta)))" .
+
+op mkGenericApproxSOExp : Qid QidList -> String .
+eq mkGenericApproxSOExp(sname,epsilon delta toks) =
+   fillTemplate(genericApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+               ("%epsilon" :~ string(epsilon)),
+                ("%delta" :~ string(delta)) )) .
+
+eq mkGenericApproxSOExp(sname,toks) =
+   fillTemplate(genericApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+                ("%epsilon" :~ ".25"),
+                ("%delta" :~ ".25") )) [owise] .
+
+op ngenericApproxTemplate : -> String [ctor] .
+eq ngenericApproxTemplate =
+"(object (\"g2d.stats.nGenericApprox\" %sname (double %epsilon) (double %delta) (int %n)))" .
+
+op mknGenericApproxSOExp : Qid QidList -> String .
+eq mknGenericApproxSOExp(sname,epsilon delta nq toks) =
+   fillTemplate(ngenericApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+               ("%n" :~ string(nq)),
+               ("%epsilon" :~ string(epsilon)),
+                ("%delta" :~ string(delta)) )) .
+
+eq mknGenericApproxSOExp(sname,toks) =
+   fillTemplate(ngenericApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+                ("%n" :~ "1"),
+                ("%epsilon" :~ ".25"),
+                ("%delta" :~ ".25") )) [owise] .
+
+
+op blackboxApproxTemplate : -> String [ctor] .
+eq blackboxApproxTemplate =
+"(object (\"g2d.stats.BlackboxApprox\" %sname (double %threshold) (int  %rounds)))" .
+****    threshold .75     rounds 30
+
+op mkBlackboxApproxSOExp : Qid QidList -> String .
+eq mkBlackboxApproxSOExp(sname,threshold rounds toks) =
+   fillTemplate(blackboxApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+                ("%threshold" :~ string(threshold)),
+                ("%rounds" :~ string(rounds)) )) .
+
+eq mkBlackboxApproxSOExp(sname,toks) =
+   fillTemplate(blackboxApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+                ("%threshold" :~ ".75"),
+                ("%rounds" :~ "30") )) [owise] .
+
+
+***(
+  ;; alpha: error bound, delta: confidence interval, pval: pvalue for JB test
+  ;; minsize: minimum rounds, maxsize: maximum rounds, rate: % of sample (=rounds) increase  
+  (object ("g2d.stats.QAApprox" "qaApprox"  (double 0.25) (double 0.35) (double 0.75) (int 20) (int 1000) (double 0.45)))
+)
+
+op mkQAApproxTemplate : -> String [ctor] .
+eq mkQAApproxTemplate =
+"(object (\"g2d.stats.QAApprox\" %sname (double %alpha) (double %delta) (double %pval) (int  %minrounds) (int  %maxrounds) (double %rate)))" .
+
+
+op mkQAApproxSOExp : Qid QidList -> String .
+eq mkQAApproxSOExp(sname,alpha delta pval minrounds maxrounds rate toks) =
+   fillTemplate(mkQAApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+                ("%alpha" :~ string(alpha)),
+                ("%delta" :~ string(delta)),
+                ("%pval" :~ string(pval)),
+                ("%minrounds" :~ string(minrounds)),
+                ("%maxrounds" :~ string(maxrounds)),
+                ("%rate" :~ string(rate)) )) .
+
+eq mkQAApproxSOExp(sname,toks) =
+   fillTemplate(mkQAApproxTemplate,
+                (("%sname" :~ sqquote(sname)),
+                ("%alpha" :~ ".25"),
+                ("%delta" :~ ".25"),
+                ("%pval" :~ ".05"),
+                ("%minrounds" :~ "20"),
+                ("%maxrounds" :~ "1000"),
+                ("%rate" :~ ".5") ))  [owise] .
+
+
+
+***********************************************************************
+**** end stats setup
+***********************************************************************
+  
+  eq isReq('pyexe) = true .
+  eq enabled(wait4s,req('pyexe,ql(pyname toks),reqQ)) = 
+      not(waiting4(wait4s,pyname)) .
+
+  crl[pyexe]:
+   [nil,
+    st(processing(req('pyexe,ql(pyname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    OutQ]
+     =>
+   [nil,  
+    st(ready,
+       wait4s ! wait4(pyname,nil,
+                      req('logreq,ql('pyexe pyname toks),reqQ')), 
+       reqQ,
+       es,
+       log), OutQ 
+     pyname '\n mname '\n toks' maudePrompt]
+   if  mname := getMaudeName(es)
+   /\ ?string :=  withPyAck(removeBQs(qidl2str(toks),0,""),mname,pyname) 
+   /\ toks' := str2toks(?string) .
+
+  op withPyAckTemplate : -> String .
+  eq withPyAckTemplate = 
+"(seq \n\
+    %exp\n\
+    (apply send %replyto %pyname \"OK\") )" .
+ 
+ op withPyAck : String Qid Qid -> String .
+ eq withPyAck(?string,mname,aname) =
+     fillTemplate(withPyAckTemplate,
+                  (("%exp" :~ ?string),
+                   ("%replyto" :~ squote(string(mname))),
+                   ("%pyname" :~ squote(string(aname))))) .
+
+
+***********************************************************************
+**** apply rules in QidList until nothing to do. 
+**** inst rules or timestep
+**** assume t is reduced
+
+
+op getConf : Qid Term -> Term .
+eq getConf(sysOp,sysOp[t0]) = t0 .
+eq getConf(sysOp,t) = t [owise] .
+
+
+op applyXXRules : Module Term QidList -> Term .
+ceq applyXXRules(module,t,rids) =
+     (if done? 
+      then t'
+      else applyXXRules(module,t',rids) 
+      fi)
+  if t' := applyXXRules1(module,t,rids)
+  /\ done? := t' == t .
+
+
+**** assume wellFormed(mod,t) == true
+  op applyXXRules1 : Module Term QidList -> Term .
+  eq applyXXRules1(mod,t,nil) =  t .
+  ceq applyXXRules1(mod,t, rid rids) = applyXXRules1(mod,t', rids)
+   if res4? :=  metaXapply(mod,t,rid,none,0,unbounded,0)
+   /\ t' :=  (if res4? :: Result4Tuple then getTerm(res4?) else t fi)
+  .
+
+*****************  
+***(
+if q is 'ASystem then applyXXRules will encase aconfT in sysOp
+to rewrite at the top.
+)
+ eq isReq('rewTilDone) = true .
+ eq enabled(wait4s,req('rewTilDone,ql(toks),reqQ')) = true .
+
+ crl[rewTilDone]:
+    [nil,
+     st(processing(req('rewTilDone, ql(toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+     [nil,  
+       st(ready, wait4s,  (reqQ reqQ'), es',log),
+      outQ]
+
+  if tm(amodname,aconfT) := 
+       getVal(es,'tval,'agentConf,tm('SOFT-AGENTS,'`{_`}['none.Conf]))
+  /\ aconfT' := applyXXRules([amodname], aconfT,toks)
+  /\ es' := addEntry(es,'tval,'agentConf,tm(amodname,aconfT'))
+  .      
+
+***********************************************************************
+****** update the display
+***********************************************************************
+op updateGridTemplate : -> String .
+eq updateGridTemplate =
+    "(apply updateGrid %gname (int %scale) %dnames %dspecs)" .
+
+
+****                      confT  gname scale  dsize
+op mkUpdateGridExp : Module Term  Qid  String String -> String .
+ceq mkUpdateGridExp(module, confT, gname,  scale, dsize) =
+   fillTemplate(updateGridTemplate,bindings)
+if res?? := metaReduce(module, 'asys2locs[confT])
+/\ idLocsT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+               else 'none.InfoSet
+               fi)
+/\ idLocTL := lterm2terml(module, 'Info, 'none.InfoSet, idLocsT)     
+/\ bindings := (
+    ("%gname" :~ sqquote(gname)),
+    ("%scale" :~ scale),
+    ("%dnames" :~ ""),  **** idLocs2ids1(module,idLocTL)
+    ("%dspecs" :~ "")   **** idLocs2dspecs(idLocTL,dsize)
+    )               
+.
+
+*****************************
+             
+eq isReq('updateGrid) = true .
+eq enabled(wait4s, 
+          req('updateGrid, ql(g2dvname gname toks),reqQ'))
+     = not(waiting4(wait4s,g2dvname)) .
+
+crl[updateGrid]:
+   [nil, 
+    st(processing(req('updateGrid, ql(g2dvname gname toks),reqQ')),
+       wait4s,reqQ,es,log),
+     outQ]
+   =>
+   [nil, 
+    st(ready,
+       (wait4s !
+         wait4(g2dvname,gname,
+               req('logreq,ql('updateGrid g2dvname gname),reqQ'))), 
+       reqQ, es,log),
+      outQ  g2dvname '\n maudename '\n toks' maudePrompt ]
+ if tm(amodname, aconfT) := 
+          getVal(es,'tval, 'agentConf, tm('SOFT-AGENTS,'`{_`}['none.Conf]))
+ /\ maudename := getMaudeName(es)
+ /\ sv(scale) := getVal(es,'sval,'scale, sv("100"))
+ /\ sv(dsize) := getVal(es,'sval,'dsize, sv("6"))
+ /\ str := mkUpdateGridExp([amodname], aconfT, gname, scale, dsize)
+ /\ ?string := withAck(str, maudename,g2dvname) 
+ /\ toks' := str2toks(?string) .
+
+
+***********************************************************************
+***********************************************************************
+
+ eq isReq('doRound) = true .
+ eq enabled(wait4s,req('doRound,ql(g2dvname gname nq toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[doRound]:
+   [nil,
+    st(processing(req('doRound, ql(g2dvname gname nq toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+       wait4s,
+      (reqQ reqQ0),
+       es,
+       log), outQ  ] 
+if n := rat(string(nq),10)
+/\ reqQ0 :=
+    (if ( n :: Nat and n > 0 ) 
+    then req('rewTilDone,
+           ql('doTask),
+           req('updateGrid,ql(g2dvname gname),
+             req('rewTilDone,ql('timeStep),
+                req('doRound, ql(g2dvname gname qid(string(sd(n,1),10)) ),
+                      reqQ'))))
+    else reqQ' fi) .
+  
+
+
+***********************************************************************
+***********************************************************************
+***** quit if simStatus = ql(Stop) or countdown 
+ eq isReq('doSimRound) = true .
+ eq enabled(wait4s,req('doSimRound,ql(pyname nq toks),reqQ)) = 
+    not(waiting4(wait4s,pyname)) .
+
+crl[doSimRound]:
+   [nil,
+    st(processing(req('doSimRound, ql(pyname nq toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+       wait4s,
+      (reqQ reqQ0),
+       es,
+       log), outQ  ] 
+if n := rat(string(nq),10)
+****17jan18 status >> running
+/\ ql(running) := getVal(es,'qval,'running, ql(nil))
+/\ reqQ0 :=
+    (if ( n :: Nat and n > 0 and running =/= nil) 
+    then req('rewTilDone, ql('doTask),
+             req('doActs, ql(nil),
+                req('doSimRound, ql(pyname qid(string(sd(n,1),10)) ),
+                      reqQ')))
+    else reqQ' fi) .
+  
+
+***********************************************************************
+***********************************************************************
+***** quit if simStatus = ql(Stop) or countdown 
+ eq isReq('doMaudeSimRound) = true .
+ eq enabled(wait4s,req('doMaudeSimRound,ql(nq toks),reqQ)) = true .
+
+crl[doMaudeSimRound]:
+   [nil,
+    st(processing(req('doMaudeSimRound, ql(nq toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+       wait4s,
+      (reqQ reqQ0),
+       es,
+       log), outQ  ] 
+if n := rat(string(nq),10)
+/\ ql(running) := getVal(es,'qval,'running, ql(nil))
+/\ reqQ0 :=
+    (if ( n :: Nat and n > 0 and running =/= nil) 
+    then req('rewTilDone, ql('doTask),
+           req('rewTilDone, ql('timeStep),
+             req('doMaudeSimRound, ql(qid(string(sd(n,1),10)) ),
+                 reqQ')))
+    else reqQ' fi) .
+  
+
+***********************************************************************
+***(
+ Interaction with simulator
+
+doActs()
+sets envKB, time, mte, nzt, acts
+schedules doUnitActs() with continuation odActs()
+
+odActs()  updates 'agentConf to be {aconf2}
+**** aconf0 := updateEnv(ekb',timeEffect(aconf,nzt))
+**** aconf1 := shareKnowledge(aconf0)
+**** aconf2 := updateConf(aconf1) 
+
+doUnitActs()
+if nzt > 0
+ schedules doUnitAct(id,act,args) for each ready act in acts
+ followed by odUnitActs
+ followed by doUnitActs()
+
+ow schedule incoming continuation
+ 
+odUnitActs
+  t := s t, nzt := nzt - 1, acts <= timeEffect(acts,1) 
+  schedule continuation
+  
+doUnitAct calls python actor, waits4 reply, 
+with odUnitAct which updates ekb, and schedules continuation
+)
+***********************************************************************
+
+***(
+
+op mkActStr : Qid QidList -> String .
+eq mkActStr('mv, dir toks) = "mv" + " " + string(dir) .
+eq mkActStr('charge, amt toks) = "charge" + " " + string(amt) .
+eq mkActStr('charge, nil) = "charge 5"  .
+)
+
+op actTemplate : -> String .
+**** fetch object named id, not by definition
+eq actTemplate  =
+"(seq \
+  (invoke %id %act %args)\
+  (apply time.sleep (int 1))\
+  (apply send %mname %dname (concat %id \" \" (apply getTimeElapsed)))\
+  (if logging (apply writeLog %id))\
+)"
+.
+***(
+
+eq actTemplate  =
+"(let ((dobj (fetch \"%id\")))\
+   (if (isobject dobj)\
+    (seq (invoke dobj %act %args)\
+         (apply send %mname %dname (concat dobj \"\")))\
+    (apply send %mname %dname (concat \"unknown id: \" \"%id\")))\
+)"
+.
+)
+
+op contTemplate : -> String .
+
+eq contTemplate  = 
+"(seq \
+  (apply time.sleep (int 1))\
+  (apply send %mname %dname (concat %id \" \" (apply getTimeElapsed)))\
+  (if logging (apply writeLog %id))\
+)" .
+
+***(
+eq contTemplate  =
+"(let ((dobj (fetch \"%id\")))\
+  (apply time.sleep (int 1))\
+  (if (isobject dobj)\
+    (apply send %mname %dname (concat dobj \"\"))\
+    (apply send %mname %dname (concat \"unknown id: \" \"%id\")))\
+)"
+.
+)
+
+***(
+takeOff(id,alt)
+land(id)
+mv(id,dir(x,y,z),v)
+stop(id)
+continue(id)
+)
+op mkActStr : Qid Qid Qid Qid QidList -> String .
+ceq mkActStr(pyname, mname, id, 'continue, toks) =
+  fillTemplate(contTemplate,bindings)
+if bindings := 
+   (("%dname" :~ sqquote(id)),
+    ("%mname" :~ sqquote(mname)),
+    ("%id" :~ string(id)) ) .
+
+ceq mkActStr(pyname, mname, id, act, toks) =
+  fillTemplate(actTemplate,bindings)
+if bindings := 
+   (("%dname" :~ sqquote(id)),
+    ("%mname" :~ sqquote(mname)),
+    ("%id" :~ string(id)),
+    ("%act" :~ sqquote(act)),
+    ("%args" :~ mkActArgs(act,toks))
+   ) [owise] .  
+
+op mkActArgs : Qid QidList -> String .
+eq mkActArgs('mv, x y z v toks) = 
+     sqquote(x) + " " + sqquote(y) + " " + sqquote(z) + " " + sqquote(v) .
+eq mkActArgs('takeOff, amt toks) = sqquote(amt) .
+**** eq mkActArgs('charge, amt toks) = sqquote(amt) .
+**** eq mkActArgs('charge, nil) = squote("5") .
+eq mkActArgs(act,toks) = "" [owise] .
+eq mkActArgs('goToW, vx vy vz wx wy wz dur toks) = 
+     sqquote(vx) + " " + sqquote(vy) + " " + sqquote(vz) + " " +
+     sqquote(wx) + " " + sqquote(wy) + " " + sqquote(wz) + " " + sqquote(dur) .
+
+--- op mkActArgsDir : Qid -> String .
+--- eq mkActArgsDir('dir[x,y,z]) = sqquote(x) + " " +  sqquote(y) + " " +  sqquote(z) .
+
+**** assume bot/drone ids are constants or enumerated op <char> : Nat -> Id .
+op idT2id : Term -> Qid .
+eq idT2id(idchar[nT]) = qid(string(idchar) + string(natT2nat(nT),10)) .
+eq idT2id(id:Constant) = getName(id:Constant) .
+
+op id2IdT : Qid -> Term .
+eq id2IdT(id) = id2IdT(string(id)) .
+
+op id2IdT : String -> Term .
+ceq id2IdT(idstr) = 
+  (if isConst 
+  then mkConst(idchar,'Id)
+  else idchar[nat2natT(rat(argstr,10))] 
+  fi)
+if length(idstr) >= 1 
+/\ isConst := (length(idstr) == 1)
+/\ idchar := qid(substr(idstr,0,1))
+/\ argstr := substr(idstr,1,length(idstr))
+.
+
+eq id2IdT(idstr) = 'unk.Id [owise] .
+
+**** do one action; wait4 the result, update ekb, continue
+ eq isReq('doUnitAct) = true .
+ eq enabled(wait4s,req('doUnitAct,ql(id act toks),reqQ)) = 
+    not(waiting4(wait4s,id)) .
+
+**** if act is stop update  simStatus in es to be stop
+ crl[doUnitAct]:
+    [nil,
+     st(processing(req('doUnitAct, ql(id act toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+      [nil,  
+       st(ready, 
+         (wait4s !
+          wait4(id,nil, req('odUnitAct, ql(nil), 
+                          req('logreq,ql('doUnitAct id act toks),reqQ')) )),
+          reqQ, es',log),
+      outQ  pyname '\n mname '\n toks' maudePrompt ]
+ if mname := getMaudeName(es)
+ /\ pyname := getPyName(es)
+ /\ es' := (if (act == 'stop) 
+            then removeFromRunning(es,id)
+****  17jan18
+****        then addEntry(es,'qval,'simStatus,ql('stop))
+            else es
+            fi )
+ /\ str := mkActStr(pyname,mname,id,act,toks) 
+ /\ toks' := str2toks(str) .
+
+op removeFromRunning : ESet Qid -> ESet .
+ceq removeFromRunning(es,id) = 
+              addEntry(es,'qval,'running ,ql(removeQid(running,id)))
+if ql(running) := getVal(es,'qval, 'running, ql(nil)) .
+
+op removeQid : QidList Qid -> QidList .
+eq removeQid(toks id toks',id) = toks toks' .
+eq removeQid(toks,id) = toks [owise] .
+
+ eq isReq('odUnitAct) = true .
+ eq enabled(wait4s,req('odUnitAct,ql(id x y z dx dy dz v e toks),reqQ)) = true .
+
+ crl[odUnitAct]:
+    [nil,
+     st(processing(req('odUnitAct, 
+                       ql(id x y z dx dy dz v e dt toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+      [nil,  
+       st(ready, wait4s, (reqQ reqQ0),
+           updateEkbT(es,id,x,y,z,dx,dy,dz,v,e,dt),log),
+      outQ ] 
+    if reqQ0 :=   req('logreq,ql('odUnitAct id x y z v e dt toks), reqQ')
+                 .
+
+op updateEkbT : ESet Qid Qid Qid Qid Qid Qid Qid Qid Qid Qid -> ESet .
+ceq updateEkbT(es,id,x,y,z,dx,dy,dz,v,e,dt) =
+        addEntry(es,'tval,'envKB,tm(amodname,ekbT'))
+if tm(amodname,ekbT) := 
+       getVal(es,'tval,'envKB,tm('SOFT-AGENTS,'none.KB))
+/\ tm(modname,timeT) := getVal(es,'tval,'time,tm('amodname,'infty.TimeInf))  
+/\ idT := id2IdT(id)
+/\ xT := upTerm(float(string(x)))
+/\ yT := upTerm(float(string(y)))
+/\ zT := upTerm(float(string(z)))
+/\ dxT := upTerm(float(string(dx)))
+/\ dyT := upTerm(float(string(dy)))
+/\ dzT := upTerm(float(string(dz)))
+/\ vT := upTerm(float(string(v)))
+/\ eT := upTerm(float(rat(string(e),10)))
+/\ dtT := upTerm(float(string(dt)))  
+/\ res1?? := metaReduce([amodname],   
+                 'updateEkb[ekbT,idT,xT,yT,zT,dxT,dyT,dzT,vT,eT,dtT,timeT])
+/\ ekbT' := (if res1?? :: ResultPair then getTerm(res1??) else ekbT fi)
+.
+
+op doActs : ESet -> ESet .
+ceq doActs(es) = es' 
+if tm(amodname,aconfT) := 
+       getVal(es,'tval,'agentConf,tm('SOFT-AGENTS,'`{_`}['none.Conf]))
+  /\ res1?? := metaReduce([amodname],'envKB[aconfT])
+  /\ ekbT := (if res1?? :: ResultPair then getTerm(res1??) else 'none.KB fi)
+  /\ res2?? := metaReduce([amodname],'getTime['getConf[aconfT]])
+  /\ timeT :=  (if res2?? :: ResultPair 
+                then getTerm(res2??) 
+                else 'infty.TimeInf fi)
+  /\ res3?? := metaReduce([amodname],'mte['getConf[aconfT]])
+  /\ mteT :=  (if res3?? :: ResultPair 
+               then getTerm(res3??) 
+               else 'infty.TimeInf fi)
+  /\ res4?? := metaReduce([amodname],'effActs['getConf[aconfT]])
+  /\ actsT :=  (if res3?? :: ResultPair 
+               then getTerm(res4??) 
+               else 'none.EventSet fi)
+  /\ es' := addEntry( addEntry( addEntry( addEntry( addEntry(es,
+             'tval,'envKB,tm(amodname,ekbT)),
+             'tval,'time,tm(amodname,timeT)),
+             'tval,'mte,tm(amodname,mteT)), 
+             'tval,'nzt,tm(amodname,mteT)), 
+             'tval,'acts,tm(amodname,actsT))
+   .             
+             
+ eq isReq('doActs) = true .
+ eq enabled(wait4s,req('doActs,ql(toks),reqQ)) = true .
+ 
+ crl[doActs]:
+    [nil,
+     st(processing(req('doActs, ql(toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+     [nil,  
+       st(ready, wait4s,  (reqQ reqQ0), es',log),
+      outQ]
+  if es' := doActs(es)
+  /\ tm(amodname,mteT) := getVal(es','tval, 'mte, tm('NAT,'0.Zero))
+  /\  reqQ1 := req('odActs,ql(toks),reqQ')
+  /\  reqQ0 := (if hasSort([amodname],mteT,'NzTime)
+               then req('doUnitActs,ql(toks),reqQ1)
+               else reqQ'
+               fi)  .      
+
+
+ eq isReq('odActs) = true .
+ eq enabled(wait4s,req('odActs,ql(toks),reqQ)) = true .
+ 
+***** finishup
+**** aconf0 := updateEnv(ekb',timeEffect(aconf,nzt))
+**** aconf1 := shareKnowledge(aconf0)
+**** aconf2 := updateConf(aconf1) 
+ 
+ crl[odActs]:
+    [nil,
+     st(processing(req('odActs, ql(toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+     [nil,  
+       st(ready, wait4s,  (reqQ reqQ'),
+          addEntry(es,'tval,'agentConf,tm(amodname,'`{_`}[aconfT2])),
+          log),
+      outQ]
+  if tm(amodname,sconfT) := 
+       getVal(es,'tval,'agentConf,tm('SOFT-AGENTS,'`{_`}['none.Conf]))
+  /\ tm(amodname,ekbT) := 
+       getVal(es,'tval,'envKB,tm('SOFT-AGENTS,'none.KB))
+  /\ tm(modname,nztT) :=         
+        getVal(es,'tval,'mte,tm('amodname,'infty.TimeInf)) 
+  /\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+  /\ res?? := metaReduce([amodname],'getConf[sconfT])
+  /\ aconfT := (if res?? :: ResultPair 
+                 then getTerm(res??)
+                 else 'none.Conf fi)
+  /\ res0?? := 
+     (if (q == 'true)
+      then metaReduce([amodname],  
+                      'updateEnv[ekbT,'timeEffect[aconfT,nztT]])
+      else metaReduce([amodname],  
+                      'updateEnv[ekbT,'timeEffectN[aconfT,nztT]])
+     fi)                      
+  /\ aconfT0 := (if res0?? :: ResultPair 
+                 then getTerm(res0??)
+                 else aconfT fi)
+  /\ res1?? := metaReduce([amodname],'shareKnowledge[aconfT0])
+  /\ aconfT1 := (if res1?? :: ResultPair 
+                 then getTerm(res1??)
+                 else aconfT0 fi)
+  /\ res2?? := metaReduce([amodname],'updateConf[aconfT1])
+  /\ aconfT2 := (if res2?? :: ResultPair 
+                 then getTerm(res2??)
+                 else aconfT1 fi)
+  .
+    
+***(
+if nzT not NzTime done 
+ow 
+
+)  
+ eq isReq('doUnitActs) = true .
+ eq enabled(wait4s,req('doUnitActs,ql(toks),reqQ)) = true .
+ 
+ crl[doUnitActs]:
+    [nil,
+     st(processing(req('doUnitActs, ql(toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+     [nil,  
+       st(ready, wait4s,  (reqQ reqQ0), es,log),
+      outQ]
+  if tm(amodname,nztT) := 
+       getVal(es,'tval,'nzt,tm('SOFT-AGENTS,'infty.TimeInf))
+  /\ reqQ0 :=
+       (if hasSort([amodname],nztT,'NzTime)
+       then genUnitActReqs(es,reqQ')
+       else reqQ'
+       fi) .
+
+op genUnitActReqs : ESet  RequestQ -> RequestQ .
+ceq genUnitActReqs(es,reqQ) =
+      genUnitActReqsX(es,amodname,reqQ0,actTL)
+if tm(amodname,actsT) :=
+    getVal(es,'tval,'acts,tm('SOFT-AGENTS, 'none.EventSet))
+/\ actTL := actsT2actTL(actsT)
+/\ reqQ0 := req('odUnitActs,ql(nil),reqQ)
+.
+
+**** Act metatheory
+**** charge(id) @ 0 ; nzt
+****   op _@_;_ : Action Time Time -> DEvent . 
+****   op _@_ : Action Time -> DEvent . 
+**** assume action declarations have the form op act : Id .. -> Action [ctor]
+
+op actsT2actTL : Term -> TermList .
+eq actsT2actTL('none.EventSet) = empty .
+eq actsT2actTL('__[tl]) = tl .
+eq actsT2actTL(t) = t  [owise] .
+
+op getActTId : Term -> Qid .            
+op getActTAct : Term -> Qid .           
+op getActTArgs : Qid Term -> QidList .  
+op getActTDelay : Term -> Term .        
+
+eq getActTId('_@_;_[act[idT,tl],delayT,durT]) = idT2id(idT) .
+eq getActTAct('_@_;_[act[idT,tl],delayT,durT]) = act .
+eq getActTArgs(amodname,'_@_;_[act[idT,tl],delayT,durT]) = actArgs2QidL(amodname,tl) .
+eq getActTDelay('_@_;_[act[idT,tl],delayT,durT]) = delayT .
+
+eq getActTId('_@_[act[idT,tl],delayT]) = idT2id(idT) .
+eq getActTAct('_@_[act[idT,tl],delayT]) = act .
+eq getActTArgs(amodname,'_@_[act[idT,tl],delayT]) =   actArgs2QidL(amodname,tl) .
+eq getActTDelay('_@_[act[idT,tl],delayT]) = delayT .
+
+****!!!! For now arg is constant
+--- actArgs2QidL('MODEL-KNOWLEDGE,upTerm(dir(1.0,0.0,0.0))) .
+**** ff, int, dir,
+op actArgs2QidL : Qid TermList -> QidList .
+
+ceq actArgs2QidL(amodname,(t,tl)) = 
+        mkFloatT2Qid(t) actArgs2QidL(amodname,tl)
+ if hasSort([amodname],t,'FiniteFloat) .
+
+ceq actArgs2QidL(amodname,(t,tl)) = 
+        mkIntT2Qid(t) actArgs2QidL(amodname,tl)
+ if hasSort([amodname],t,'Int) .
+
+ceq actArgs2QidL(amodname,(t,tl)) = 
+      mkFloatT2Qid(xT) mkFloatT2Qid(yT) mkFloatT2Qid(zT)
+      actArgs2QidL(amodname,tl)
+ if hasSort([amodname],t,'Dir) 
+ /\ 'dir[xT,yT,zT] := t .
+
+***(
+ceq actArgs2QidL(amodname,(t,tl)) = getName(t) actArgs2QidL(amodname,tl)
+ if t :: Constant .
+)
+eq actArgs2QidL(amodname,(t,tl)) = actArgs2QidL(amodname,tl) [owise] . 
+eq actArgs2QidL(amodname,empty) =  nil .
+
+--- Function to convert float in exponential form into a valid string term
+op mkFloatT2Qid : Term -> Qid .
+eq mkFloatT2Qid(x) = qid(makeString(decFloat(downTerm(x,0.0),4))) .
+
+op mkIntT2Qid : Term -> Qid .
+eq mkIntT2Qid(t) = qid(string(downTerm(t,0),10)) .
+ 
+op genUnitActReqsX : ESet Qid RequestQ TermList -> RequestQ .
+eq genUnitActReqsX(es,amodname,reqQ, empty) = reqQ .
+eq genUnitActReqsX(es,amodname,reqQ, (tl,t)) = 
+    genUnitActReqsX(es,amodname, genUnitActReq(es,amodname,reqQ,t),tl) .
+
+op genUnitActReq : ESet Qid RequestQ Term -> RequestQ .
+ceq genUnitActReq(es,amodname,reqQ,actT) =
+  (if hasSort([amodname],delayT,'Zero)
+   then req('doUnitAct,ql(id act args),reqQ)
+   else reqQ fi)
+if id := getActTId(actT)
+/\ act := getActTAct(actT)
+/\ args := getActTArgs(amodname,actT)
+/\ delayT := getActTDelay(actT)
+.
+
+  
+***(
+inc time
+dec nzt
+passtime in actsT
+)
+  
+ eq isReq('odUnitActs) = true .
+ eq enabled(wait4s,req('odUnitActs,ql(toks),reqQ)) = true .
+ 
+ crl[odUnitActs]:
+    [nil,
+     st(processing(req('odUnitActs, ql(toks),reqQ')), 
+        wait4s,reqQ,es,log), 
+     outQ]
+      =>
+     [nil,  
+       st(ready, wait4s,  (reqQ reqQ0), es',log),
+      outQ]
+  if tm(amodname,nztT) := 
+       getVal(es,'tval,'nzt,tm('SOFT-AGENTS,'infty.TimeInf))
+  /\ tm(amodname,timeT) := 
+       getVal(es,'tval,'time,tm('SOFT-AGENTS,'infty.TimeInf))
+  /\ tm(amodname,actsT) := 
+       getVal(es,'tval,'acts,tm('SOFT-AGENTS,'none.EventSet))
+  /\ oneT := upTerm(1)
+  /\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+  /\ res0?? := metaReduce([amodname], 'sd[nztT,oneT])
+  /\ nztT1 := (if (res0?? :: ResultPair) then getTerm(res0??) else nztT fi)
+  /\ res1?? := metaReduce([amodname], 's_[timeT])
+  /\ timeT1 := (if (res1?? :: ResultPair) then getTerm(res1??) else timeT fi)
+  /\ res2?? := (if (q == 'true)
+                then metaReduce([amodname], 'timeEffect[actsT,oneT])
+                else metaReduce([amodname], 'timeEffectN[actsT,oneT])
+                fi)
+  /\ actsT1 := (if (res2?? :: ResultPair) then getTerm(res2??) else actsT fi)
+  /\ es' := addEntry(addEntry(addEntry(es,
+                    'tval,'nzt,tm(amodname,nztT1)),
+                    'tval,'time,tm(amodname,timeT1)),
+                    'tval,'acts,tm(amodname,actsT1))
+   /\ reqQ0 := req('doUnitActs,ql(nil),reqQ')
+  .
+***********************************************************************
+***** begin top level stats round
+***********************************************************************
+***********************************************************************
+***** (doRun Patrol g2d)
+**** doRun--set agentConf, rewrite til done, update randix, send result
+***********************************************************************
+
+ eq isReq('doRun) = true .
+ eq enabled(wait4s,req('doRun,ql(sname g2dvname toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[doRun]:
+   [nil,
+    st(processing(req('doRun, ql(sname g2dvname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready, wait4s,(reqQ reqQ0), es',log), 
+    outQ  ] 
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'initConf, tm(amodname,'`{_`}['none.Conf]))
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ res?? := metaReduce([amodname], 'upDateRand[aconfT,nT])
+/\ aconfT0 := (if res?? :: ResultPair
+               then getTerm(res??)
+               else aconfT fi)
+***** 17jan18 reset agentConf and running list
+/\ running := getIdsQL(amodname,aconfT)
+/\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
+                    'qval, 'running, ql(running))
+***** reset agentConf and simStatus ql(init)
+**** /\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
+****                    'qval, 'simStatus, ql('init))
+/\ pyname := getPyName(es)
+/\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+/\ ql(nq) := getVal(es,'qval,'simSteps,ql('1000))          
+/\ reqQ0 := (if q == 'true
+             then req('doMaudeSimRound, ql(nq),
+                      req('runOd,ql(g2dvname sname),
+                          reqQ'))
+             else req('resetSitl, ql(pyname), 
+                   req('doSimRound, ql(pyname nq),
+                    req('runOd,ql(g2dvname sname),
+                     reqQ')))
+            fi)  .
+
+
+ eq isReq('runOd) = true .
+ eq enabled(wait4s,req('runOd,ql(g2dvname sname toks),reqQ)) = 
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[runOd]:
+   [nil,
+    st(processing(req('runOd, ql(g2dvname sname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+      (wait4s ! 
+       wait4(g2dvname,sname,
+             req('logreq,ql('runOd g2dvname sname),reqQ'))), 
+       reqQ ,
+       es',
+       log), 
+        outQ  g2dvname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getObs[aconfT])
+/\ bT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+               else 'false.Bool fi)
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ tm(amodname, xT) := getVal(es,'tval, 'randInc, tm(amodname,'0.Zero))
+/\ res1?? := metaReduce([amodname], '_+_[nT,xT])
+/\ nT1 := (if res1?? :: ResultPair 
+           then getTerm(res1??) else nT fi)               
+/\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
+/\ str := (if q == 'true
+          then mkRunReplySingleExp(sname, bT)
+          else mkRunReplyExp(sname,mname, bT)
+          fi)
+/\ toks' := str2toks(str) .
+
+
+op runReplyTemplate : -> String .
+eq runReplyTemplate =
+     "(apply runConcurrentResult %sname %mname (apply makeDouble  %obs))" .
+
+op runReplyNTemplate : -> String .
+eq runReplyNTemplate = 
+     "(apply runConcurrentResult %sname %mname (array double %obs))"   .
+
+op mkRunReplyExp : Qid Qid Term -> String .
+**** true -- multi obs fill array template, false single obs
+eq mkRunReplyExp(sname,mname, 'br[bT, t]) =
+  fillTemplate((if bT == 'true.Bool 
+                then runReplyNTemplate
+                else runReplyTemplate fi),
+              (("%sname" :~ sqquote(sname)), 
+  						 ("%mname" :~ sqquote(mname)), 
+               ("%obs" :~ downTerm(t,"")))  ) .
+
+***********  non concurrent status
+op runReplySingleTemplate : -> String .
+eq runReplySingleTemplate =
+     "(apply runResult %sname (apply makeDouble  %obs))" .
+
+op runReplyNSingleTemplate : -> String .
+eq runReplyNSingleTemplate = 
+   "(apply runResult %sname (array double %obs))" 
+   .
+
+op mkRunReplySingleExp : Qid Term -> String .
+**** true -- multi obs fill array template, false single obs
+eq mkRunReplySingleExp(sname, 'br[bT, t]) =
+  fillTemplate((if bT == 'true.Bool 
+                then runReplyNSingleTemplate
+                else runReplySingleTemplate fi),
+	            (("%sname" :~ sqquote(sname)), 
+               ("%obs" :~ downTerm(t,"")))  ) .
+
+********************************************************************************
+***** reseting SITL
+********************************************************************************
+
+op idsT2idsQ : Qid Term -> QidList .
+op idTL2idsQ : Qid TermList -> QidList .
+eq idsT2idsQ(amodname,'__[tl]) = idTL2idsQ(amodname,tl) .
+eq idsT2idsQ(amodname,t) = 
+     if (hasSort([amodname],t,'Id)) then idT2id(t) else nil fi .
+eq idsT2idsQ(amodname,'none.IdSet) = nil .
+eq idTL2idsQ(amodname,empty) = nil .
+eq idTL2idsQ(amodname,(t,tl)) = idT2id(t) idTL2idsQ(amodname,tl) .
+
+op qids2lstr : QidList String -> String .
+eq qids2lstr(nil,str) = str .
+eq qids2lstr(q ql,str) = qids2lstr(ql,str + " " + sqquote(q)) . 
+
+ eq isReq('resetSitl) = true .
+ eq enabled(wait4s,req('resetSitl,ql(pyname toks),reqQ)) = 
+    not(waiting4(wait4s,pyname)) .
+
+crl[resetSitl]:
+   [nil,
+    st(processing(req('resetSitl, ql(pyname toks),reqQ')), 
+       wait4s,reqQ,es,log), 
+    outQ]
+     =>
+   [nil,  
+    st(ready,
+      (wait4s ! 
+       wait4(pyname,nil,
+             req('logreq,ql('resetSitl pyname),reqQ'))), 
+       reqQ ,
+       es,
+       log), 
+        outQ  pyname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) := 
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getIds[aconfT])
+/\ idsT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+               else 'none.IdSet fi)
+
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ str := mkResetSitlExp(amodname,pyname,mname,idsT)
+/\ toks' := str2toks(str) .
+               
+               
+
+op resetSitlTemplate : -> String .
+eq resetSitlTemplate  =
+"(seq \
+  (apply resetSitl (mklist %idlist))\
+  (apply send %mname %pyname \"OK\")\
+)"
+.
+
+op listTemplate : -> String .
+eq listTemplate = "(mklist %elts)" .
+
+op mkResetSitlExp : Qid Qid Qid Term -> String .
+ceq mkResetSitlExp(amodname,pyname,mname,idsT) =
+  fillTemplate(resetSitlTemplate,bindings)
+if  bindings := 
+   (("%pyname" :~ sqquote(pyname)),
+    ("%mname" :~ sqquote(mname)),
+    ("%idlist" :~ qids2lstr(idsT2idsQ(amodname,idsT),"")) ) .
+
+
+***********************************************************************
+***** end top level stats round
+***********************************************************************
+
+endm
