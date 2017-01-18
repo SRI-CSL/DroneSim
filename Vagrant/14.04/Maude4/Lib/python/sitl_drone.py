@@ -13,7 +13,7 @@ import pymavlink
 
 tracing = False
 
-binary_path = '/home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter'
+binary_path = '/home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter-quad'
 
 params_path = '/home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm'
 
