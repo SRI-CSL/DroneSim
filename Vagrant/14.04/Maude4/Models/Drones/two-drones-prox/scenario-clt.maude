@@ -153,6 +153,14 @@ eq stopSimulation = 5.0 .
 ops asys asys2 : Nat -> ASystem .
 eq asys(n) = { conf1 bound(n) } .
 
+
+op getIds : ASystem -> IdSet .
+eq getIds({ aconf }) = getIdsX(aconf, none)  .
+
+op getIdsX : Conf IdSet -> IdSet .
+eq getIdsX(aconf, ids) = ids [owise] .
+eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
+
 op upDateRand : ASystem Nat -> ASystem .
 eq upDateRand({[ eI | ekb ] aconf}, n) =
               {[ eI | upDateRandKB(ekb,n)] aconf} .

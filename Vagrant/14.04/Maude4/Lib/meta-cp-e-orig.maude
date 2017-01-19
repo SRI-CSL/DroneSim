@@ -13,7 +13,7 @@ var ee? : Entry? .
 vars log log'  : Log .
 vars es0 es es' es'' es1 : ESet .
 
-vars InQ OutQ outQ toks toks' rids args ql running : QidList .
+vars InQ OutQ outQ toks toks' rids args ql : QidList .
 vars q modname initname aname amodname mname g2dname g2dvname pyname sname
       maudename id reqid  gname  mphysics 
       act dir x y z dx dy dz v e dt idchar amt  status
@@ -113,23 +113,13 @@ ceq qid2NatT(q) =
 ****   initializes maudeName, g2dName, g2dVname 
 ****   initname should refer to a Conf not an ASystem
 **********************************************************************
-
-****17jan18clt
- 
-op getIdsQL : Qid Term -> QidList .
-ceq getIdsQL(amodname,aconfT) = idsT2idsQ(amodname,idsT)
-if res?? := metaReduce([amodname], 'getIds[aconfT])
-/\ idsT := (if (res?? :: ResultPair)
-               then getTerm(res??)
-               else 'none.IdSet fi)
-.
  
 op initAgentEset : ESet Qid Qid Qid Qid Qid Qid Qid QidList -> ESet .
 ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
                      amodname,initname,mphysics,toks) =
      addEntry(addEntry( addEntry( addEntry(
       addEntry( addEntry( addEntry( addEntry(
-       addEntry( addEntry( addEntry( addEntry(
+       addEntry( addEntry( addEntry(
         addEntry(es, 
                 'qval, 'maudeName, ql(maudename)), 
                 'qval, 'g2dName, ql(g2dname)), 
@@ -139,7 +129,6 @@ ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
                 'sval, 'globalCounter,sv("0")),
                 'qval, 'MaudePhysics, ql(mphysics)),
                 'qval, 'simStatus, ql('init)),
-                'qval, 'running, ql(running)),
                 'qval, 'simSteps, ql(nq)),
                 'tval, 'agentConf, tm(amodname,aconfT)),
                 'tval, 'envKB, tm(amodname,ekbT)),
@@ -155,7 +144,6 @@ ceq initAgentEset(es,maudename,g2dname,g2dvname,pyname,
                 then getTerm(res12??) 
                 else 'infty.TimeInf fi)
  /\ nq := (if (toks :: NeQidList) then head(toks) else '1000 fi)  
- /\ running := getIdsQL(amodname,aconfT)
 .
  
 eq isReq('initAgentEset) = true .
@@ -594,10 +582,9 @@ crl[doSimRound]:
        es,
        log), outQ  ] 
 if n := rat(string(nq),10)
-****17jan18 status >> running
-/\ ql(running) := getVal(es,'qval,'running, ql(nil))
+/\ ql(status) := getVal(es,'qval,'simStatus, ql('unknown))
 /\ reqQ0 :=
-    (if ( n :: Nat and n > 0 and running =/= nil) 
+    (if ( n :: Nat and n > 0 and status =/= 'stop) 
     then req('rewTilDone, ql('doTask),
              req('doActs, ql(nil),
                 req('doSimRound, ql(pyname qid(string(sd(n,1),10)) ),
@@ -624,9 +611,9 @@ crl[doMaudeSimRound]:
        es,
        log), outQ  ] 
 if n := rat(string(nq),10)
-/\ ql(running) := getVal(es,'qval,'running, ql(nil))
+/\ ql(status) := getVal(es,'qval,'simStatus, ql('unknown))
 /\ reqQ0 :=
-    (if ( n :: Nat and n > 0 and running =/= nil) 
+    (if ( n :: Nat and n > 0 and status =/= 'stop) 
     then req('rewTilDone, ql('doTask),
            req('rewTilDone, ql('timeStep),
              req('doMaudeSimRound, ql(qid(string(sd(n,1),10)) ),
@@ -797,22 +784,12 @@ eq id2IdT(idstr) = 'unk.Id [owise] .
  if mname := getMaudeName(es)
  /\ pyname := getPyName(es)
  /\ es' := (if (act == 'stop) 
-            then removeFromRunning(es,id)
-****  17jan18
-****        then addEntry(es,'qval,'simStatus,ql('stop))
+            then addEntry(es,'qval,'simStatus,ql('stop))
             else es
             fi )
  /\ str := mkActStr(pyname,mname,id,act,toks) 
  /\ toks' := str2toks(str) .
 
-op removeFromRunning : ESet Qid -> ESet .
-ceq removeFromRunning(es,id) = 
-              addEntry(es,'qval,'running ,ql(removeQid(running,id)))
-if ql(running) := getVal(es,'qval, 'running, ql(nil)) .
-
-op removeQid : QidList Qid -> QidList .
-eq removeQid(toks id toks',id) = toks toks' .
-eq removeQid(toks,id) = toks [owise] .
 
  eq isReq('odUnitAct) = true .
  eq enabled(wait4s,req('odUnitAct,ql(id x y z dx dy dz v e toks),reqQ)) = true .
@@ -1129,13 +1106,9 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
 /\ aconfT0 := (if res?? :: ResultPair
                then getTerm(res??)
                else aconfT fi)
-***** 17jan18 reset agentConf and running list
-/\ running := getIdsQL(amodname,aconfT)
-/\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
-                    'qval, 'running, ql(running))
 ***** reset agentConf and simStatus ql(init)
-**** /\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
-****                    'qval, 'simStatus, ql('init))
+/\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
+                    'qval, 'simStatus, ql('init))
 /\ pyname := getPyName(es)
 /\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
 /\ ql(nq) := getVal(es,'qval,'simSteps,ql('1000))          
