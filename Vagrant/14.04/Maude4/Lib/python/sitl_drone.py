@@ -111,9 +111,9 @@ class SitlDrone(object):
     def initialize(self, x=0, y=0):
         """ Initializes the drone, and readies it for takeoff.
 
-        The x and y should be floats or strings that are parseable as floats (ints are OK).
-        The drone is positioned delta x delta to the home location passed in to the constructor,
-        or the default location if no home is specified.
+        The x and y should be floats or strings that parse as floats (ints are OK).
+        The drone is positioned delta x East delta y North to the home location passed in to the constructor,
+        or the default location if no such home is specified.
         """
 
         self.setLocation(x,y)
