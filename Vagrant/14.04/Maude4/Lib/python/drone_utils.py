@@ -29,7 +29,7 @@ def get_location_metres(original_location, dNorth, dEast):
     if isinstance(original_location, dronekit.LocationGlobal):
         targetlocation = dronekit.LocationGlobal(newlat, newlon, original_location.alt)
     elif isinstance(original_location, dronekit.LocationGlobalRelative):
-        targetlocation = dronekit. LocationGlobalRelative(newlat, newlon, original_location.alt)
+        targetlocation = dronekit.LocationGlobalRelative(newlat, newlon, original_location.alt)
     else:
         raise Exception("Invalid Location object passed")
 

@@ -17,7 +17,13 @@ binary_path = '/home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter-qu
 
 params_path = '/home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm'
 
-home_default = '-7.162675,-34.817705,36,250'
+# Somewhere in Brazil.
+hd_latitude  = -7.162675
+hd_longitude = -34.817705
+hd_altitude  = 36
+hd_yaw       = 250
+
+home_default = '{0},{1},{2},{3}'.format(hd_latitude,hd_longitude,hd_altitude,hd_yaw)
 
 init_squark = """
 SitlDrone:
@@ -28,7 +34,6 @@ SitlDrone:
 \tdebug:            {4}
 \tspeedup:          {5}
 """
-
 class SitlDrone(object):
     """
     plambda lesson:
@@ -72,14 +77,10 @@ class SitlDrone(object):
         if self.debug:
             sys.stderr.write(init_squark.format(self.name, self.ino, self.binary, self.params, self.debug, self.speedup))
 
-        #<iam thinks these are  obsolete>
-        self.x = 0
-        self.y = 0
-        self.z = 0
+        #<iam thinks these are  obsolete; or should be>
         self.v = 0
         self.e = 10.0
-        self.altitude = 5
-        #</iam thinks these are  obsolete>
+        #</iam thinks these are  obsolete; or should be>
 
 
         self.vehicle = None
@@ -91,7 +92,35 @@ class SitlDrone(object):
         self.trace("getName")
         return self.name
 
-    def initialize(self):
+
+
+    def setLocation(self, x, y):
+        """ Sets the home location of the drone to be (delta x, delta y) from the current self.home location.
+
+        Unless set in the constructor, the self.home location is the global home_default location set above in the
+        preamble. This should of course take place prior to the call to initialize. We could also add (x,y) arguments
+        to initialize if so desired.
+        """
+        x = float(x)
+        y = float(y)
+        location = dronekit.LocationGlobal(hd_latitude, hd_longitude, hd_altitude)
+        location = drone_utils.get_location_metres(location, y, x)
+        self.home = '{0},{1},{2},{3}'.format(location.lat,location.lon,location.alt,hd_yaw)
+
+
+    def initialize(self, x=0, y=0):
+        """ Initializes the drone, and readies it for takeoff.
+
+        The x and y should be floats or strings that are parseable as floats (ints are OK).
+        The drone is positioned delta x delta to the home location passed in to the constructor,
+        or the default location if no home is specified.
+        """
+
+        self.setLocation(x,y)
+
+        if self.debug:
+            sys.stderr.write('\thome:             {0}\n'.format(self.home))
+
 
         self.spawn()
 
@@ -294,6 +323,9 @@ class SitlDrone(object):
 from sitl_drone import *
 
 x = SitlDrone("hello")
+
+x.setLocation(100,100)
+
 x.initialize()
 
 x.takeOff(5)

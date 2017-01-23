@@ -9,6 +9,14 @@
   ;; the 0 is the instance number (all ports depend on it)
   (let ((drone (apply Drone name ins mapP)))
     (setuid drone name)
+    ;;
+    ;; you can now pass in a delta to the initialize routine.
+    ;; x and y should be floats, or strings that look like floats.
+    ;; ints are ok too.
+    ;;
+    ;;(invoke drone "initialize" x y)
+    ;;
+    ;;
     (invoke drone "initialize")
     (define logging logP)
     (define logFile logFileName)
