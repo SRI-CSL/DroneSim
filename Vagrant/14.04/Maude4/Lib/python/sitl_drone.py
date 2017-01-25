@@ -98,8 +98,8 @@ class SitlDrone(object):
         """ Sets the home location of the drone to be (delta x, delta y) from the current self.home location.
 
         Unless set in the constructor, the self.home location is the global home_default location set above in the
-        preamble. This should of course take place prior to the call to initialize. We could also add (x,y) arguments
-        to initialize if so desired.
+        preamble. This should of course take place prior to the call to initialize. We also add optional (x,y) arguments
+        to initialize method.
         """
         x = float(x)
         y = float(y)
