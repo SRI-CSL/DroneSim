@@ -2,22 +2,30 @@
 
 (define Drone sitl_drone.SitlDrone)
 
-;; at some stage the x y z v e will be used.
-;; currently we drop them on the floor.
 ;;
-(define mkdrone (name ins mapP logP logFileName)
+;;  NOTE THE NEW ARGUMENTS TO mkdrone...
+;;  I (iam) have only updated Drones/two-drones
+;;  anything else will be broke.
+;;
+;;
+;;  delta_x: distance in meters (east) from default home
+;;  delat_y: distance in meters (north) from default home
+;;
+;;
+(define mkdrone (name ins delta_x delta_y mapP logP logFileName)
   ;; the 0 is the instance number (all ports depend on it)
   (let ((drone (apply Drone name ins mapP)))
     (setuid drone name)
     ;;
     ;; you can now pass in a delta to the initialize routine.
     ;; x and y should be floats, or strings that look like floats.
-    ;; ints are ok too.
+    ;; ints or strings that look like ints are ok too.
     ;;
     ;;(invoke drone "initialize" x y)
     ;;
     ;;
-    (invoke drone "initialize")
+	;; the default is x = 0 and y = 0
+    (invoke drone "initialize" delta_x delta_y)
     (define logging logP)
     (define logFile logFileName)
     drone))
