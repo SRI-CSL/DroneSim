@@ -69,6 +69,9 @@ class SitlDrone(object):
         self.speedup = int(speedup) if speedup is not None else None
         self.binary = binary
         self.params = params
+        self.delta_x = 0
+        self.delta_y = 0
+        self.origin = dronekit.LocationGlobal(hd_latitude, hd_longitude, hd_altitude)
         self.home = home
 
 
@@ -94,17 +97,17 @@ class SitlDrone(object):
 
 
 
-    def setLocation(self, x, y):
+    def setOrigin(self, x, y):
         """ Sets the home location of the drone to be (delta x, delta y) from the current self.home location.
 
         Unless set in the constructor, the self.home location is the global home_default location set above in the
         preamble. This should of course take place prior to the call to initialize. We also add optional (x,y) arguments
         to initialize method.
         """
-        x = float(x)
-        y = float(y)
-        location = dronekit.LocationGlobal(hd_latitude, hd_longitude, hd_altitude)
-        location = drone_utils.get_location_metres(location, y, x)
+        self.delta_x = float(x)
+        self.delta_y = float(y)
+        location = self.origin
+        location = drone_utils.get_location_metres(location, self.delta_y, self.delta_x)
         self.home = '{0},{1},{2},{3}'.format(location.lat,location.lon,location.alt,hd_yaw)
 
 
@@ -116,7 +119,7 @@ class SitlDrone(object):
         or the default location if no such home is specified.
         """
 
-        self.setLocation(x,y)
+        self.setOrigin(x,y)
 
         if self.debug:
             sys.stderr.write('\thome:             {0}\n'.format(self.home))
@@ -280,8 +283,8 @@ class SitlDrone(object):
     def data(self):
         retval = {}
         if self.vehicle is not None and self.vehicle.location.local_frame.north is not None:
-            retval['north'] = self.vehicle.location.local_frame.north
-            retval['east'] = self.vehicle.location.local_frame.east
+            retval['north'] = self.vehicle.location.local_frame.north + self.delta_y
+            retval['east'] = self.vehicle.location.local_frame.east + self.delta_x
             retval['alt'] = -self.vehicle.location.local_frame.down
             retval['auxVel'] = self.vehicle.velocity
             retval['bat'] = self.vehicle.battery.level
@@ -296,6 +299,9 @@ class SitlDrone(object):
                 retval['dy'] /= retval['vel']
                 retval['dz'] /= retval['vel']
         return retval
+
+
+
 
     def __str__(self):
         d = self.data()
