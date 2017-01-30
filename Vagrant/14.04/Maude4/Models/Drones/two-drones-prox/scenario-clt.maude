@@ -297,6 +297,20 @@ op asys3 : -> ASystem .
 eq asys3 = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
                    maxSep(20,pt(0,0,0),pt(10,10,0)) } .
 
+
+op locHor : -> LocList .
+eq locHor = mkLoc(100.0,0.0,5.0) ; mkLoc(300.0,0.0,5.0)
+           ; mkLoc(500.0,0.0,5.0) ; mkLoc(1000.0,0.0,5.0) .
+
+op confHor : -> Conf .
+eq confHor = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locHor)
+           mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
+
+op asysHor : -> ASystem .
+eq asysHor = { confHor minSep(20,pt(0,0,0),pt(10,10,0))
+                   maxSep(20,pt(0,0,0),pt(10,10,0)) } .
+
 **** with tracks
 op asys3a : -> ASystem .
 eq asys3a = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))

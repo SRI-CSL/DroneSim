@@ -83,6 +83,13 @@ eq costMv(v) = (if v < 3.0 then .125 else .25 fi) .
      else  dt * 0.25
      fi .
 
+*** SITL cost
+ --- eq costMvZ(v,dt) = 
+ ---  if (v > 0.0)
+ ---  then 2.0 / 6.11827 - 4.429001 = 1.1834319526627217
+ ---  else 4.0 / 8.41851 - 6.11827 = 1.7391304347826089
+
+
 
 **** ekb has current velocity vel
 op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
