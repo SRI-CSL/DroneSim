@@ -1,0 +1,109 @@
+Maude Physics Experiments using:
+
+Our goal is to adjust the cost of moving so that the maude physic roughly matches the SITL results (taken from file ../two-drones-prox/tests.txt):
+
+no wind using asys3:
+
+ops locs1 locs2 locs1p : -> LocList .
+eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
+           ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
+
+eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
+           ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
+
+op asys3 : -> ASystem .
+eq asys3 = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
+                   maxSep(20,pt(0,0,0),pt(10,10,0)) } .
+
+
+visitTimes(b(0),pt(10,30,5),6 ; 41)@ 41)
+(visitTimes(b(0),pt(50,10,5),30)@ 30)
+(visitTimes(b(0),pt(-20,50,5),13 ; 47)@ 47)
+(visitTimes(b(0),pt(-40,5,5),19)@ 19)
+
+(visitTimes(b(1), pt(10,-30,10),6 ; 43)@ 43)
+(visitTimes(b(1),pt(40,-10,10),11 ; 48)@ 48)
+(visitTimes(b(1),pt(-35,-5,10),23 ; 35)@ 35)
+(visitTimes(b(1),pt(-40,-40,10),27)@ 27)
+
+====================================================
+
+Experiment 1:
+
+
+eq costMv(v) = (if v < 3.0 then 1.30 else 1.49 fi) .
+
+**** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+ eq costMvZ(v,dt) = 
+     if (v > 0.0) 
+     then  dt * 1.57  --- for sitl replace by 1.57 if up 
+     else  dt * 1.15 --- for sitl replace by 1.15 going down
+     fi .
+
+Ending configuration for asys3:
+No Wind
+
+[eI
+  | clock(76) class(b(0), Bot) class(b(1), Bot) (timeElapsed(7.6e+1) @ 76) (rand(
+    304) @ 76) (atloc(b(0), pt(0, 0, 0)) @ 75) (atloc(b(1), pt(12, 10, 0)) @ 76) (
+    energy(b(0), 0.0) @ 75) (energy(b(1), 4.0000000000106173e-2) @ 76) (vel(b(0), 5.0) @
+    0) (vel(b(1), 5.0) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(76) class(b(0), Bot) (timeElapsed(7.6e+1) @ 76) (rand(380) @ 76) (atloc(
+    b(0), pt(0, 0, 0)) @ 75) (pending(b(0), goToW(b(0), pt(0, 0, 0), 5.0)) @ 77) (
+    energy(b(0), 0.0) @ 75) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(
+    b(0), 5.0) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(10, 30, 5) ; pt(-20, 50,
+    5) ; pt(-40, 5, 5), pt(50, 10, 5)) @ 39) (visitTimes(b(0), pt(10, 30, 5), 20) @ 20)
+    (visitTimes(b(0), pt(50, 10, 5), 12) @ 12) (visitTimes(b(0), pt(-20, 50, 5), 27) @
+    27) (visitTimes(b(0), pt(-40, 5, 5), 38) @ 38) (eLoc(b(0), pt(0, 0, 0), 66 ; 70 ; 72
+    ; 74) @ 73) (eLoc(b(0), pt(10, 30, 5), 21) @ 12) (eLoc(b(0), pt(50, 10, 5), 11 ; 56)
+    @ 38) (eLoc(b(0), pt(-20, 50, 5), 28) @ 20) (eLoc(b(0), pt(-40, 5, 5), 37) @ 27)
+    myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(0, 0, 0)) @ 75),
+  evs : ((tick @ 1) goToW(b(0), pt(0, 0, 0), 5.0) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(76) class(b(1), Bot) (timeElapsed(7.6e+1) @ 76) (rand(456) @ 76) (atloc(
+    b(1), pt(12, 10, 0)) @ 76) (pending(b(1), land(b(1))) @ 77) (energy(b(1),
+    4.0000000000106173e-2) @ 76) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0)
+    (vel(b(1), 5.0) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(-40, -40, 10) ; pt(
+    -35, -5, 10) ; pt(10, -30, 10), pt(40, -10, 10)) @ 49) (visitTimes(b(1), pt(10, -30,
+    10), 48) @ 48) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(b(1), pt(
+    -35, -5, 10), 38) @ 38) (visitTimes(b(1), pt(-40, -40, 10), 30) @ 30) (eLoc(b(1),
+    pt(10, 10, 0), 63 ; 66 ; 70 ; 72 ; 76) @ 75) (eLoc(b(1), pt(10, -30, 10), 48) @ 38)
+    (eLoc(b(1), pt(40, -10, 10), 9 ; 55) @ 48) (eLoc(b(1), pt(-35, -5, 10), 37) @ 30) (
+    eLoc(b(1), pt(-40, -40, 10), 27) @ 10) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(12, 10, 0)) @ 76),
+  evs : ((tick @ 1) land(b(1)) @ 0)]
+  minSep(2, pt(20, 4, 5), pt(22, 4, 10))
+  maxSep(95, pt(-18, 49, 5), pt(-28, -36, 10))}
+
+
+Visit times:
+Too conservative in energy consumption. Fewer points being visited!
+(visitTimes(b(0), pt(10, 30, 5), 20) @ 20)
+(visitTimes(b(0), pt(50, 10, 5), 12) @ 12) 
+(visitTimes(b(0), pt(-20, 50, 5), 27) @ 27) 
+(visitTimes(b(0), pt(-40, 5, 5), 38) @ 38)
+
+(visitTimes(b(1), pt(10, -30, 10), 48) @ 48) 
+(visitTimes(b(1), pt(40, -10, 10), 10) @ 10) 
+(visitTimes(b(1), pt(-35, -5, 10), 38) @ 38) 
+(visitTimes(b(1), pt(-40, -40, 10), 30) @ 30)
+
+===============================================
+
+Experiment 2:
+
+*** Using values inferred from SITL experiments
+*** The value for hovering is not well supported.
+eq costMv(v) = (if v < 3.0 then 1.30 * 0.9 else 1.49 * 0.9 fi) .
+
+**** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+ eq costMvZ(v,dt) = 
+     if (v > 0.0) 
+     then  dt * 1.57 * 0.9  --- for sitl replace by 1.57 if up 
+     else  dt * 1.15 * 0.9 --- for sitl replace by 1.15 going down
+     fi .
+
+
+

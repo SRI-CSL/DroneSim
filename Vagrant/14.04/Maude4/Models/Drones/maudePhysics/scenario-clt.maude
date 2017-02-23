@@ -72,24 +72,29 @@ Assume .5 for taking off
 
  **** for 1 sec     
 ***  op costMv : FiniteFloat -> FiniteFloat .
-eq costMv(v) = (if v < 3.0 then .125 else .25 fi) .
-**** eq costMv(v) = 0.06 . --- consumes x percent battery per meter
+--- eq costMv(v) = (if v < 3.0 then .125 else .25 fi) .
 
+**** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+ --- eq costMvZ(v,dt) = 
+     --- if (v > 0.0) 
+     --- then  dt * 0.5  --- for sitl replace by 1.57 if up 
+     --- else  dt * 0.25 --- for sitl replace by 1.15 going down
+     --- fi .
+
+
+op reducedFactor : -> FiniteFloat .
+eq reducedFactor = 1.0 .
+
+*** Using values inferred from SITL experiments
+*** The value for hovering is not well supported.
+eq costMv(v) = (if v < 3.0 then 1.30 * reducedFactor else 1.49 * reducedFactor fi) .
 
 **** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
  eq costMvZ(v,dt) = 
      if (v > 0.0) 
-     then  dt * 0.5
-     else  dt * 0.25
+     then  dt * 1.57 * reducedFactor  --- for sitl replace by 1.57 if up 
+     else  dt * 1.15 * reducedFactor --- for sitl replace by 1.15 going down
      fi .
-
-*** SITL cost
- --- eq costMvZ(v,dt) = 
- ---  if (v > 0.0)
- ---  then 2.0 / 6.11827 - 4.429001 = 1.1834319526627217
- ---  else 4.0 / 8.41851 - 6.11827 = 1.7391304347826089
-
-
 
 **** ekb has current velocity vel
 op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
@@ -344,8 +349,8 @@ eq stopSimulation = 5.0 .
 --- eq act(id,kb) = actSCP(id,kb) .
 
 eq act(id,kb) = actBasic(id,kb) .
-eq nextLoc(id,kb) = nextLocSimple(id,kb) .
---- eq nextLoc(id,kb) = nextLocSCP(id,kb) .
+--- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
+eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
 
 endm

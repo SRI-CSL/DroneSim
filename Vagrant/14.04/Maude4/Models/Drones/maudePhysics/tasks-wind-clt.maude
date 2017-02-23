@@ -336,7 +336,6 @@ eq isGoTo(goToW(id,loc,v), loc) = true .
 eq isGoTo(goTo(id,loc), loc) = true .
 eq isGoTo(act,loc) = false [owise] .
 
-****!!!! owise tag missing!!!!
 op recentVisit : Loc KB FiniteFloat -> Bool .
 eq recentVisit(loc,(lastVisit(id,loc,dt1) @ t) kb,dt2) = dt2 - dt1 < 3.0 .
 eq recentVisit(loc,kb,dt2) = false [owise] .

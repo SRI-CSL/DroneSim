@@ -1,7 +1,7 @@
 mod SCENARIO is
   inc MODEL-ACTIONS  .
   inc SOFT-AGENT-RULES .
-   inc PRETTY .
+  inc PRETTY .
   --- inc SOLVE-SCP{valuation2valpatrolonly} . 
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
@@ -260,13 +260,8 @@ eq stopSimulation = 5.0 .
 --- eq act(id,kb) = actSCP(id,kb) .
 eq act(id,kb) = actBasic(id,kb) .
 
-<<<<<<< HEAD
 eq nextLoc(id,kb) = nextLocSimple(id,kb) .
 --- eq nextLoc(id,kb) = nextLocSCP(id,kb) .
-=======
---- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
-eq nextLoc(id,kb) = nextLocSCP(id,kb) .
->>>>>>> 84719716b49b6a09ca8f10dc2f71a6468dd4ea40
 
 endm
 
