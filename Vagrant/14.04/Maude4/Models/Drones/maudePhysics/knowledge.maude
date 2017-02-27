@@ -350,7 +350,7 @@ eq locsdiff(locs1, nil)  = locs1 .
 
 
   op cost2loc : Loc Loc FiniteFloat -> FiniteFloat .
-  eq cost2loc(l0,l1,v) = distanceFF(l0,l1) * costMv(v) .
+  eq cost2loc(l0,l1,v) = (distanceFF(l0,l1) / v) * costMv(v) .
 
   op getLKB : Id Conf -> KB .
   eq getLKB(id:Id,[id:Id : cl:Class | lkb : kb:KB, attrs:AttributeSet] pc:Conf) = kb:KB .

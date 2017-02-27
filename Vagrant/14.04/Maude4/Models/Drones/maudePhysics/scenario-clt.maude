@@ -87,6 +87,7 @@ eq reducedFactor = 1.0 .
 
 *** Using values inferred from SITL experiments
 *** The value for hovering is not well supported.
+*** seems to be in energy per meter (Need to check this with carolyn)
 eq costMv(v) = (if v < 3.0 then 1.30 * reducedFactor else 1.49 * reducedFactor fi) .
 
 **** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
@@ -334,6 +335,22 @@ eq asys3c = { conf5 minSep(20,pt(0,0,0),pt(10,10,0))
                     mkTLs(b(0),locs1)                   
                     mkTLs(b(1),locs2)                   
                    } .
+
+**** with elocs
+op confSpeed35 : -> Conf .
+eq confSpeed35 = mkBB(0,0.0,0.0,0.0,35.0,100.0,20.0,5,locs1)
+           mkBB(1,10.0,10.0,0.0,35.0,100.0,20.0,10,locs2)
+           mkE2(0,0.0,0.0,0.0,35.0,100.0) . 
+
+
+
+op asysSpeed35 : -> ASystem .
+eq asysSpeed35 = { confSpeed35 minSep(20,pt(0,0,0),pt(10,10,0))
+                    maxSep(20,pt(0,0,0),pt(10,10,0)) 
+                    mkTLs(b(0),locs1)                   
+                    mkTLs(b(1),locs2)                   
+                   } .
+
 
 
 --- eq windThresh = round(float(rand.25) / 2.0) .

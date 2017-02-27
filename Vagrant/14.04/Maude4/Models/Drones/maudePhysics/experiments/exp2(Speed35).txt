@@ -1,0 +1,550 @@
+Maude Physics Experiments using:
+
+Our goal is to adjust the cost of moving so that the maude physic roughly matches the SITL results (taken from file ../two-drones-prox/tests.txt):
+
+no wind using asys3:
+
+ops locs1 locs2 locs1p : -> LocList .
+eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
+           ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
+
+eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
+           ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
+
+**** with elocs
+op confSpeed35 : -> Conf .
+eq confSpeed35 = mkBB(0,0.0,0.0,0.0,35.0,100.0,20.0,5,locs1)
+           mkBB(1,10.0,10.0,0.0,35.0,100.0,20.0,10,locs2)
+           mkE2(0,0.0,0.0,0.0,35.0,100.0) . 
+
+
+
+op asysSpeed35 : -> ASystem .
+eq asysSpeed35 = { confSpeed35 minSep(20,pt(0,0,0),pt(10,10,0))
+                    maxSep(20,pt(0,0,0),pt(10,10,0)) 
+                    mkTLs(b(0),locs1)                   
+                    mkTLs(b(1),locs2)                   
+                   } .
+
+
+visitTimes(b(0),pt(10,30,5),6 ; 41)@ 41)
+(visitTimes(b(0),pt(50,10,5),30)@ 30)
+(visitTimes(b(0),pt(-20,50,5),13 ; 47)@ 47)
+(visitTimes(b(0),pt(-40,5,5),19)@ 19)
+
+(visitTimes(b(1), pt(10,-30,10),6 ; 43)@ 43)
+(visitTimes(b(1),pt(40,-10,10),11 ; 48)@ 48)
+(visitTimes(b(1),pt(-35,-5,10),23 ; 35)@ 35)
+(visitTimes(b(1),pt(-40,-40,10),27)@ 27)
+
+====================================================
+
+Experiment 1:
+
+Because of the high speed the drone is making circles around a target point.
+
+rew[80] asysSpeed35 .
+rewrite [80] in SCENARIO : asysSpeed35 .
+rewrites: 99289 in 72ms cpu (70ms real) (1379013 rewrites/second)
+result ASystem: {
+[eI
+  | clock(26) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    2.6e+1) @ 26) (rand(104) @ 26) (atloc(b(0), pt(18, 50, 5)) @ 26) (
+    atloc(b(1), pt(11, 8, 0)) @ 26) (energy(b(0),
+    6.1180000000000121e+1) @ 26) (energy(b(1), 7.6000000000000085e+1) @
+    26) (vel(b(0), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @ 0) wind(1.0, 0.0,
+    0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(26) class(b(0), Bot) (timeElapsed(2.6e+1) @ 26) (rand(
+    130) @ 26) (atloc(b(0), pt(18, 50, 5)) @ 26) (pending(b(0), goToW(
+    b(0), pt(10, 30, 5), 3.5e+1)) @ 2) (energy(b(0),
+    6.1180000000000121e+1) @ 26) (caution(b(0), 2.0e+1) @ 0) (
+    targetVel(b(0), 3.5e+1) @ 0) (vel(b(0), 3.5e+1) @ 0) (wind(1.0,
+    0.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(
+    -20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30,
+    5), nil) @ 0) (visitTimes(b(0), pt(50, 10, 5), nil) @ 0) (
+    visitTimes(b(0), pt(-20, 50, 5), nil) @ 0) (visitTimes(b(0), pt(
+    -40, 5, 5), nil) @ 0) (eLoc(b(0), pt(10, 30, 5), 2) @ 1) myHome(b(
+    0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(18, 50, 5)) @ 26),
+  evs : ((tick @ 1) goToW(b(0), -1.2998673672393631e+1,
+    -3.2496684180984083e+1, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(26) class(b(1), Bot) (timeElapsed(2.6e+1) @ 26) (rand(
+    156) @ 26) (atloc(b(1), pt(11, 8, 0)) @ 26) (pending(b(1), land(b(
+    1))) @ 27) (energy(b(1), 7.6000000000000085e+1) @ 26) (caution(b(
+    1), 2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @
+    0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(
+    -40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (
+    visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (visitTimes(b(1), pt(40,
+    -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35, -5, 10), nil) @ 0) (
+    visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (eLoc(b(1), pt(10, 10,
+    0), 6 ; 8 ; 12 ; 16 ; 20 ; 24) @ 24) (eLoc(b(1), pt(10, -30, 10),
+    4) @ 3) (eLoc(b(1), pt(40, -10, 10), 3 ; 5) @ 4) myHome(b(1), pt(
+    10, 10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(11, 8, 0)) @ 26),
+  evs : ((tick @ 1) land(b(1)) @ 0)]
+  minSep(13, pt(6, 17, 5), pt(11, 9, 0))
+  maxSep(84, pt(16, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), mtTL)
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)} ; {5,pt(40,
+    -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+
+cont 30
+
+result ASystem: {
+[eI
+  | clock(80) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    8.0e+1) @ 80) (rand(320) @ 80) (atloc(b(0), pt(7, 16, 0)) @ 80) (
+    atloc(b(1), pt(11, 8, 0)) @ 79) (energy(b(0), 0.0) @ 80) (energy(b(
+    1), 3.726000000000009e+1) @ 79) (vel(b(0), 3.5e+1) @ 0) (vel(b(1),
+    3.5e+1) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(80) class(b(0), Bot) (timeElapsed(7.9e+1) @ 79) (rand(
+    395) @ 79) (atloc(b(0), pt(7, 16, 0)) @ 77) (pending(b(0), land(b(
+    0))) @ 80) (energy(b(0), 0.0) @ 77) (caution(b(0), 2.0e+1) @ 0) (
+    targetVel(b(0), 3.5e+1) @ 0) (vel(b(0), 3.5e+1) @ 0) (wind(1.0,
+    0.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(
+    -20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30,
+    5), nil) @ 0) (visitTimes(b(0), pt(50, 10, 5), nil) @ 0) (
+    visitTimes(b(0), pt(-20, 50, 5), nil) @ 0) (visitTimes(b(0), pt(
+    -40, 5, 5), nil) @ 0) (eLoc(b(0), pt(0, 0, 0), 67 ; 69 ; 72 ; 75 ;
+    78) @ 78) (eLoc(b(0), pt(10, 30, 5), 2) @ 1) myHome(b(0), pt(0, 0,
+    0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(7, 16, 0)) @ 77),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(80) class(b(1), Bot) (timeElapsed(7.9e+1) @ 79) (rand(
+    474) @ 79) (atloc(b(1), pt(11, 8, 0)) @ 79) (pending(b(1), stop(b(
+    1))) @ 80) (energy(b(1), 3.726000000000009e+1) @ 79) (caution(b(1),
+    2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @ 0)
+    (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40,
+    -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (
+    visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (visitTimes(b(1), pt(40,
+    -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35, -5, 10), nil) @ 0) (
+    visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (eLoc(b(1), pt(10, 10,
+    0), 6 ; 8 ; 12 ; 16 ; 20 ; 24 ; 28 ; 32 ; 36 ; 40 ; 44 ; 48 ; 52 ;
+    56 ; 60 ; 64 ; 68 ; 72 ; 76) @ 76) (eLoc(b(1), pt(10, -30, 10), 4)
+    @ 3) (eLoc(b(1), pt(40, -10, 10), 3 ; 5) @ 4) myHome(b(1), pt(10,
+    10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(11, 8, 0)) @ 79),
+  evs : (tick @ 0)]
+  minSep(12, pt(7, 16, 0), pt(11, 8, 0))
+  maxSep(84, pt(16, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), mtTL)
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)} ; {5,pt(40,
+    -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+
+cont 100 .
+rewrites: 111049 in 108ms cpu (107ms real) (1028231 rewrites/second)
+result ASystem: {
+[eI
+  | clock(60) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    6.0e+1) @ 60) (rand(240) @ 60) (atloc(b(0), pt(16, 50, 5)) @ 60) (
+    atloc(b(1), pt(11, 8, 0)) @ 59) (energy(b(0),
+    1.0520000000000099e+1) @ 60) (energy(b(1), 5.216000000000011e+1) @
+    59) (vel(b(0), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @ 0) wind(1.0, 0.0,
+    0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(60) class(b(0), Bot) (timeElapsed(5.9e+1) @ 59) (rand(
+    295) @ 59) (atloc(b(0), pt(6, 17, 5)) @ 59) (pending(b(0), goToW(b(
+    0), pt(10, 30, 5), 3.5e+1)) @ 2) (energy(b(0),
+    1.2010000000000099e+1) @ 59) (caution(b(0), 2.0e+1) @ 0) (
+    targetVel(b(0), 3.5e+1) @ 0) (vel(b(0), 3.5e+1) @ 0) (wind(1.0,
+    0.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(
+    -20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30,
+    5), nil) @ 0) (visitTimes(b(0), pt(50, 10, 5), nil) @ 0) (
+    visitTimes(b(0), pt(-20, 50, 5), nil) @ 0) (visitTimes(b(0), pt(
+    -40, 5, 5), nil) @ 0) (eLoc(b(0), pt(10, 30, 5), 2) @ 1) myHome(b(
+    0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(6, 17, 5)) @ 59),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(60) class(b(1), Bot) (timeElapsed(5.9e+1) @ 59) (rand(
+    354) @ 59) (atloc(b(1), pt(11, 8, 0)) @ 59) (pending(b(1), stop(b(
+    1))) @ 60) (energy(b(1), 5.216000000000011e+1) @ 59) (caution(b(1),
+    2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @ 0)
+    (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40,
+    -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (
+    visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (visitTimes(b(1), pt(40,
+    -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35, -5, 10), nil) @ 0) (
+    visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (eLoc(b(1), pt(10, 10,
+    0), 6 ; 8 ; 12 ; 16 ; 20 ; 24 ; 28 ; 32 ; 36 ; 40 ; 44 ; 48 ; 52 ;
+    56) @ 56) (eLoc(b(1), pt(10, -30, 10), 4) @ 3) (eLoc(b(1), pt(40,
+    -10, 10), 3 ; 5) @ 4) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(11, 8, 0)) @ 59),
+  evs : (tick @ 0)]
+  minSep(13, pt(6, 17, 5), pt(11, 9, 0))
+  maxSep(84, pt(16, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), mtTL)
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)} ; {5,pt(40,
+    -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+
+
+cont 100 .
+rewrites: 124513 in 116ms cpu (113ms real) (1073387 rewrites/second)
+result ASystem: {
+[eI
+  | clock(93) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    9.3e+1) @ 93) (rand(372) @ 93) (atloc(b(0), pt(7, 16, 0)) @ 92) (
+    atloc(b(1), pt(-4, 39, 0)) @ 93) (energy(b(0), 0.0) @ 92) (energy(
+    b(1), 2.6830000000000091e+1) @ 93) (vel(b(0), 3.5e+1) @ 0) (vel(b(
+    1), 3.5e+1) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(93) class(b(0), Bot) (timeElapsed(9.3e+1) @ 93) (rand(
+    465) @ 93) (atloc(b(0), pt(7, 16, 0)) @ 92) (pending(b(0), goToW(b(
+    0), pt(0, 0, 0), 3.5e+1)) @ 94) (energy(b(0), 0.0) @ 92) (caution(
+    b(0), 2.0e+1) @ 0) (targetVel(b(0), 3.5e+1) @ 0) (vel(b(0), 3.5e+1)
+    @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(
+    10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(
+    b(0), pt(10, 30, 5), nil) @ 0) (visitTimes(b(0), pt(50, 10, 5),
+    nil) @ 0) (visitTimes(b(0), pt(-20, 50, 5), nil) @ 0) (visitTimes(
+    b(0), pt(-40, 5, 5), nil) @ 0) (eLoc(b(0), pt(0, 0, 0), 67 ; 69 ;
+    72 ; 75 ; 78 ; 81 ; 84 ; 87 ; 90 ; 93) @ 93) (eLoc(b(0), pt(10, 30,
+    5), 2) @ 1) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(7, 16, 0)) @ 92),
+  evs : ((tick @ 1) goToW(b(0), -1.4028659190689773e+1,
+    -3.2065506721576625e+1, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(93) class(b(1), Bot) (timeElapsed(9.2e+1) @ 92) (rand(
+    552) @ 92) (atloc(b(1), pt(11, 8, 0)) @ 91) (pending(b(1), goToW(b(
+    1), pt(10, 10, 0), 3.5e+1)) @ 93) (energy(b(1),
+    2.8320000000000089e+1) @ 91) (caution(b(1), 2.0e+1) @ 0) (
+    targetVel(b(1), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @ 0) (wind(1.0,
+    0.0, 0.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ;
+    pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (visitTimes(b(1), pt(
+    10, -30, 10), 4) @ 4) (visitTimes(b(1), pt(40, -10, 10), 3) @ 3) (
+    visitTimes(b(1), pt(-35, -5, 10), nil) @ 0) (visitTimes(b(1), pt(
+    -40, -40, 10), nil) @ 0) (eLoc(b(1), pt(10, 10, 0), 6 ; 8 ; 12 ; 16
+    ; 20 ; 24 ; 28 ; 32 ; 36 ; 40 ; 44 ; 48 ; 52 ; 56 ; 60 ; 64 ; 68 ;
+    72 ; 76 ; 80 ; 84 ; 88 ; 92) @ 92) (eLoc(b(1), pt(10, -30, 10), 4)
+    @ 3) (eLoc(b(1), pt(40, -10, 10), 3 ; 5) @ 4) myHome(b(1), pt(10,
+    10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(11, 8, 0)) @ 91),
+  evs : (tick @ 0)]
+  minSep(12, pt(7, 16, 0), pt(11, 8, 0))
+  maxSep(84, pt(16, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), mtTL)
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)} ; {5,pt(40,
+    -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+
+cont 100 .
+rewrites: 92850 in 80ms cpu (78ms real) (1160625 rewrites/second)
+result ASystem: {
+[eI
+  | clock(126) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    1.26e+2) @ 126) (rand(504) @ 126) (atloc(b(0), pt(7, 16, 0)) @ 125)
+    (atloc(b(1), pt(-4, 39, 0)) @ 126) (energy(b(0), 0.0) @ 125) (
+    energy(b(1), 2.9900000000000997) @ 126) (vel(b(0), 3.5e+1) @ 0) (
+    vel(b(1), 3.5e+1) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(126) class(b(0), Bot) (timeElapsed(1.26e+2) @ 126) (
+    rand(630) @ 126) (atloc(b(0), pt(7, 16, 0)) @ 125) (pending(b(0),
+    goToW(b(0), pt(0, 0, 0), 3.5e+1)) @ 127) (energy(b(0), 0.0) @ 125)
+    (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 3.5e+1) @ 0) (vel(b(
+    0), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(50,
+    10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0)
+    (visitTimes(b(0), pt(10, 30, 5), nil) @ 0) (visitTimes(b(0), pt(50,
+    10, 5), nil) @ 0) (visitTimes(b(0), pt(-20, 50, 5), nil) @ 0) (
+    visitTimes(b(0), pt(-40, 5, 5), nil) @ 0) (eLoc(b(0), pt(0, 0, 0),
+    67 ; 69 ; 72 ; 75 ; 78 ; 81 ; 84 ; 87 ; 90 ; 93 ; 96 ; 99 ; 102 ;
+    105 ; 108 ; 111 ; 114 ; 117 ; 120 ; 123 ; 126) @ 126) (eLoc(b(0),
+    pt(10, 30, 5), 2) @ 1) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(7, 16, 0)) @ 125),
+  evs : ((tick @ 1) goToW(b(0), -1.4028659190689773e+1,
+    -3.2065506721576625e+1, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(126) class(b(1), Bot) (timeElapsed(1.26e+2) @ 126) (
+    rand(756) @ 126) (atloc(b(1), pt(-4, 39, 0)) @ 126) (pending(b(1),
+    stop(b(1))) @ 127) (energy(b(1), 2.9900000000000997) @ 126) (
+    caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (vel(b(1),
+    3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(40, -10,
+    10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @
+    0) (visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (visitTimes(b(1), pt(
+    40, -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35, -5, 10), nil) @ 0)
+    (visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (eLoc(b(1), pt(10,
+    10, 0), 6 ; 8 ; 12 ; 16 ; 20 ; 24 ; 28 ; 32 ; 36 ; 40 ; 44 ; 48 ;
+    52 ; 56 ; 60 ; 64 ; 68 ; 72 ; 76 ; 80 ; 84 ; 88 ; 92 ; 96 ; 100 ;
+    104 ; 108 ; 112 ; 116 ; 120 ; 124) @ 124) (eLoc(b(1), pt(10, -30,
+    10), 4) @ 3) (eLoc(b(1), pt(40, -10, 10), 3 ; 5) @ 4) myHome(b(1),
+    pt(10, 10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(-4, 39, 0)) @ 126),
+  evs : ((tick @ 1) stop(b(1)) @ 0)]
+  minSep(12, pt(7, 16, 0), pt(11, 8, 0))
+  maxSep(84, pt(16, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), mtTL)
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)} ; {5,pt(40,
+    -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+
+======================================================
+Experiment 2:
+Changing the speed adjustment to:
+ eq adjustedSpeed(sp,wind?,ctheta) =
+      (if wind? 
+       then (if (ctheta > .5) 
+             then 2.0
+             else sp fi)
+        else 2.0 fi) .
+
+
+Needed to change how doAct evaluated energy consumption to % per second. 
+It was before % per meter:
+
+  op cost2loc : Loc Loc FiniteFloat -> FiniteFloat .
+  eq cost2loc(l0,l1,v) = (distanceFF(l0,l1) / v) * costMv(v) .
+
+It made the drone now go a bit further and visit some more points. However, 
+because of the high speed it is circling around a target point. 
+
+It circled at the point:
+
+rew[20] asysSpeed35 .
+rewrite [20] in SCENARIO : asysSpeed35 .
+rewrites: 35218 in 24ms cpu (23ms real) (1467416 rewrites/second)
+result ASystem: {
+[eI
+  | clock(6) class(b(0), Bot) class(b(1), Bot) (timeElapsed(6.0)
+    @ 6) (rand(24) @ 6) (atloc(b(0), pt(-46, -13, 5)) @ 6) (atloc(b(1),
+    pt(-52, 4, 10)) @ 6) (energy(b(0), 9.117000000000003e+1) @ 6) (
+    energy(b(1), 9.0900000000000034e+1) @ 6) (vel(b(0), 3.5e+1) @ 0) (
+    vel(b(1), 3.5e+1) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(6) class(b(0), Bot) (timeElapsed(6.0) @ 6) (rand(30) @
+    6) (atloc(b(0), pt(-46, -13, 5)) @ 6) (pending(b(0), goToW(b(0),
+    pt(-40, 5, 5), 3.5e+1)) @ 5) (energy(b(0), 9.117000000000003e+1) @
+    6) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 3.5e+1) @ 0) (vel(
+    b(0), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(50,
+    10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0)
+    (visitTimes(b(0), pt(10, 30, 5), 3) @ 3) (visitTimes(b(0), pt(50,
+    10, 5), nil) @ 0) (visitTimes(b(0), pt(-20, 50, 5), 4) @ 4) (
+    visitTimes(b(0), pt(-40, 5, 5), nil) @ 0) (eLoc(b(0), pt(10, 30,
+    5), 2) @ 1) (eLoc(b(0), pt(-20, 50, 5), 4) @ 3) (eLoc(b(0), pt(-40,
+    5, 5), 5) @ 4) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(-46, -13, 5)) @ 6),
+  evs : ((tick @ 1) goToW(b(0), 1.1067971810589327e+1,
+    3.3203915431767982e+1, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(6) class(b(1), Bot) (timeElapsed(6.0) @ 6) (rand(36) @
+    6) (atloc(b(1), pt(-52, 4, 10)) @ 6) (pending(b(1), goToW(b(1), pt(
+    -35, -5, 10), 3.5e+1)) @ 5) (energy(b(1), 9.0900000000000034e+1) @
+    6) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (vel(
+    b(1), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(40,
+    -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10),
+    nil) @ 0) (visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (visitTimes(b(
+    1), pt(40, -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35, -5, 10),
+    nil) @ 0) (visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (eLoc(b(1),
+    pt(10, -30, 10), 4) @ 3) (eLoc(b(1), pt(40, -10, 10), 3) @ 2) (
+    eLoc(b(1), pt(-35, -5, 10), 5) @ 4) myHome(b(1), pt(10, 10, 0))
+    myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(-52, 4, 10)) @ 6),
+  evs : ((tick @ 1) goToW(b(1), 3.0932577072147165e+1,
+    -1.6376070214666147e+1, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
+  minSep(20, pt(0, 0, 0), pt(10, 10, 0))
+  maxSep(110, pt(-20, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)} ; {3,pt(11, 32,
+    5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), {4,pt(-20, 50, 5)})
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+Maude> cont 5 .
+rewrites: 3330 in 0ms cpu (2ms real) (~ rewrites/second)
+result ASystem: {
+[eI
+  | clock(8) class(b(0), Bot) class(b(1), Bot) (timeElapsed(8.0)
+    @ 8) (rand(32) @ 8) (atloc(b(0), pt(-47, -14, 5)) @ 8) (atloc(b(1),
+    pt(-52, 4, 10)) @ 8) (energy(b(0), 8.819000000000004e+1) @ 8) (
+    energy(b(1), 8.7920000000000044e+1) @ 8) (vel(b(0), 3.5e+1) @ 0) (
+    vel(b(1), 3.5e+1) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(8) class(b(0), Bot) (timeElapsed(8.0) @ 8) (rand(40) @
+    8) (atloc(b(0), pt(-47, -14, 5)) @ 8) (pending(b(0), goToW(b(0),
+    pt(-40, 5, 5), 3.5e+1)) @ 5) (energy(b(0), 8.819000000000004e+1) @
+    8) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 3.5e+1) @ 0) (vel(
+    b(0), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(50,
+    10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0)
+    (visitTimes(b(0), pt(10, 30, 5), 3) @ 3) (visitTimes(b(0), pt(50,
+    10, 5), nil) @ 0) (visitTimes(b(0), pt(-20, 50, 5), 4) @ 4) (
+    visitTimes(b(0), pt(-40, 5, 5), nil) @ 0) (eLoc(b(0), pt(10, 30,
+    5), 2) @ 1) (eLoc(b(0), pt(-20, 50, 5), 4) @ 3) (eLoc(b(0), pt(-40,
+    5, 5), 5) @ 4) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(-47, -14, 5)) @ 8),
+  evs : ((tick @ 1) goToW(b(0), 1.2099687558957473e+1,
+    3.2842009088598857e+1, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
+[b(1) : Bot |
+  lkb : (clock(8) class(b(1), Bot) (timeElapsed(7.0) @ 7) (rand(42) @
+    7) (atloc(b(1), pt(-21, -13, 10)) @ 7) (pending(b(1), goToW(b(1),
+    pt(-35, -5, 10), 3.5e+1)) @ 5) (energy(b(1), 8.9410000000000039e+1)
+    @ 7) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (
+    vel(b(1), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(
+    40, -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30,
+    10), nil) @ 0) (visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (
+    visitTimes(b(1), pt(40, -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35,
+    -5, 10), nil) @ 0) (visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (
+    eLoc(b(1), pt(10, -30, 10), 4) @ 3) (eLoc(b(1), pt(40, -10, 10), 3)
+    @ 2) (eLoc(b(1), pt(-35, -5, 10), 5) @ 4) myHome(b(1), pt(10, 10,
+    0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(-21, -13, 10)) @ 7),
+  evs : (tick @ 0)]
+  minSep(20, pt(0, 0, 0), pt(10, 10, 0))
+  maxSep(110, pt(-20, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)} ; {3,pt(11, 32,
+    5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), {4,pt(-20, 50, 5)})
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+Maude> cont 5 .
+rewrites: 3349 in 4ms cpu (2ms real) (837250 rewrites/second)
+result ASystem: {
+[eI
+  | clock(10) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    1.0e+1) @ 10) (rand(40) @ 10) (atloc(b(0), pt(-46, -13, 5)) @ 10) (
+    atloc(b(1), pt(-52, 4, 10)) @ 10) (energy(b(0),
+    8.5210000000000051e+1) @ 10) (energy(b(1), 8.4940000000000055e+1) @
+    10) (vel(b(0), 3.5e+1) @ 0) (vel(b(1), 3.5e+1) @ 0) wind(1.0, 0.0,
+    0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(10) class(b(0), Bot) (timeElapsed(9.0) @ 9) (rand(45) @
+    9) (atloc(b(0), pt(-35, 19, 5)) @ 9) (pending(b(0), goToW(b(0), pt(
+    -40, 5, 5), 3.5e+1)) @ 5) (energy(b(0), 8.6700000000000045e+1) @ 9)
+    (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 3.5e+1) @ 0) (vel(b(
+    0), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(50,
+    10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0)
+    (visitTimes(b(0), pt(10, 30, 5), 3) @ 3) (visitTimes(b(0), pt(50,
+    10, 5), nil) @ 0) (visitTimes(b(0), pt(-20, 50, 5), 4) @ 4) (
+    visitTimes(b(0), pt(-40, 5, 5), nil) @ 0) (eLoc(b(0), pt(10, 30,
+    5), 2) @ 1) (eLoc(b(0), pt(-20, 50, 5), 4) @ 3) (eLoc(b(0), pt(-40,
+    5, 5), 5) @ 4) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(-35, 19, 5)) @ 9),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(10) class(b(1), Bot) (timeElapsed(9.0) @ 9) (rand(54) @
+    9) (atloc(b(1), pt(-21, -13, 10)) @ 9) (pending(b(1), goToW(b(1),
+    pt(-35, -5, 10), 3.5e+1)) @ 5) (energy(b(1), 8.6430000000000049e+1)
+    @ 9) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 3.5e+1) @ 0) (
+    vel(b(1), 3.5e+1) @ 0) (wind(1.0, 0.0, 0.0) @ 0) (targets(b(1), pt(
+    40, -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10, -30,
+    10), nil) @ 0) (visitTimes(b(1), pt(10, -30, 10), 4) @ 4) (
+    visitTimes(b(1), pt(40, -10, 10), 3) @ 3) (visitTimes(b(1), pt(-35,
+    -5, 10), nil) @ 0) (visitTimes(b(1), pt(-40, -40, 10), nil) @ 0) (
+    eLoc(b(1), pt(10, -30, 10), 4) @ 3) (eLoc(b(1), pt(40, -10, 10), 3)
+    @ 2) (eLoc(b(1), pt(-35, -5, 10), 5) @ 4) myHome(b(1), pt(10, 10,
+    0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(-21, -13, 10)) @ 9),
+  evs : (tick @ 0)]
+  minSep(20, pt(0, 0, 0), pt(10, 10, 0))
+  maxSep(110, pt(-20, 50, 5), pt(11, -29, 10))
+  track(b(0), pt(10, 30, 5), {2,pt(11, 33, 5)} ; {3,pt(11, 32,
+    5)})
+  track(b(0), pt(50, 10, 5), mtTL)
+  track(b(0), pt(-20, 50, 5), {4,pt(-20, 50, 5)})
+  track(b(0), pt(-40, 5, 5), mtTL)
+  track(b(1), pt(10, -30, 10), {4,pt(11, -29, 10)})
+  track(b(1), pt(40, -10, 10), {3,pt(39, -10, 10)})
+  track(b(1), pt(-35, -5, 10), mtTL)
+  track(b(1), pt(-40, -40, 10), mtTL)}
+
+
+===========================================
+
+Now with the corrected doAct. Retrying the asys3 experiments:
+
+
+rew[210] asys3 .
+rewrite [210] in SCENARIO : asys3 .
+rewrites: 182296 in 136ms cpu (136ms real) (1340411 rewrites/second)
+result ASystem: {
+[eI
+  | clock(70) class(b(0), Bot) class(b(1), Bot) (timeElapsed(
+    7.0e+1) @ 70) (rand(280) @ 70) (atloc(b(0), pt(-2, 0, 0)) @ 69) (
+    atloc(b(1), pt(10, 7, 0)) @ 70) (energy(b(0), 9.4400000000001043) @
+    69) (energy(b(1), 9.5500000000000966) @ 70) (vel(b(0), 5.0) @ 0) (
+    vel(b(1), 5.0) @ 0) wind(1.0, 0.0, 0.0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(70) class(b(0), Bot) (timeElapsed(6.9e+1) @ 69) (rand(
+    345) @ 69) (atloc(b(0), pt(-2, 0, 0)) @ 69) (pending(b(0), stop(b(
+    0))) @ 70) (energy(b(0), 9.4400000000001043) @ 69) (caution(b(0),
+    2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (wind(
+    1.0, 0.0, 0.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ;
+    pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10,
+    30, 5), 8) @ 8) (visitTimes(b(0), pt(50, 10, 5), 47) @ 47) (
+    visitTimes(b(0), pt(-20, 50, 5), 16) @ 16) (visitTimes(b(0), pt(
+    -40, 5, 5), 28) @ 28) (eLoc(b(0), pt(0, 0, 0), 57 ; 62 ; 64 ; 68) @
+    67) (eLoc(b(0), pt(10, 30, 5), 7) @ 1) (eLoc(b(0), pt(50, 10, 5),
+    46) @ 28) (eLoc(b(0), pt(-20, 50, 5), 15) @ 8) (eLoc(b(0), pt(-40,
+    5, 5), 26) @ 16) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(-2, 0, 0)) @ 69),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(70) class(b(1), Bot) (timeElapsed(6.9e+1) @ 69) (rand(
+    414) @ 69) (atloc(b(1), pt(10, 12, 0)) @ 68) (pending(b(1), goToW(
+    b(1), pt(10, 10, 0), 5.0)) @ 70) (energy(b(1),
+    1.1040000000000097e+1) @ 68) (caution(b(1), 2.0e+1) @ 0) (
+    targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (wind(1.0, 0.0, 0.0)
+    @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ; pt(-35,
+    -5, 10) ; pt(10, -30, 10), nil) @ 0) (visitTimes(b(1), pt(10, -30,
+    10), 18 ; 48) @ 48) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (
+    visitTimes(b(1), pt(-35, -5, 10), 28) @ 28) (visitTimes(b(1), pt(
+    -40, -40, 10), 37) @ 37) (eLoc(b(1), pt(10, 10, 0), 56 ; 59 ; 63 ;
+    67 ; 69) @ 69) (eLoc(b(1), pt(10, -30, 10), 17 ; 47) @ 37) (eLoc(b(
+    1), pt(40, -10, 10), 9) @ 2) (eLoc(b(1), pt(-35, -5, 10), 29) @ 18)
+    (eLoc(b(1), pt(-40, -40, 10), 35) @ 28) myHome(b(1), pt(10, 10, 0))
+    myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(10, 12, 0)) @ 68),
+  evs : (tick @ 0)]
+  minSep(8, pt(9, 2, 0), pt(10, 9, 0))
+  maxSep(108, pt(-18, 49, 5), pt(14, -27, 10))}
+
+  comparing with SITL visit times below:
+
+   SITL                                            MAUDE
+visitTimes(b(0),pt(10,30,5),6 ; 41)@ 41)     ---   time 8
+(visitTimes(b(0),pt(50,10,5),30)@ 30)        ---   time 47
+(visitTimes(b(0),pt(-20,50,5),13 ; 47)@ 47)  ---   time 16
+(visitTimes(b(0),pt(-40,5,5),19)@ 19)        ---   time 28
+
+(visitTimes(b(1), pt(10,-30,10),6 ; 43)@ 43) ---   time 48 
+(visitTimes(b(1),pt(40,-10,10),11 ; 48)@ 48) ---   time 10
+(visitTimes(b(1),pt(-35,-5,10),23 ; 35)@ 35) ---   time 28
+(visitTimes(b(1),pt(-40,-40,10),27)@ 27)     ---   time 27
+
+There are two problems with this analysis. The times in sitl seem to be 
+logical and timeelapsed. The second problem is that doAct in SITL might also be bugged. Need to check. 
+
