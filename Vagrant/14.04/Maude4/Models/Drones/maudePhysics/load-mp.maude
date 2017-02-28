@@ -5,8 +5,8 @@ load ../../../Lib/cp-e-rules
 load ../../../Lib/pretty
 load knowledge
 
-load scp-clt
-load tasks-wind-clt
+load scp
+load tasks-wind
 load actions
-load scenario-clt
+load scenario
 **** load analysis-stats
