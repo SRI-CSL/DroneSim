@@ -4,8 +4,8 @@ fmod MODEL-ACTIONS is
   vars t t' t0 t1 t2 : Time .
   var nzt : NzTime .
   vars id id' id0 : Id .
-  vars l0 l1 l2 l3 loc : Loc .
-  vars lkb ekb ekb' ekb0 : KB .
+  vars l0 l1 l2 l3 loc home : Loc .
+  vars lkb ekb ekb' ekb0 kb' : KB .
   var dir : Dir .
   var b b0 b1 b2 : Bool .
   var evs : EventSet .
@@ -98,7 +98,7 @@ Assume .5 for taking off
   ceq doUnitEnvAct(t, ekb, 
      (goToW(id,ffx1,ffy1,ffz1, ffx,ffy,ffz,dur) @ 0 ) evs)
    = doUnitEnvAct(t, addK(ekb,(atloc(id,l3) @ s(t)) 
-                              energy(id,e0) @ s(t)) , evs)
+                              energy(id,e0) @ s(t)) kb', evs)
   if l0 := getLoc(id,ekb)
   /\ pt(x0,y0,z0) := l0
   /\ dx := ffx1 + ffx
@@ -110,14 +110,13 @@ Assume .5 for taking off
               z0 + round(dz / gridStepZ))
   /\ e := getEnergy(id,ekb)
   /\ e0 := energyGoToW(e,sp)
-  /\ e0 > 0.0
   /\ l3 := (if occupied(l1,ekb) then l0 else l1 fi)
+  /\ kb' := if e0 > 0.0 then none else (crashed(id,l3,float(t)) @ s(t)) fi
   .
 
 **** costMv horizontal motion as sp for 1 unit
   op energyGoToW : FiniteFloat FiniteFloat  -> FiniteFloat .
   eq energyGoToW(e,v) = max(e - costMv(v),0.0) .  
-
 
 ***(
   op doMvU : Loc Dir FiniteFloat -> Loc .
@@ -159,13 +158,16 @@ Assume .5 for taking off
  **** cost of vertical move at speed v for dt.
 
  ceq doUnitEnvAct(t, ekb, (land(id) @ 0 ) evs)
-   = doUnitEnvAct(t, addK(ekb,(atloc(id,l1) @ s(t)) 
+   = doUnitEnvAct(t, addK(ekb,kb' (atloc(id,l1) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
  if pt(x0,y0,z0) := getLoc(id,ekb)
+ /\ home := getHome(id,ekb)
  /\ dz := landInc(float(z0) * gridStepZ,0.0,vland)
  /\ l1 := pt(x0,y0,z0 - round(dz * gridStepZ))
  /\ e := getEnergy(id,ekb)
  /\ e0 := energyLandU(e,vland, dz / vland)
+ /\ kb' := if near(pt(x0,y0,0),home) then none
+           else (landFarFromHome(id,pt(x0,y0,0),float(t)) @ s(t)) fi
   .
 
   op landInc : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
@@ -174,7 +176,6 @@ Assume .5 for taking off
 
  op energyLandU : FiniteFloat FiniteFloat FiniteFloat -> FiniteFloat .
  eq energyLandU(e,v,dt) = max(e - costMvZ(- v,dt),0.0) .  
-
 
 ***( 
  alt = 2  v = 3  alt - v neg so subtract alt

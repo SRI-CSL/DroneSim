@@ -12,7 +12,8 @@ fmod MODEL-KNOWLEDGE is
   var dir dir0 dir1 : Dir .
   vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
-  var act act0 act1  : Action .
+  var act act0 act1 pact : Action .
+  var acts : ActSet .
   vars n n0 n1 r j : Nat .
 	var times : TimesList .
 
@@ -95,6 +96,15 @@ op equiv : Loc Loc -> Bool .
   eq getWind((wind(ffx,ffy,ffz) @ t) kb ) = (wind(ffx,ffy,ffz) @ t) .
   eq getWind(kb ) = none [owise] .
 
+  *** Knowledge fact specifying that some drone 
+  *** has reached energy zero during flight
+  op crashed : Id Loc FiniteFloat -> Info .
+  eq hasId(id,crashed(id,loc,ff) @ t) = true .
+  *** Knowledge fact specifying that some drone
+  *** landed far from home
+  op landFarFromHome : Id Loc FiniteFloat -> Info .
+  eq hasId(id,landFarFromHome(id,loc,ff) @ t) = true .
+
   op pending : Id Action -> Info .
   eq hasId(id,pending(id,act) @ t) = true .
 
@@ -129,6 +139,10 @@ op equiv : Loc Loc -> Bool .
 
   op myHome : Id Loc -> PKItem .
   eq hasId(id,myHome(id,loc)) = true .
+
+  op getHome : Id KB -> Loc .
+  eq getHome(id,myHome(id,loc) kb) = loc .
+  eq getHome(id,kb) = pt(0,0,0) [owise] .
 
   op myAlt : Id Int -> PKItem .
   eq hasId(id,myAlt(id,alt)) = true .
@@ -257,6 +271,7 @@ op equiv : Loc Loc -> Bool .
   eq lastVisit(id,l0,dt0) @ t0 << lastVisit(id,l0,dt1) @ t1 = t0 < t1 .
   eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
   eq timeElapsed(dt0) @ t0 << timeElapsed(dt1) @ t1 = t0 < t1 .
+  eq landFarFromHome(id,l0,ff0) @ t0 << landFarFromHome(id,l1,ff) @ t1 = t0 < t1 . *** it does not matter which one we keep.
 
   op incCountVisit : Id Loc Time KB -> KB .
   eq incCountVisit(id,loc,t1,(countVisit(id,loc,n) @ t) kb) = (countVisit(id,loc,s n) @ t1) kb .
@@ -356,6 +371,22 @@ eq locsdiff(locs1, nil)  = locs1 .
   eq getLKB(id:Id,[id:Id : cl:Class | lkb : kb:KB, attrs:AttributeSet] pc:Conf) = kb:KB .
 	
 
+  op getPending : Id KB -> ActSet . **** 0 or 1
+  eq getPending(id, kb (pending(id,pact) @ t)) = pact .
+  eq getPending(id, kb) = none [owise] .
+  
+  op pickOne : ActSet -> Action .
+  eq pickOne(act acts) = act .
+  
+  op isGoTo : Action Loc -> Bool .
+  eq isGoTo(goToW(id,loc,v), loc) = true .
+  eq isGoTo(goTo(id,loc), loc) = true .
+  eq isGoTo(act,loc) = false [owise] .
+  
+  op isStop : Action -> Bool .
+  eq isStop(stop(id)) = true .
+  eq isStop(act) = false [owise] .
+
 *********16dec06 clt new stuff
 ***** using NAT-LIST causes ambiguity -- Maude thinks (n - m) could be
 ***** the list (n -m)   which is silly becuase -m is not a Nat, but ....
@@ -395,7 +426,6 @@ eq rest(times) = nil [owise] .
    /\ fdz := float(z1 - z0) / gridStepZ
    /\ ffn := sqrt(fdx ^ 2.0 + fdy ^ 2.0 + fdz ^ 2.0) .
   
-
 ****** using visit times
 
 	op doActT : Id KB Action -> KB .

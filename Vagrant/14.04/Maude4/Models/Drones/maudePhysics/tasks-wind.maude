@@ -327,25 +327,6 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
   op stopSimulation : -> FiniteFloat .
   op windThresh : -> Nat .
 
-***(
-pending acts:
- land(id)
- takeOff(id,alt)
- goToW(id,loc,sp)
- stop(id)
-)
-op getPending : Id KB -> ActSet . **** 0 or 1
-eq getPending(id, kb (pending(id,pact) @ t)) = pact .
-eq getPending(id, kb) = none [owise] .
-
-op pickOne : ActSet -> Action .
-eq pickOne(act acts) = act .
-
-op isGoTo : Action Loc -> Bool .
-eq isGoTo(goToW(id,loc,v), loc) = true .
-eq isGoTo(goTo(id,loc), loc) = true .
-eq isGoTo(act,loc) = false [owise] .
-
 op recentVisit : Loc KB FiniteFloat -> Bool .
 eq recentVisit(loc,(lastVisit(id,loc,dt1) @ t) kb,dt2) = dt2 - dt1 < 3.0 .
 eq recentVisit(loc,kb,dt2) = false [owise] .
