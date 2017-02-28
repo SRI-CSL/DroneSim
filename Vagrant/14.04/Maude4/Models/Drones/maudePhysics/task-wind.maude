@@ -41,8 +41,7 @@ fmod MODEL-TASKS is
   op proSensors : Id KB KB -> KB .
   eq proSensors(id,lkb,ekb) = addK(lkb,ekb) .
 
-***(
-controller  maps
+***(controller  maps
  takeOff(id,alt) >> takeOff(id,alt)
  land(id) >> land(id)
  stop(id) >> none?

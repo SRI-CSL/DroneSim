@@ -110,7 +110,7 @@ Assume .5 for taking off
               z0 + round(dz / gridStepZ))
   /\ e := getEnergy(id,ekb)
   /\ e0 := energyGoToW(e,sp)
-  /\ e > 0.0
+  /\ e0 > 0.0
   /\ l3 := (if occupied(l1,ekb) then l0 else l1 fi)
   .
 
