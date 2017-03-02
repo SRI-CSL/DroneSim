@@ -5,7 +5,7 @@ fmod MODEL-ACTIONS is
   var nzt : NzTime .
   vars id id' id0 : Id .
   vars l0 l1 l2 l3 loc home : Loc .
-  vars lkb ekb ekb' ekb0 kb' : KB .
+  vars lkb ekb ekb' ekb0 kb' kb1 : KB .
   var dir : Dir .
   var b b0 b1 b2 : Bool .
   var evs : EventSet .
@@ -160,8 +160,8 @@ Assume .5 for taking off
  ceq doUnitEnvAct(t, ekb, (land(id) @ 0 ) evs)
    = doUnitEnvAct(t, addK(ekb,kb' (atloc(id,l1) @ s(t)) 
                               energy(id,e0) @ s(t)) , evs)
- if pt(x0,y0,z0) := getLoc(id,ekb)
- /\ home := getHome(id,ekb)
+ if myHome(id,home) kb1 := ekb
+ /\ pt(x0,y0,z0) := getLoc(id,ekb)
  /\ dz := landInc(float(z0) * gridStepZ,0.0,vland)
  /\ l1 := pt(x0,y0,z0 - round(dz * gridStepZ))
  /\ e := getEnergy(id,ekb)

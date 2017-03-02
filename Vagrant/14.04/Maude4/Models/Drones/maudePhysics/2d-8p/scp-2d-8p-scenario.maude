@@ -2,12 +2,13 @@ mod SCENARIO is
   inc MODEL-ACTIONS  .
   inc SOFT-AGENT-RULES .
    inc PRETTY .
+   inc VERIFICATION .
   --- inc SOLVE-SCP{valuation2valpatrolonly} . 
   --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
 	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
 
 var check : Bool .
-vars n n' t t0 m t1 : Nat .
+vars n n' t t0 m t1 thr : Nat .
 vars i j x y z x0 y0 z0 : Int .
 vars sx sy sz dx dy dz v e c dt te : FiniteFloat .
 var dir : Dir .
@@ -22,6 +23,7 @@ var a : Int .
 var locs : LocList .
 var lts : TimeLocList .
 var pact : ActSet .
+var asys : ASystem .
 
 op bound : Nat -> ConfElt .
 
@@ -36,8 +38,8 @@ eq gridStepX = 1.0 .
 eq gridStepY = 1.0 .
 eq gridStepZ = 1.0 .
  
-eq chargeUnit = 5.0 .
-eq maxCharge = 20.0 .
+--- eq chargeUnit = 5.0 .
+--- eq maxCharge = 20.0 .
 
 eq botDelay = 1 .
 eq periodicity = 60 .
@@ -87,7 +89,6 @@ eq reducedFactor = 1.0 .
 
 *** Using values inferred from SITL experiments
 *** The value for hovering is not well supported.
-*** seems to be in energy per meter (Need to check this with carolyn)
 eq costMv(v) = (if v < 3.0 then 1.30 * reducedFactor else 1.49 * reducedFactor fi) .
 
 **** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
@@ -125,46 +126,64 @@ eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
  [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs),
                ckb : none, evs : (tick @ 0)] .
  
-ops mkE1 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
-ops mkE2 : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Env .  **** bot env
-eq mkE1(n,sx,sy,sz,v,e) = [eI | clock(0) mkBekb(n,sx,sy,sz,v,e)] .
+ops mkE : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat FiniteFloat -> Env .  **** bot env
 
-eq mkE2(n,sx,sy,sz,v,e) = 
-      [eI | clock(0) (rand(0) @ 0) (wind(1.0,0.0,0.0) @ 0) (timeElapsed(0.0) @ 0)
+eq mkE(n,sx,sy,sz,v,thr,e) = 
+      [eI | clock(0) (rand(0) @ 0) (wind(1.0,0.0,0.0,thr) @ 0) (timeElapsed(0.0) @ 0)
             mkBekb(n,sx,sy,sz,v,e) 
             mkBekb(s n,sx + 10.0,sy + 10.0, sz,v,e)] .
 
-
-ops locs1 locs2 locs1p : -> LocList .
+ops locs1 locs2 allTargets : -> LocList .
 eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
            ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
 
 eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
            ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
 
---- energy parameter is not yet useful
-ops conf1 conf2 conf3 conf4 : -> Conf .
-****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
-****          (n,sx, sy, sz, v,  e,    c,   a,locs)
-eq conf1 = mkB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
-           mkB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
-           mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
+eq allTargets = locs1 ; locs2 .
 
-op asys1 : -> ASystem .
-eq asys1 = { conf1 } .
+ops noWind lowWind highWind : -> Nat .
+eq noWind = 0 .
+eq lowWind = round(float(rand.25) / 2.0) .
+eq highWind = round(float(rand.25) / 2.0) .
 
 --- eq windThresh = 2 * rand.25 .
 --- eq windThresh = round(float(rand.25) / 2.0) .
-eq windThresh = 0 .
+--- eq windThresh = 0 .
+
+
+ops confNoWind confLowWind confHighWind : -> Conf .
+****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
+****          (n,sx, sy, sz, v,  e,    c,   a,locs)
+eq confNoWind = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE(0,0.0,0.0,0.0,5.0,noWind,100.0) . 
+
+eq confLowWind = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE(0,0.0,0.0,0.0,5.0,lowWind,100.0) . 
+
+eq confHighWind = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
+           mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
+           mkE(0,0.0,0.0,0.0,5.0,highWind,100.0) . 
+
+
+ops asysNoWind asysLowWind asysHighWind : -> ASystem .
+eq asysNoWind = { confNoWind } .
+eq asysLowWind = { confLowWind } .
+eq asysHighWind = { confHighWind } .
+
+--- op asys : Nat -> ASystem .
+--- eq asys(n) = { conf1 bound(n) } .
+
 eq stopSimulation = 5.0 .
 
 --- eq act(id,kb) = actSimple(id,kb) .
 --- eq act(id,kb) = actSCP(id,kb) .
 
-
-
-ops asys asys2 : Nat -> ASystem .
-eq asys(n) = { conf1 bound(n) } .
+eq act(id,kb) = actBasic(id,kb) .
+--- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
+eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
 op upDateRand : ASystem Nat -> ASystem .
 eq upDateRand({[ eI | ekb ] aconf}, n) =
@@ -186,16 +205,13 @@ eq updateTE(clock(t1) (timeElapsed(te) @ t) kb, dt)
 eq updateConf([ eI | ekb ] aconf) = 
    updateTracks(updateMaxSep(updateMinSep([ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf))) .
 
-
 op minSep : Nat Loc Loc -> ConfElt [ctor format(nt d)] .
 op maxSep : Nat Loc Loc -> ConfElt [ctor format(nt d)] .
-
 
 op updateMinSep : Conf -> Conf .
 eq updateMinSep([ eI | ekb ] aconf minSep(n,l,l0)) =
                 ([ eI | ekb ] aconf updateMinSep(n,l,l0,ekb)) .
 eq updateMinSep(conf) = conf [owise] .
-
 
 **** quick and dirty for 2 drone case
 op updateMinSep : Nat Loc Loc KB -> ConfElt .
@@ -264,10 +280,6 @@ eq mkTLs(id,l ; locs) = track(id,l,mtTL) mkTLs(id,locs) .
 eq mkTLs(id,nil) = none .
    
 
-op asys2 : -> ASystem .
-eq asys2 = { conf1 minSep(20,pt(0,0,0),pt(10,10,0))
-                   maxSep(20,pt(0,0,0),pt(10,10,0)) } .
-
 ***********  init configs with visit counting simplified
 op mkBBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
            FiniteFloat Int LocList -> KB .
@@ -290,101 +302,55 @@ eq mkBB(n,sx,sy,sz,v,e,c,a,locs) =
  [b(n) : Bot | lkb : mkBBkb(n,sx,sy,sz,v,e,c,a,locs),
                ckb : none, evs : (tick @ 0)] .
 
-
-
-**** with elocs
-op conf3 : -> Conf .
-eq conf3 = mkBB(0,0.0,0.0,0.0,5.0,100.0,20.0,5,locs1)
-           mkBB(1,10.0,10.0,0.0,5.0,100.0,20.0,10,locs2)
-           mkE2(0,0.0,0.0,0.0,5.0,100.0) . 
-
-op asys3 : -> ASystem .
-eq asys3 = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
-                   maxSep(20,pt(0,0,0),pt(10,10,0)) } .
-
-**** with tracks
-op asys3a : -> ASystem .
-eq asys3a = { conf3 minSep(20,pt(0,0,0),pt(10,10,0))
-                    maxSep(20,pt(0,0,0),pt(10,10,0)) 
-                    mkTLs(b(0),locs1)                   
-                    mkTLs(b(1),locs2)                   
-                   } .
-
-**** vel 10.0
-op conf4 : -> Conf .
-eq conf4 = mkBB(0,0.0,0.0,0.0,10.0,100.0,20.0,5,locs1)
-           mkBB(1,10.0,10.0,0.0,10.0,100.0,20.0,10,locs2)
-           mkE2(0,0.0,0.0,0.0,10.0,100.0) . 
-
-op asys3b : -> ASystem .
-eq asys3b = { conf4 minSep(20,pt(0,0,0),pt(10,10,0))
-                    maxSep(20,pt(0,0,0),pt(10,10,0)) 
-                    mkTLs(b(0),locs1)                   
-                    mkTLs(b(1),locs2)                   
-                   } .
-
-**** vel 7.5
-op conf5 : -> Conf .
-eq conf5 = mkBB(0,0.0,0.0,0.0,7.5,100.0,20.0,5,locs1)
-           mkBB(1,10.0,10.0,0.0,7.5,100.0,20.0,10,locs2)
-           mkE2(0,0.0,0.0,0.0,7.5,100.0) . 
-
-op asys3c : -> ASystem .
-eq asys3c = { conf5 minSep(20,pt(0,0,0),pt(10,10,0))
-                    maxSep(20,pt(0,0,0),pt(10,10,0)) 
-                    mkTLs(b(0),locs1)                   
-                    mkTLs(b(1),locs2)                   
-                   } .
-
-**** with elocs
-op confSpeed35 : -> Conf .
-eq confSpeed35 = mkBB(0,0.0,0.0,0.0,35.0,100.0,20.0,5,locs1)
-           mkBB(1,10.0,10.0,0.0,35.0,100.0,20.0,10,locs2)
-           mkE2(0,0.0,0.0,0.0,35.0,100.0) . 
-
-
-
-op asysSpeed35 : -> ASystem .
-eq asysSpeed35 = { confSpeed35 minSep(20,pt(0,0,0),pt(10,10,0))
-                    maxSep(20,pt(0,0,0),pt(10,10,0)) 
-                    mkTLs(b(0),locs1)                   
-                    mkTLs(b(1),locs2)                   
-                   } .
-
-
-
---- eq windThresh = round(float(rand.25) / 2.0) .
-
---- eq windThresh = rand.25 + rand.25 .
---- eq windThresh = rand.25 + rand.125 .
---- eq windThresh = rand.25 .
-eq windThresh = 0 .
-
-eq stopSimulation = 5.0 .
-
---- eq act(id,kb) = actSimple(id,kb) .
---- eq act(id,kb) = actSCP(id,kb) .
-
-eq act(id,kb) = actBasic(id,kb) .
---- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
-eq nextLoc(id,kb) = nextLocSCP(id,kb) .
-
-
 endm
 
 
 ***(
 
-rew [450] asys3 .
+Realizability Problem:
 
-simple wind 0, .25, .375, .5
+search [1] asysNoWind =>* asys such that success(asys,allTargets) .
 
-scp wind 0, .25, .375, .5
-        
+Solution 1 (state 234)
+states: 235  rewrites: 296393 in 383ms cpu (388ms real) (772041 rewrites/second)
+asys --> {
+[eI
+  | clock(58) class(b(0), Bot) class(b(1), Bot) (timeElapsed(5.8e+1) @ 58) (rand(
+    232) @ 58) (atloc(b(0), pt(2, 0, 0)) @ 56) (atloc(b(1), pt(10, 9, 0)) @ 57) (energy(
+    b(0), 1.7810000000000102e+1) @ 56) (energy(b(1), 1.7000000000000103e+1) @ 57) (vel(
+    b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(1.0, 0.0, 0.0, 0) @ 0]
+[b(0) : Bot |
+  lkb : (clock(58) class(b(0), Bot) (timeElapsed(5.7e+1) @ 57) (rand(285) @ 57) (atloc(
+    b(0), pt(2, 0, 0)) @ 56) (pending(b(0), stop(b(0))) @ 58) (energy(b(0),
+    1.7810000000000102e+1) @ 56) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0)
+    (vel(b(0), 5.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ;
+    pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30, 5), 8) @ 8) (visitTimes(b(0),
+    pt(50, 10, 5), 44) @ 44) (visitTimes(b(0), pt(-20, 50, 5), 15) @ 15) (visitTimes(b(
+    0), pt(-40, 5, 5), 26) @ 26) (eLoc(b(0), pt(0, 0, 0), 54) @ 44) (eLoc(b(0), pt(10,
+    30, 5), 7) @ 1) (eLoc(b(0), pt(50, 10, 5), 44) @ 26) (eLoc(b(0), pt(-20, 50, 5), 15)
+    @ 8) (eLoc(b(0), pt(-40, 5, 5), 25) @ 15) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0),
+    pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(2, 0, 0)) @ 56),
+  evs : (tick @ 0)]
+[b(1) : Bot |
+  lkb : (clock(58) class(b(1), Bot) (timeElapsed(5.8e+1) @ 58) (rand(348) @ 58) (atloc(
+    b(1), pt(10, 9, 0)) @ 57) (pending(b(1), stop(b(1))) @ 59) (energy(b(1),
+    1.7000000000000103e+1) @ 57) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0)
+    (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5,
+    10) ; pt(10, -30, 10), nil) @ 0) (visitTimes(b(1), pt(10, -30, 10), 18 ; 48) @ 48) (
+    visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(b(1), pt(-35, -5, 10), 28) @
+    28) (visitTimes(b(1), pt(-40, -40, 10), 37) @ 37) (eLoc(b(1), pt(10, 10, 0), 56) @
+    48) (eLoc(b(1), pt(10, -30, 10), 17 ; 47) @ 37) (eLoc(b(1), pt(40, -10, 10), 9) @ 2)
+    (eLoc(b(1), pt(-35, -5, 10), 28) @ 18) (eLoc(b(1), pt(-40, -40, 10), 35) @ 28) (
+    wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(10, 9, 0)) @ 57),
+  evs : ((tick @ 1) stop(b(1)) @ 0)]}
 
-Look for circles
+Soft Survivability:
 
-fix controller to slow down when near target.
-and try again.
+search [1] asysNoWind =>* asys such that softFail(asys,allTargets) .
+
+
+
 
 )

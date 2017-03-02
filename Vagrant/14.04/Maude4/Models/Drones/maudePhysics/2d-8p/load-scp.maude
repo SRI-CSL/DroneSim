@@ -4,7 +4,7 @@ load ../../../../Lib/cp-e-config
 load ../../../../Lib/cp-e-rules
 load ../../../../Lib/pretty
 load ../knowledge
-
+load ../verification
 load ../scp
 load ../tasks-wind
 load ../actions

@@ -19,9 +19,9 @@ fmod VERIFICATION is
   var cl : Class .
   var attrs : AttributeSet .
   var pact : Action .
+  var pact? : ActSet .
 
-
-  op success : ASystem LocList -> Bool .
+  ops success softFail hardFail : ASystem LocList -> Bool .
 
   ceq success( { conf }, locs ) = true 
    if ekb := envKB({ conf })
@@ -29,7 +29,19 @@ fmod VERIFICATION is
    /\ getLandedFarFromHome(ekb) == none
    /\ allStop(conf)
    /\ visitedAllTargets(locs,conf) .
+  eq success( { conf }, locs ) = false [owise] . 
 
+  ceq hardFail( { conf }, locs ) = true 
+   if ekb := envKB({ conf })
+   /\ (not (getCrashed(ekb) == none))
+      or (not (getLandedFarFromHome(ekb) == none)) .
+  eq hardFail( { conf }, locs ) = false [owise] . 
+
+  ceq softFail( { conf }, locs ) = true 
+   if allStop(conf)
+   /\ not visitedAllTargets(locs,conf) .
+  eq softFail( { conf }, locs ) = false [owise] . 
+  
   op getCrashed : KB -> KB .
   eq getCrashed((crashed(id,loc,ff) @ t) kb) 
    = (crashed(id,loc,ff) @ t) getCrashed(kb) .
@@ -45,9 +57,10 @@ fmod VERIFICATION is
    = visitedAllTargets$(locs,getVisited(conf)) .
 
   op visitedAllTargets$ : LocList KB -> Bool .
-  eq visitedAllTargets$(loc locs, (visitTimes(id,loc,times) @ t) kb) 
-   = visitedAllTargets$(locs,kb) .
-  eq visitedAllTargets$(none,kb) = true .
+  ceq visitedAllTargets$(loc ; locs, (visitTimes(id,loc,times) @ t) kb) 
+   = visitedAllTargets$(locs,kb) 
+   if not (times == nil) .
+  eq visitedAllTargets$(nil,kb) = true .
   eq visitedAllTargets$(locs,kb) = false [owise] .
 
   op getVisited : Conf -> KB .
@@ -64,7 +77,9 @@ fmod VERIFICATION is
   op allStop : Conf -> Bool .
   ceq allStop([id : cl | lkb : lkb, attrs] conf) = false
    if pact := getPending(id,lkb)
-   /\ not isStop(pact) . 
-
+   /\ (not isStop(pact)) . 
+  ceq allStop([id : cl | lkb : lkb, attrs] conf) = false
+   if getPending(id,lkb) == none . 
+  eq allStop(conf) = true [owise] .
             
 endfm

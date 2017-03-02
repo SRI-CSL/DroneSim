@@ -4,7 +4,7 @@ fmod MODEL-KNOWLEDGE is
 
 
   vars t t0 t1 t2 : Time .
-  vars alt x y x1 y1 x0 y0 z0 z1 z : Int .
+  vars alt x y x1 y1 x0 y0 z0 z1 z thr : Int .
   vars id id0 id1 : Id .
 	var cl : Class .
   vars l l0 l1 l2 l3 loc : Loc .
@@ -66,6 +66,7 @@ op equiv : Loc Loc -> Bool .
   op nil : -> LocList [ctor] .
   op _;_ : LocList LocList -> LocList [ctor assoc id: nil] .
 
+
   op first : LocList ~> Loc .
   op rest : LocList ~> LocList .
   eq first(loc ; locs) = loc .
@@ -91,10 +92,10 @@ op equiv : Loc Loc -> Bool .
    /\ ffy1 := float(y1) / norm2 
    /\ ffz1 := float(z1) / norm2 .
      
-  op wind : FiniteFloat FiniteFloat FiniteFloat -> Info .
+  op wind : FiniteFloat FiniteFloat FiniteFloat Nat -> Info .
   op getWind : KB -> KB .
-  eq getWind((wind(ffx,ffy,ffz) @ t) kb ) = (wind(ffx,ffy,ffz) @ t) .
-  eq getWind(kb ) = none [owise] .
+  eq getWind((wind(ffx,ffy,ffz,thr) @ t) kb ) = (wind(ffx,ffy,ffz,thr) @ t) .
+  eq getWind(kb) = none [owise] .
 
   *** Knowledge fact specifying that some drone 
   *** has reached energy zero during flight
@@ -139,10 +140,6 @@ op equiv : Loc Loc -> Bool .
 
   op myHome : Id Loc -> PKItem .
   eq hasId(id,myHome(id,loc)) = true .
-
-  op getHome : Id KB -> Loc .
-  eq getHome(id,myHome(id,loc) kb) = loc .
-  eq getHome(id,kb) = pt(0,0,0) [owise] .
 
   op myAlt : Id Int -> PKItem .
   eq hasId(id,myAlt(id,alt)) = true .
