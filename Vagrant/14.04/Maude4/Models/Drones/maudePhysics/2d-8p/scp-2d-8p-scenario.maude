@@ -202,6 +202,10 @@ op updateTE : KB FiniteFloat -> KB .
 eq updateTE(clock(t1) (timeElapsed(te) @ t) kb, dt)
            = clock(t1) (timeElapsed(te + dt) @ t1) kb .
 ****
+eq updateConf(conf) = 
+   if allStop(conf) then allStopConf(conf)
+   else conf fi .
+
 eq updateConf([ eI | ekb ] aconf) = 
    updateTracks(updateMaxSep(updateMinSep([ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf))) .
 
@@ -347,9 +351,18 @@ asys --> {
   evs : ((tick @ 1) stop(b(1)) @ 0)]}
 
 Soft Survivability:
+search [1] in SCENARIO : asysNoWind =>* asys such that softFail(asys, allTargets) = true
+    .
 
-search [1] asysNoWind =>* asys such that softFail(asys,allTargets) .
+No solution.
+states: 272  rewrites: 344943 in 433ms cpu (435ms real) (796473 rewrites/second)
 
+Hard Survivability
+search [1] in SCENARIO : asysNoWind =>* asys such that hardFail(asys, allTargets) = true
+    .
+
+No solution.
+states: 272  rewrites: 349003 in 439ms cpu (443ms real) (794152 rewrites/second)
 
 
 

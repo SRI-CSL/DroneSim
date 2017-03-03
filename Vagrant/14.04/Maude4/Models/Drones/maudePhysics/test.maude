@@ -11,27 +11,35 @@ ops lkb0 lkb1 ekb1  : -> KB .
 op conf : -> Conf .
 
 eq conf = [eI
-    | clock(0) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(0) @
-    0) (atloc(b(0), pt(0, 0, 0)) @ 0) (atloc(b(1), pt(10, 10, 0)) @ 0) (energy(b(0),
-    1.0e+2) @ 0) (energy(b(1), 1.0e+2) @ 0) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0)
-    wind(1.0, 0.0, 0.0, 0) @ 0]
+    | clock(67) class(b(0), Bot) class(b(1), Bot) (timeElapsed(6.7e+1) @ 67) (rand(
+    268) @ 67) (atloc(b(0), pt(2, 0, 0)) @ 56) (atloc(b(1), pt(10, 9, 0)) @ 57) (energy(
+    b(0), 1.7810000000000102e+1) @ 56) (energy(b(1), 1.7000000000000103e+1) @ 57) (vel(
+    b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) wind(1.0, 0.0, 0.0, 0) @ 0]
 [b(0) : Bot |
-  lkb : (clock(0) class(b(0), Bot) (atloc(b(0), pt(0, 0, 0)) @ 0) (energy(b(0), 1.0e+2)
-    @ 0) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (
-    targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @
-    0) (visitTimes(b(0), pt(10, 30, 5), nil) @ 0) (visitTimes(b(0), pt(50, 10, 5), nil)
-    @ 0) (visitTimes(b(0), pt(-20, 50, 5), nil) @ 0) (visitTimes(b(0), pt(-40, 5, 5),
-    nil) @ 0) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
-  ckb : none,
-  evs : (tick @ 0)]
+  lkb : (clock(67) class(b(0), Bot) (timeElapsed(6.7e+1) @ 67) (rand(335) @ 67) (atloc(
+    b(0), pt(2, 0, 0)) @ 56) (pending(b(0), stop(b(0))) @ 68) (energy(b(0),
+    1.7810000000000102e+1) @ 56) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0)
+    (vel(b(0), 5.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ;
+    pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30, 5), 8) @ 8) (visitTimes(b(0),
+    pt(50, 10, 5), 44) @ 44) (visitTimes(b(0), pt(-20, 50, 5), 15) @ 15) (visitTimes(b(
+    0), pt(-40, 5, 5), 26) @ 26) (eLoc(b(0), pt(0, 0, 0), 54) @ 44) (eLoc(b(0), pt(10,
+    30, 5), 7) @ 1) (eLoc(b(0), pt(50, 10, 5), 44) @ 26) (eLoc(b(0), pt(-20, 50, 5), 15)
+    @ 8) (eLoc(b(0), pt(-40, 5, 5), 25) @ 15) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0),
+    pt(0, 0, 0)) myAlt(b(0), 5)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(2, 0, 0)) @ 56),
+  evs : ((tick @ 1) stop(b(0)) @ 0)]
 [b(1) : Bot |
-  lkb : (clock(0) class(b(1), Bot) (atloc(b(1), pt(10, 10, 0)) @ 0) (energy(b(1),
-    1.0e+2) @ 0) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0)
-    @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5, 10) ; pt(10,
-    -30, 10), nil) @ 0) (visitTimes(b(1), pt(10, -30, 10), nil) @ 0) (visitTimes(b(1),
-    pt(40, -10, 10), nil) @ 0) (visitTimes(b(1), pt(-35, -5, 10), nil) @ 0) (visitTimes(
-    b(1), pt(-40, -40, 10), nil) @ 0) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
-  ckb : none,
+  lkb : (clock(67) class(b(1), Bot) (timeElapsed(6.6e+1) @ 66) (rand(396) @ 66) (atloc(
+    b(1), pt(10, 9, 0)) @ 57) (pending(b(1), stop(b(1))) @ 67) (energy(b(1),
+    1.7000000000000103e+1) @ 57) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0)
+    (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ; pt(-35, -5,
+    10) ; pt(10, -30, 10), nil) @ 0) (visitTimes(b(1), pt(10, -30, 10), 18 ; 48) @ 48) (
+    visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(b(1), pt(-35, -5, 10), 28) @
+    28) (visitTimes(b(1), pt(-40, -40, 10), 37) @ 37) (eLoc(b(1), pt(10, 10, 0), 56) @
+    48) (eLoc(b(1), pt(10, -30, 10), 17 ; 47) @ 37) (eLoc(b(1), pt(40, -10, 10), 9) @ 2)
+    (eLoc(b(1), pt(-35, -5, 10), 28) @ 18) (eLoc(b(1), pt(-40, -40, 10), 35) @ 28) (
+    wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(10, 9, 0)) @ 57),
   evs : (tick @ 0)] .
 
 eq acts = myActs(Bot,b(1),lkb1) .
