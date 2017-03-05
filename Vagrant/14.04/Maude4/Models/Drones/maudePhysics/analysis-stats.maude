@@ -88,7 +88,8 @@ op getObs : ASystem -> BoolRes .
     "(" + "double" + " " + makeString(decFloat(e,2)) + ")"  .
 
   op getObsKB : KB KB -> Bool .
-  eq getObs({aconf}) = br(true,getObsN(aconf)) .
+  eq getObs({allStopConf(aconf) }) = br(true,getObsN(aconf)) .
+  eq getObs({aconf}) = br(true,getObsN(aconf)) [owise] .
 
   ***(
 

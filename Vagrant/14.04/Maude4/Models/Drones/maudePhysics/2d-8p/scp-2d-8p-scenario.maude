@@ -306,6 +306,14 @@ eq mkBB(n,sx,sy,sz,v,e,c,a,locs) =
  [b(n) : Bot | lkb : mkBBkb(n,sx,sy,sz,v,e,c,a,locs),
                ckb : none, evs : (tick @ 0)] .
 
+**** clt added -- called by meta-cp-e
+op getIds : ASystem -> IdSet .
+eq getIds({ aconf }) = getIdsX(aconf, none)  .
+
+op getIdsX : Conf IdSet -> IdSet .
+eq getIdsX(aconf, ids) = ids [owise] .
+eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
+
 endm
 
 

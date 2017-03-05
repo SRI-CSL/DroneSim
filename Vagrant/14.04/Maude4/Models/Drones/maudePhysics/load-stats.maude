@@ -1,8 +1,18 @@
-load load-maudephysics
+load ../../../Lib/time
+load ../../../Lib/soft-agents
+load ../../../Lib/cp-e-config
+load ../../../Lib/cp-e-rules
+load ../../../Lib/pretty
+load knowledge
+load verification
+load scp
+load tasks-wind
+load actions
+**** load scenario
+load 2d-8p/scp-2d-8p-scenario
+load analysis-stats
 
 load model-checker 
-**** load ../../../../../imaude/ilib/load-lib
-**** load /home/vagrant/Repositories/imaude/ilib/load-lib
 load ~/Repositories/imaude/ilib/load-lib
 load ../../../Lib/meta-cp-e 
 loop init .
@@ -13,9 +23,8 @@ loop init .
 **** (loadg2dlib g2d /home/vagrant/Repositories/imaude/jlib/jl-util.lsp)
 (g2dexe g2d (load (sinvoke "g2d.util.IO" "interpretTilde" "~/Repositories/imaude/jlib/jl-util.lsp")))
 (loadg2dlib g2d ../../../Lib/stats-funs.lsp)
-(initAgentEset maude g2d g2d none ANALYSIS asys1 true 300) 
+(initAgentEset maude g2d g2d none ANALYSIS asysLowWind true 300) 
 (augAgentEsetStats Patrol 400 nGenericApprox .25 .25 5)
-
 )
 
 **** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400 GenericApprox .25 .25)
