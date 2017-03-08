@@ -9,9 +9,8 @@ load ../scp
 load ../tasks-wind
 load ../actions
 load 2d-8p-scenario
-load scp-2d-8p-scenario
+load simple-2d-8p-scenario
 load ../analysis-stats-simple
-
 load model-checker 
 load ~/Repositories/imaude/ilib/load-lib
 load ../../../../Lib/meta-cp-e 
@@ -26,10 +25,3 @@ loop init .
 (initAgentEset maude g2d g2d none ANALYSIS asysHighWind40 true 300) 
 (augAgentEsetStats Patrol 400 nGenericApprox .25 .25 5)
 )
-
-**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400 GenericApprox .25 .25)
-**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400  BlackboxApprox .75 30)
-**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400  QAApprox .25 .35 .05 20 1000 .45)
-**** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys2w Patrol 400 GenericApprox .25 .25)
-****(initAgentEsetStats maude g2d g2d SCENARIO-VER initSys2w Patrol 400 GenericApprox .5 .5)
-
