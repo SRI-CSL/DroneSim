@@ -66,7 +66,6 @@ op equiv : Loc Loc -> Bool .
   op nil : -> LocList [ctor] .
   op _;_ : LocList LocList -> LocList [ctor assoc id: nil] .
 
-
   op first : LocList ~> Loc .
   op rest : LocList ~> LocList .
   eq first(loc ; locs) = loc .

@@ -8,5 +8,6 @@ load ../verification
 load ../scp
 load ../tasks-wind
 load ../actions
+load 2d-8p-scenario
 load scp-2d-8p-scenario
 **** load analysis-stats

@@ -1,0 +1,86 @@
+mod ANALYSIS is
+ inc SCENARIO .
+
+vars n n' t t0 m k n1 h f c v : Nat .
+vars i j x y z : Int .
+vars sx sy sz dx dy dz e dt ff : FiniteFloat .
+var dir : Dir .
+vars wkb kb lkb ekb : KB .
+var aconf : Conf .
+var attrs : AttributeSet .
+var id eid : Id .
+var ids : IdSet .
+var cl : Class .
+var l home loc : Loc .
+var a : Int .
+var locs : LocList .
+var conf : Conf .
+
+**** We measure: whether all drones returned home
+**** How many crashed 
+**** Minimum energy
+**** points not visited
+
+sort BoolRes .
+**** bool indicates multi or single
+**** res is string rep of answer 
+op br : Bool String -> BoolRes .
+op getObs : ASystem -> BoolRes .
+
+op card : KB -> Nat .
+eq card(none) = 0 .
+eq card(ki:KItem kb) = s(card(kb)) .
+
+  op getObsHome : Conf -> Nat .
+  eq getObsHome([eid | ekb ] [ id : Bot | lkb : lkb, attrs] aconf) 
+   = getObsHome$(lkb,ekb) + getObsHome([eid | ekb ] aconf) .
+  eq getObsHome(aconf) = 0 [owise] .
+  
+  op getObsHome$ : KB KB -> Nat .
+  eq getObsHome$(lkb (pending(id,stop(id)) @ t) myHome(id,home), 
+              (atloc(id,loc) @ t0) ekb) = 
+       (if (close(home,loc))
+        then 1 else 0 fi) .
+  eq getObsHome$(lkb,ekb) = 0 [owise] .
+
+  op minEnergy : KB FiniteFloat -> FiniteFloat .
+  eq minEnergy((energy(id,e) @ t) kb,ff) = 
+   if e < ff then minEnergy(kb,e)
+   else minEnergy(kb,ff) fi .
+  eq minEnergy(kb,e) = e [owise] .
+
+  **** for nGenericApprox
+  op getObsN : Conf -> String .
+  eq getObsN(allStopConf(conf) ) = getObsN(conf) .
+  ceq getObsN([eid | ekb ] aconf )
+      =  mkdouble(float(h)) + " " + mkdouble(e)  + " " + mkdouble(float(c)) + " " + mkdouble(float(f)) + " " + mkdouble(float(v))
+   if h := getObsHome([eid | ekb ] aconf)
+   /\ e := minEnergy(ekb,100.0)
+   /\ c := card(getCrashed(ekb))
+   /\ f := card(getLandedFarFromHome(ekb))
+   /\ v := card(getVisited([eid | ekb ] aconf)) .
+
+  op mkdouble : FiniteFloat -> String .
+  eq mkdouble(e) = 
+    "(" + "double" + " " + makeString(decFloat(e,2)) + ")"  .
+
+  op getObsKB : KB KB -> Bool .
+  eq getObs({allStopConf(aconf) }) = br(true,getObsN(aconf)) .
+  eq getObs({aconf}) = br(true,getObsN(aconf)) [owise] .
+
+  ***(
+
+  eq getObs({[ b(0) : Bot | lkb : lkb, attrs] [eid | ekb ] aconf }) =
+     getObsKB(lkb,ekb)  .
+  eq getObsKB(lkb (pending(b(0),stop(b(0))) @  t) myHome(b(0),home) , 
+              ( atloc(b(0),loc) @ t0) ekb) = distance(home,loc) < 6 .
+  eq getObs({ aconf }) = false [owise] .
+  )
+  op getObsVisited : ASystem -> Nat .
+  op getObsEnergy : ASystem -> FiniteFloat .
+  eq getObsVisited({[ b(0) : Bot | lkb : ((visited(b(0),locs) @ t0) lkb), attrs] [eid | ekb ] aconf }) 
+   = len(locs).
+  eq getObsEnergy({[ b(0) : Bot | lkb : lkb, attrs] [eid | ((energy(b(0),e) @ t) ekb) ] aconf }) = e .
+
+
+endm
