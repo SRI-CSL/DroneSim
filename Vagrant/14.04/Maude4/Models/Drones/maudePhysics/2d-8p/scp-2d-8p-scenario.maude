@@ -9,15 +9,18 @@ eq act(id,kb) = actBasic(id,kb) .
 --- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
 eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
-ops asysLowWind30 asysLowWind20 asysLowWind40 : -> ASystem .
+ops asysLowWind30 asysLowWind20 asysLowWind40 asysLowWind50 : -> ASystem .
 eq asysLowWind30 = asysLowWind(30.0) .
 eq asysLowWind20 = asysLowWind(20.0) .
 eq asysLowWind40 = asysLowWind(40.0) .
+eq asysLowWind50 = asysLowWind(50.0) .
 
-ops asysHighWind30 asysHighWind20 asysHighWind40 : -> ASystem .
+ops asysHighWind30 asysHighWind20 asysHighWind40 asysHighWind50 : -> ASystem .
 eq asysHighWind30 = asysHighWind(30.0) .
 eq asysHighWind20 = asysHighWind(20.0) .
 eq asysHighWind40 = asysHighWind(40.0) .
+eq asysHighWind50 = asysHighWind(50.0) .
+
 
 
 endm
@@ -91,6 +94,8 @@ states: 236  rewrites: 322488 in 452ms cpu (461ms real) (712257 rewrites/second)
 ==============================================================
 with low wind
 
+The values are [home, minEnergy, crashes, farfromhome, pointsVisited]
+
 asysLowWind20
 
 averages ===> [ 1.5294117647058822, 7.658823529411764, 0.0, 0.29411764705882354, 8.0]
@@ -102,6 +107,10 @@ averages ===> [ 2.0, 17.11764705882353, 0.0, 0.0, 7.352941176470588]
 asysLowWind40
 
 averages ===> [ 2.0, 24.705882352941178, 0.0, 0.0, 6.235294117647059]
+
+asysLowWind50
+
+[ 2.0, 35.470588235294116, 0.0, 0.0, 5.411764705882353]
 
 ==============================================high wind
 
@@ -117,6 +126,9 @@ asysHighWind40
 
 averages ===> [ 1.9411764705882353, 21.876470588235293, 0.0, 0.0, 5.235294117647059]
 
+asysHighWind50
+
+[ 2.0, 32.11764705882353, 0.0, 0.0, 4.647058823529412]
 
 
 

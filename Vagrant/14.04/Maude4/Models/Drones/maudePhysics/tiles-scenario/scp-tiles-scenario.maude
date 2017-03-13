@@ -1,0 +1,56 @@
+mod SCENARIO is
+  inc SCENARIO-BASIC  .
+
+var kb : KB .
+var id : Id .
+var asys : ASystem .
+
+eq act(id,kb) = actBasic(id,kb) .
+--- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
+eq nextLoc(id,kb) = nextLocSCP(id,kb) .
+
+op numTiles : -> Nat .
+eq numTiles = 3 .
+
+ops asysLowWind30 asysLowWind20 asysLowWind40 asysLowWind50 : -> ASystem .
+eq asysLowWind30 = asysLowWind(numTiles,30.0) .
+eq asysLowWind20 = asysLowWind(numTiles,20.0) .
+eq asysLowWind40 = asysLowWind(numTiles,40.0) .
+eq asysLowWind50 = asysLowWind(numTiles,50.0) .
+
+ops asysHighWind30 asysHighWind20 asysHighWind40 asysHighWind50 : -> ASystem .
+eq asysHighWind30 = asysHighWind(numTiles,30.0) .
+eq asysHighWind20 = asysHighWind(numTiles,20.0) .
+eq asysHighWind40 = asysHighWind(numTiles,40.0) .
+eq asysHighWind50 = asysHighWind(numTiles,50.0) .
+
+endm
+
+***(
+
+Realizability Problem:
+
+search [1] in SCENARIO : asysNoWind(3, 2.0e+1) =>* asys such that success(asys, allTargets(3)) = true .
+
+No solution.
+states: 4352  rewrites: 17267570 in 21248ms cpu (21822ms real) (812654
+    rewrites/second)
+
+search [1] in SCENARIO : asysNoWind(4, 2.0e+1) =>* asys such that success(asys,
+    allTargets(4)) = true .
+
+No solution.
+states: 17408  rewrites: 92126910 in 115178ms cpu (119973ms real) (799864
+    rewrites/second)
+
+search [1] in SCENARIO : asysNoWind(5, 2.0e+1) =>* asys such that success(asys, allTargets(5)) = true .
+search [1] in SCENARIO : asysNoWind(5, 2.0e+1) =>* asys such that success(asys,
+    allTargets(5)) = true .
+
+No solution.
+states: 69632  rewrites: 466559427 in 680450ms cpu (700087ms real) (685662
+    rewrites/second)    
+
+
+
+)

@@ -8,6 +8,8 @@ load ../verification
 load ../scp
 load ../tasks-wind
 load ../actions
-load 2d-8p-scenario
-load simple-2d-8p-scenario
+load tiles-scenario
+load scp-tiles-scenario
 load ../analysis-stats-simple
+
+
