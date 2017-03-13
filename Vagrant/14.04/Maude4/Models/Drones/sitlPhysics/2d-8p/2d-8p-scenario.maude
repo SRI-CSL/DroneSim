@@ -1,0 +1,329 @@
+mod SCENARIO-BASIC is
+  inc MODEL-ACTIONS  .
+  inc SOFT-AGENT-RULES .
+   inc PRETTY .
+   inc VERIFICATION .
+  --- inc SOLVE-SCP{valuation2valpatrolonly} . 
+  --- inc SOLVE-SCP{valuation2valpatrolenergy} . 
+	--- inc SOLVE-SCP{valuation2valpatrolenergyconservative} . 
+
+var check : Bool .
+vars n n' t t0 m t1 thr : Nat .
+vars i j x y z x0 y0 z0 : Int .
+vars sx sy sz dx dy dz v e c dt te caution : FiniteFloat .
+var dir : Dir .
+vars wkb kb lkb ekb : KB .
+var aconf conf : Conf .
+var attrs : AttributeSet .
+var id eid : Id .
+var ids : IdSet .
+var cl : Class .
+var l l0 l1 l2  home  : Loc .
+var a : Int .
+var locs : LocList .
+var lts : TimeLocList .
+var pact : ActSet .
+var asys : ASystem .
+
+op bound : Nat -> ConfElt .
+
+eq comDistance = 2 .
+
+eq senXLow = 0.0 .
+eq senYLow = 0.0 .
+eq senZLow = 0.0 .
+
+---- Grid size
+eq gridStepX = 1.0 .
+eq gridStepY = 1.0 .
+eq gridStepZ = 1.0 .
+ 
+--- eq chargeUnit = 5.0 .
+--- eq maxCharge = 20.0 .
+
+eq botDelay = 1 .
+eq periodicity = 60 .
+
+eq vlift = 5.0 .
+eq vland = 5.0 .
+
+***(
+Performed one experiment with dronekit copter at velocity 5m/s
+and altitude 5m
+
+Takeoff : 100% -> 97%
+70m  : 96% -> 91%
+100m : 91% -> 85%
+100m : 84% -> 78%
+100m : 77% -> 71%
+100m : 70% -> 65%
+70m : 64% -> 59%
+Landing/Disarm : 58% -> 55%
+
+)
+
+***(
+Alisson's logs show .25 / sec early, then .125 /sec later 
+battery drain.
+
+Assume .5 for taking off  
+       .25 for landing
+       .25 for horizontal flight
+       .125 for hovering
+)
+
+ **** for 1 sec     
+***  op costMv : FiniteFloat -> FiniteFloat .
+--- eq costMv(v) = (if v < 3.0 then .125 else .25 fi) .
+
+**** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+ --- eq costMvZ(v,dt) = 
+     --- if (v > 0.0) 
+     --- then  dt * 0.5  --- for sitl replace by 1.57 if up 
+     --- else  dt * 0.25 --- for sitl replace by 1.15 going down
+     --- fi .
+
+
+op reducedFactor : -> FiniteFloat .
+eq reducedFactor = 1.0 .
+
+*** Using values inferred from SITL experiments
+*** The value for hovering is not well supported.
+eq costMv(v) = (if v < 3.0 then 1.30 * reducedFactor else 1.49 * reducedFactor fi) .
+
+**** op costMvZ : FiniteFloat FiniteFloat ->  FiniteFloat .
+ eq costMvZ(v,dt) = 
+     if (v > 0.0) 
+     then  dt * 1.57 * reducedFactor  --- for sitl replace by 1.57 if up 
+     else  dt * 1.15 * reducedFactor --- for sitl replace by 1.15 going down
+     fi .
+
+**** ekb has current velocity vel
+op mkBekb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
+             -> KB .
+eq mkBekb(n,sx,sy,sz,v,e) = 
+    (atloc(b(n),mkLoc(sx,sy,sz)) @ 0) (myHome(b(n),mkLoc(sx,sy,sz)))
+    class(b(n),Bot) (energy(b(n),e) @ 0) (vel(b(n),v) @ 0) .
+
+**** lkb has target velocity 
+op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> KB .
+eq mkBkb(n,sx,sy,sz,v,e,c,a,locs) = 
+    mkBekb(n,sx,sy,sz,v,e)  (targetVel(b(n),v) @ 0) 
+    myAlt(b(n),a) (caution(b(n),c) @ 0)
+    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
+***    (visited(b(n),nil) @ 0) 
+    (lastVisit(b(n),mkLoc(sx,sy,sz),0.0) @ 0)
+    (mkCountVisits(n,locs)) (countLate(b(n),0) @ 0)
+     clock(0) .
+
+op mkCountVisits : Nat LocList -> KB .
+eq mkCountVisits(n,l ; locs) 
+ = (countVisit(b(n),l,0) @ 0) mkCountVisits(n,locs) .
+eq mkCountVisits(n,nil) = none .
+
+op mkB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList -> Agent .
+eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
+ [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs),
+               ckb : none, evs : (tick @ 0)] .
+ 
+ops mkE : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat FiniteFloat -> Env .  **** bot env
+
+eq mkE(n,sx,sy,sz,v,thr,e) = 
+      [eI | clock(0) (rand(0) @ 0) (wind(1.0,0.0,0.0,thr) @ 0) (timeElapsed(0.0) @ 0)
+            mkBekb(n,sx,sy,sz,v,e) 
+            mkBekb(s n,sx + 10.0,sy + 10.0, sz,v,e)] .
+
+ops locs1 locs2 allTargets : -> LocList .
+eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
+           ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
+
+eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
+           ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
+
+eq allTargets = locs1 ; locs2 .
+
+ops noWind lowWind highWind : -> Nat .
+eq noWind = 0 .
+eq lowWind = round(float(rand.25) / 2.0) .
+eq highWind = round(float(rand.25)) .
+
+--- eq windThresh = 2 * rand.25 .
+--- eq windThresh = round(float(rand.25) / 2.0) .
+--- eq windThresh = 0 .
+
+
+ops confNoWind confLowWind confHighWind : FiniteFloat -> Conf .
+****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
+****          (n,sx, sy, sz, v,  e,    c,   a,locs)
+eq confNoWind(caution) 
+ = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
+   mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
+   mkE(0,0.0,0.0,0.0,5.0,noWind,100.0) . 
+
+eq confLowWind(caution) 
+ = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
+           mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
+           mkE(0,0.0,0.0,0.0,5.0,lowWind,100.0) . 
+
+eq confHighWind(caution) 
+ = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
+   mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
+   mkE(0,0.0,0.0,0.0,5.0,highWind,100.0) . 
+
+
+ops asysNoWind asysLowWind asysHighWind : FiniteFloat -> ASystem .
+eq asysNoWind(caution) = { confNoWind(caution) } .
+eq asysLowWind(caution) = { confLowWind(caution) } .
+eq asysHighWind(caution) = { confHighWind(caution) } .
+
+--- op asys : Nat -> ASystem .
+--- eq asys(n) = { conf1 bound(n) } .
+
+eq stopSimulation = 5.0 .
+
+--- eq act(id,kb) = actSimple(id,kb) .
+--- eq act(id,kb) = actSCP(id,kb) .
+
+--- eq act(id,kb) = actBasic(id,kb) .
+--- eq nextLoc(id,kb) = nextLocSimple(id,kb) .
+--- eq nextLoc(id,kb) = nextLocSCP(id,kb) .
+
+op upDateRand : ASystem Nat -> ASystem .
+eq upDateRand({[ eI | ekb ] aconf}, n) =
+              {[ eI | upDateRandKB(ekb,n)] aconf} .
+
+op upDateRandKB  : KB Nat -> KB .
+eq upDateRandKB(clock(t1) (rand(n') @ t) kb,n) = 
+    clock(t1) (rand(n' + n) @ t1) kb .
+eq upDateRandKB(kb,n) = kb [owise] .
+
+
+***** CAVEAT -- this needs to be fixed if running w Sitl.
+***** probably just want two versions of updateConf
+
+op updateTE : KB FiniteFloat -> KB .
+eq updateTE(clock(t1) (timeElapsed(te) @ t) kb, dt)
+           = clock(t1) (timeElapsed(te + dt) @ t1) kb .
+****
+eq updateConf(conf) = 
+   if allStop(conf) then allStopConf(conf)
+   else conf fi .
+
+eq updateConf([ eI | ekb ] aconf) = 
+   updateTracks(updateMaxSep(updateMinSep([ eI | updateTE(upDateRandKB(ekb,4),1.0) ] aconf))) .
+
+op minSep : Nat Loc Loc -> ConfElt [ctor format(nt d)] .
+op maxSep : Nat Loc Loc -> ConfElt [ctor format(nt d)] .
+
+op updateMinSep : Conf -> Conf .
+eq updateMinSep([ eI | ekb ] aconf minSep(n,l,l0)) =
+                ([ eI | ekb ] aconf updateMinSep(n,l,l0,ekb)) .
+eq updateMinSep(conf) = conf [owise] .
+
+**** quick and dirty for 2 drone case
+op updateMinSep : Nat Loc Loc KB -> ConfElt .
+ceq updateMinSep(n,l,l0,(atloc(b(0),l1) @ t0) (atloc(b(1),l2) @ t1) kb) = 
+            (if n' < n 
+            then minSep(n',l1,l2)
+            else minSep(n,l,l0)
+            fi)
+if n' := hdistance(l1,l2) .
+
+eq updateMinSep(n,l,l0,kb) = minSep(n,l,l0) [owise] .
+
+op updateMaxSep : Conf -> Conf .
+eq updateMaxSep([ eI | ekb ] aconf maxSep(n,l,l0)) =
+                ([ eI | ekb ] aconf updateMaxSep(n,l,l0,ekb)) .
+eq updateMaxSep(conf) = conf [owise] .
+
+
+op updateMaxSep : Nat Loc Loc KB -> ConfElt .
+ceq updateMaxSep(n,l,l0,(atloc(b(0),l1) @ t0) (atloc(b(1),l2) @ t1) kb) = 
+            (if n < n' 
+            then maxSep(n',l1,l2)
+            else maxSep(n,l,l0)
+            fi)
+if n' := hdistance(l1,l2) .
+
+eq updateMaxSep(n,l,l0,kb) = maxSep(n,l,l0) [owise] .
+
+
+op hdistance : Loc Loc -> Nat .
+eq hdistance(pt(x,y,z),pt(x0,y0,z0)) = abs(x - x0) + abs(y - y0) .
+
+sorts TLPair TimeLocList .
+subsort TLPair < TimeLocList .
+op `{_`,_`} : Time Loc -> TLPair [ctor] .
+op mtTL : -> TimeLocList [ctor] .
+op _;_ : TimeLocList TimeLocList -> TimeLocList [ctor assoc id: mtTL] .
+
+op track : Id Loc TimeLocList -> ConfElt [ctor format(nt d)] .
+op updateTracks : Conf -> Conf .
+op updateTrack : Id Loc TimeLocList KB KB -> ConfElt .
+
+eq updateTracks([id : cl | lkb : lkb, attrs] [ eI | ekb ] 
+                track(id,l,lts) conf )
+    =  updateTracks([id : cl | lkb : lkb, attrs] [ eI | ekb ] conf)
+       updateTrack(id,l,lts,lkb,ekb) .
+
+eq updateTracks([id : cl | lkb : lkb, attrs] [ eI | ekb ]  conf )
+   = [id : cl | lkb : lkb, attrs] updateTracks([ eI | ekb ]  conf ) [owise] .
+
+eq updateTracks( conf ) =  conf  [owise] .
+
+
+ceq updateTrack(id,l,lts,lkb,ekb) =
+   (if (check and near(l0, l))
+   then track(id,l, lts ; {t,l0})
+   else track(id,l,lts)
+   fi)
+ if clock(t) (atloc(id,l0) @ t0) kb := ekb
+ /\ pact := getPending(id,lkb) 
+ /\ check := isGoTo(pact) and (getLoc(pact) == l) 
+.
+
+op mkTLs : Id LocList -> Conf .
+eq mkTLs(id,l ; locs) = track(id,l,mtTL) mkTLs(id,locs) .
+eq mkTLs(id,nil) = none .
+   
+
+***********  init configs with visit counting simplified
+op mkBBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat 
+           FiniteFloat Int LocList -> KB .
+eq mkBBkb(n,sx,sy,sz,v,e,c,a,locs) = 
+    mkBekb(n,sx,sy,sz,v,e)  (targetVel(b(n),v) @ 0) 
+    myAlt(b(n),a) (caution(b(n),c) @ 0)
+    myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
+    mkVisitTimes(n,locs) clock(0) .
+
+op mkVisitTimes : Nat LocList -> KB .
+eq mkVisitTimes(n,l ; locs) 
+ = (visitTimes(b(n),l,nil) @ 0) mkVisitTimes(n,locs) .
+eq mkVisitTimes(n,nil) = none .
+
+
+
+op mkBB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat
+          Int LocList -> Agent .
+eq mkBB(n,sx,sy,sz,v,e,c,a,locs) =
+ [b(n) : Bot | lkb : mkBBkb(n,sx,sy,sz,v,e,c,a,locs),
+               ckb : none, evs : (tick @ 0)] .
+
+**** clt added -- called by meta-cp-e
+op getIds : ASystem -> IdSet .
+eq getIds({ aconf }) = getIdsX(aconf, none)  .
+
+op getIdsX : Conf IdSet -> IdSet .
+eq getIdsX(aconf, ids) = ids [owise] .
+eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
+
+endm
+
+
+***(
+
+
+
+
+
+)
