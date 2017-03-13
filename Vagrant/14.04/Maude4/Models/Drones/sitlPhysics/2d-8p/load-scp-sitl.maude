@@ -1,4 +1,5 @@
 load load-scp
+load sitl
 
 load model-checker
 load ~/Repositories/imaude/ilib/load-lib
@@ -11,5 +12,6 @@ loop init .
  (pyexe plambda (define b1 (apply mkdrone "b1" (int 1) (int 10) (int 10) (boolean true) (boolean true) "log-hor.txt" )))
  (pyexe plambda (apply setStartTime))
  ****           maude local remote plambda module conf maudephyscs?
- (initAgentEset maude g2d g2d plambda SITL asysHor false)
+**** (initAgentEset maude g2d g2d plambda SITL asysHor false)
+ (initAgentEset maude g2d g2d plambda SITL asysLowWind20 false)
 )

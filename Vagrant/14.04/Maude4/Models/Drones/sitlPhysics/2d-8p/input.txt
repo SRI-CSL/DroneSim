@@ -3,6 +3,8 @@
 (doMaudeSimRound  100)
 (show val qval simStatus)
 
+(doSimRound plambda 100)
+
 (show val tval envKB)
 
 **** step by hand, 
