@@ -1,8 +1,9 @@
 fmod MODEL-TASKS is
   inc MODEL-KNOWLEDGE .
 	inc RANDOM .
-  inc SOLVE-SCP{valuation2valpicsenergyconservative} . 
-
+  --- inc SOLVE-SCP{valuation2valpicsenergyconservative} . 
+  inc SOLVE-SCP{valuation2valvisit} . 
+  
   vars id : Id .
 	var cl : Class .
 	vars  t t0 t1 t2 t3 t4 t5 t6 : Time .

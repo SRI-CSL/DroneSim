@@ -49,7 +49,12 @@ search [1] in SCENARIO : asysNoWind(5, 2.0e+1) =>* asys such that success(asys,
 
 No solution.
 states: 69632  rewrites: 466559427 in 680450ms cpu (700087ms real) (685662
-    rewrites/second)    
+    rewrites/second)
+
+
+search [1] in SCENARIO : asysNoWind(6, 2.0e+1) =>* asys such that success(asys, allTargets(6)) = true .
+
+Timeout!
 
 
 

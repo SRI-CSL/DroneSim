@@ -1,18 +1,19 @@
 fmod MODEL-TASKS is
   inc MODEL-KNOWLEDGE .
-	inc RANDOM .
-  inc SOLVE-SCP{valuation2valpicsenergyconservative} . 
-
+  inc RANDOM .
+  --- inc SOLVE-SCP{valuation2valpicsenergyconservative} . 
+  inc SOLVE-SCP{valuation2valvisit} . 
+  
   vars id : Id .
-	var cl : Class .
-	vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
+  var cl : Class .
+  vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
   vars l l0 loc loc0 home locR loc1 loc2 : Loc .
   vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 lkb4 : KB .
   vars evs evs' ievs devs : EventSet . 
   var dir dir1 : Dir .
   var act act0 act1  : Action .
-	vars acts acts0 pact : ActSet .
-	vars e v c x y z : FiniteFloat .
+  vars acts acts0 pact : ActSet .
+  vars e v c x y z : FiniteFloat .
   vars sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 : FiniteFloat .
   vars wsp sp sp0 ffx ffy ffz ffx1 ffy1 ffz1 dt dt2 dt1 ctheta : FiniteFloat .
   vars alt ix iy iz ix0 iy0 iz0 : Int .
@@ -28,15 +29,15 @@ fmod MODEL-TASKS is
 **** bot processes rcvs any other events are ignored
 **** should not be any others
   op handleS : Class Id KB EventSet -> KB .
-	eq handleS(cl,id,lkb,rcv(kb) ievs) =
-	      handleS(cl,id,addK(lkb,kb),ievs) .
-	eq handleS(cl,id,lkb,ievs) = lkb [owise] .  
+  eq handleS(cl,id,lkb,rcv(kb) ievs) =
+        handleS(cl,id,addK(lkb,kb),ievs) .
+  eq handleS(cl,id,lkb,ievs) = lkb [owise] .  
 
 *** all local info
   op getSensors : Id KB -> KB .
   eq getSensors(id,ekb) = getWind(ekb)
      restrictKB(id,ekb) (getRand(id,ekb)) (getTimeElapsed(ekb)) .
-	
+  
 **** keeps only location and energy, updates myDir at the edge
   op proSensors : Id KB KB -> KB .
   eq proSensors(id,lkb,ekb) = addK(lkb,ekb) .
@@ -185,7 +186,7 @@ ceq nextLocSimple(id,kb) =
   /\  pact := getPending(id,kb0) 
   /\ kb1 := (if isGoTo(pact)
               then (if (close(getLoc(pact),loc) 
-   						         and not(recentVisitT(getLoc(pact),kb,dt)))
+                        and not(recentVisitT(getLoc(pact),kb,dt)))
                   then incVisitTimes(id,getLoc(pact),t,kb)
                   else kb fi)
             else kb fi)  .
@@ -199,9 +200,9 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
  /\ pact := getPending(id,kb0)
  /\ kb1 := (if isGoTo(pact)
             then (if (close(getLoc(pact),loc) 
-								       and not(recentVisitT(getLoc(pact),kb,dt)))
-						      then incVisitTimes(id,getLoc(pact),t,kb)
-						      else kb fi)
+                       and not(recentVisitT(getLoc(pact),kb,dt)))
+                  then incVisitTimes(id,getLoc(pact),t,kb)
+                  else kb fi)
             else kb fi)
  /\ locs := (if isGoTo(pact) then getLoc(pact) else nil fi)
  /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
@@ -213,11 +214,11 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
   eq randMax = 4294967295 .
-	eq rand.25 = 1073741824 .
-	eq rand.5  = 2147483647 .
-	eq rand.75 = 3221225471 .
+  eq rand.25 = 1073741824 .
+  eq rand.5  = 2147483647 .
+  eq rand.75 = 3221225471 .
   eq rand.125 = 536870911 .
-	
+  
 ***** set in SCENARIO  
   op stopSimulation : -> FiniteFloat .
   --- op windThresh : -> Nat .
@@ -260,7 +261,7 @@ eq near(l,l0) = false [owise] .
 
   op tell : Id Action KB -> KB .
   eq tell(id,act,(atloc(id,loc) @ t) class(id,cl) lkb) = 
-	         (atloc(id,loc) @ t) class(id,cl) .
+           (atloc(id,loc) @ t) class(id,cl) .
   eq tell(id,act,kb) = none [owise] .
 
 endfm

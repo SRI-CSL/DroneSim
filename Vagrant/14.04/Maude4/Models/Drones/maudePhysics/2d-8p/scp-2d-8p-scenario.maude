@@ -32,13 +32,13 @@ Realizability Problem:
 search [1] asysNoWind(20.0) =>* asys such that success(asys,allTargets) .
 
 No solution.
-states: 272  rewrites: 370633 in 486ms cpu (490ms real) (761316 rewrites/second)
+states: 272  rewrites: 366719 in 477ms cpu (480ms real) (767986 rewrites/second)
 
-search [1] asysNoWind(30.0) =>* asys such that success(asys,allTargets) .
-
+search [1] in SCENARIO : asysNoWind(3.0e+1) =>* asys such that success(asys,
+    allTargets) = true .
 
 Solution 1 (state 232)
-states: 233  rewrites: 314090 in 415ms cpu (419ms real) (756604 rewrites/second)
+states: 233  rewrites: 310734 in 403ms cpu (409ms real) (769434 rewrites/second)
 asys --> {allStopConf(
 [eI
   | clock(58) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
@@ -46,14 +46,13 @@ asys --> {allStopConf(
     (energy(b(0), 1.7810000000000102e+1) @ 57) (energy(b(1),
     2.1280000000000108e+1) @ 55) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (wind(
     1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myHome(b(1), pt(10, 10, 0))]
-
 [b(0) : Bot |
-  lkb : (clock(58) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(57) @ 57) (
-    atloc(b(0), pt(2, 0, 0)) @ 57) (pending(b(0), stop(b(0))) @ 58) (energy(b(0),
-    1.7810000000000102e+1) @ 57) (caution(b(0), 3.0e+1) @ 0) (targetVel(b(0),
-    5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ;
-    pt(-20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30, 5), 8)
-    @ 8) (visitTimes(b(0), pt(50, 10, 5), 44) @ 44) (visitTimes(b(0), pt(-20, 50,
+  lkb : (clock(58) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(57) @ 57) (atloc(
+    b(0), pt(2, 0, 0)) @ 57) (pending(b(0), stop(b(0))) @ 58) (energy(b(0),
+    1.7810000000000102e+1) @ 57) (caution(b(0), 3.0e+1) @ 0) (targetVel(b(0), 5.0)
+    @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(50, 10, 5) ; pt(10, 30, 5) ; pt(
+    -20, 50, 5) ; pt(-40, 5, 5), nil) @ 0) (visitTimes(b(0), pt(10, 30, 5), 8) @
+    8) (visitTimes(b(0), pt(50, 10, 5), 44) @ 44) (visitTimes(b(0), pt(-20, 50,
     5), 15) @ 15) (visitTimes(b(0), pt(-40, 5, 5), 26) @ 26) (eLoc(b(0), pt(0, 0,
     0), 54) @ 44) (eLoc(b(0), pt(10, 30, 5), 7) @ 1) (eLoc(b(0), pt(50, 10, 5),
     44) @ 26) (eLoc(b(0), pt(-20, 50, 5), 15) @ 8) (eLoc(b(0), pt(-40, 5, 5), 25)
@@ -62,34 +61,30 @@ asys --> {allStopConf(
   evs : (tick @ 0)]
 [b(1) : Bot |
   lkb : (clock(58) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(114) @ 57) (
-    atloc(b(1), pt(9, 10, 0)) @ 55) (pending(b(1), stop(b(1))) @ 58) (energy(b(
-    1), 2.1280000000000108e+1) @ 55) (caution(b(1), 3.0e+1) @ 0) (targetVel(b(1),
-    5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40,
-    10) ; pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (visitTimes(b(1), pt(10,
-    -30, 10), 18) @ 18) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(
-    b(1), pt(-35, -5, 10), 28) @ 28) (visitTimes(b(1), pt(-40, -40, 10), 37) @
-    37) (eLoc(b(1), pt(10, 10, 0), 54) @ 44) (eLoc(b(1), pt(10, -30, 10), 17) @
-    10) (eLoc(b(1), pt(40, -10, 10), 9) @ 2) (eLoc(b(1), pt(-35, -5, 10), 28 ;
-    44) @ 37) (eLoc(b(1), pt(-40, -40, 10), 35) @ 28) (wind(1.0, 0.0, 0.0, 0) @
-    0) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
+    atloc(b(1), pt(9, 10, 0)) @ 55) (pending(b(1), stop(b(1))) @ 58) (energy(b(1),
+    2.1280000000000108e+1) @ 55) (caution(b(1), 3.0e+1) @ 0) (targetVel(b(1), 5.0)
+    @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40, -10, 10) ; pt(-40, -40, 10) ;
+    pt(-35, -5, 10) ; pt(10, -30, 10), nil) @ 0) (visitTimes(b(1), pt(10, -30,
+    10), 18) @ 18) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(b(1),
+    pt(-35, -5, 10), 28) @ 28) (visitTimes(b(1), pt(-40, -40, 10), 37) @ 37) (
+    eLoc(b(1), pt(10, 10, 0), 54) @ 44) (eLoc(b(1), pt(10, -30, 10), 17) @ 10) (
+    eLoc(b(1), pt(40, -10, 10), 9) @ 2) (eLoc(b(1), pt(-35, -5, 10), 28 ; 44) @
+    37) (eLoc(b(1), pt(-40, -40, 10), 35) @ 28) (wind(1.0, 0.0, 0.0, 0) @ 0)
+    myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
   ckb : (class(b(1), Bot) atloc(b(1), pt(9, 10, 0)) @ 55),
   evs : (tick @ 0)])}
 
 Soft Survivability:
 search [1] asysNoWind(30.0) =>* asys such that softFail(asys,allTargets) .
 
-search [1] in SCP-SCENARIO : asysNoWind(3.0e+1) =>* asys such that softFail(asys,
-    allTargets) = true .
-
 No solution.
-states: 236  rewrites: 319004 in 438ms cpu (445ms real) (728213 rewrites/second)
+states: 236  rewrites: 315648 in 659ms cpu (725ms real) (478300 rewrites/second)
 
 Hard Survivability
-search [1] in SCP-SCENARIO : asysNoWind(3.0e+1) =>* asys such that hardFail(asys,
-    allTargets) = true .
+search [1] asysNoWind(3.0e+1) =>* asys such that hardFail(asys,allTargets) = true .
 
 No solution.
-states: 236  rewrites: 322488 in 452ms cpu (461ms real) (712257 rewrites/second)
+states: 236  rewrites: 319132 in 418ms cpu (423ms real) (762204 rewrites/second)
 
 ==============================================================
 with low wind
@@ -98,11 +93,11 @@ The values are [home, minEnergy, crashes, farfromhome, pointsVisited]
 
 asysLowWind20
 
-averages ===> [ 1.5294117647058822, 7.658823529411764, 0.0, 0.29411764705882354, 8.0]
+averages ===> [ 1.4705882352941178, 6.647058823529411, 0.0, 0.35294117647058826, 8.0]
 
 asysLowWind30
 
-averages ===> [ 2.0, 17.11764705882353, 0.0, 0.0, 7.352941176470588]
+averages ===>  [ 2.0, 17.11764705882353, 0.0, 0.0, .352941176470588]
 
 asysLowWind40
 

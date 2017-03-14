@@ -1,11 +1,11 @@
 fth VALUATION is
   pr BOOL .
   inc SOFT-AGENTS .
-	
+  
   sort Grade . 
   op equivZero : Grade -> Bool .
   op _<_ : Grade  Grade -> Bool .
-****  op _equiv_ : Grade x Grade -> Bool .	
+****  op _equiv_ : Grade x Grade -> Bool .  
  
   op val : Id KB Action  -> Grade .
 ***  op val : Id KB  -> Grade .
@@ -17,12 +17,12 @@ fmod SOLVE-SCP{Z :: VALUATION} is
    inc SOFT-AGENTS .
 
   vars v v0 v1 : Z$Grade .
-	vars acts acts0 actset : ActSet .
-	vars act1 act : Action .
+  vars acts acts0 actset : ActSet .
+  vars act1 act : Action .
   vars rks rks1 : RankSet{Z} .
-	var id : Id .
-	var kb : KB .
-		
+  var id : Id .
+  var kb : KB .
+    
   sorts RankEle{Z} RankSet{Z} .
   op {_,_} : Z$Grade ActSet -> RankEle{Z} . 
 
@@ -40,7 +40,7 @@ fmod SOLVE-SCP{Z :: VALUATION} is
    if v0 < v1 .
   eq updateRks({v1,acts0} rks,act1,v1) = {v1,acts0 act1} rks .
   eq updateRks(rks,act1,v1) = 
-	    if equivZero(v1) then rks else {v1,act1} rks fi [owise] .
+      if equivZero(v1) then rks else {v1,act1} rks fi [owise] .
     
 ****  op solveSCP : Id KB ActSet -> ActSet .
   eq solveSCP(id,kb,acts) = solveSCP$(id,kb,acts,none) .
@@ -71,7 +71,7 @@ fmod BVAL is
   eq x:BVal < y:BVal = false [owise] .
 
   eq equivZero(bot) = true .
-  eq equivZero(top) = false .	
+  eq equivZero(top) = false .  
 
 endfm
 
@@ -115,7 +115,7 @@ fmod VAL-ENERGY is
   vars loc0 loc1 loc2 : Loc .
   var locs : LocSet .
   vars ni ni0 ni1 : Float .
-	vars dir dir1 : Dir .
+  vars dir dir1 : Dir .
   var dummy : BVal .
  
   op val-energy : Id KB  -> BVal .
@@ -240,6 +240,52 @@ fmod FFVAL is
 
 endfm
 
+***(
+This valuatios is for just visiting a point once
+)
+
+fmod VAL-VISITS is 
+  inc SOFT-AGENTS .
+  inc CONVERSION .
+  inc FFVAL .
+  inc MODEL-KNOWLEDGE .
+
+  vars kb kb' kb1 kb2 kb3 : KB .
+  vars id st : Id .
+  vars x y x1 y1 z1 x0 y0 z0 m n i : Nat .
+  var act : Action .
+  vars loc loc0 loc1 loc2 : Loc .
+  var locs locs0 locs1 : LocList .
+  vars dir dir1 : Dir .
+  vars t t0 t1 : Time .
+  vars st1 st2 v dt ff1 ff2 : FiniteFloat .
+  var times : TimesList .
+  
+  op valueCS : Id KB -> FiniteFloat .
+  op benefit : Id KB Action -> FiniteFloat .
+  op cost : Id KB Action -> FiniteFloat .
+  op val-visits : Id KB Action  -> FF .
+
+  ceq benefit(id,kb,goTo(id,loc)) = st2 - st1
+   if kb1 := doActT(id,kb,goTo(id,loc))
+   /\ st1 := valueCS(id,kb)
+   /\ st2 := valueCS(id,kb1) .
+
+  eq valueCS(id,(clock(t)) (visitTimes(id,loc, times ; t0) @ t1) kb)
+   = valueCS(id,(clock(t)) kb) + 1.0 .
+  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have 
+
+  ceq cost(id,kb,goTo(id,loc)) = cost2locT(loc0,loc,v,time2Loc(loc0,loc,v)) 
+   if v := getVel(id,kb) 
+   /\ loc0 := getLoc(id,kb) .
+
+  eq val-visits(id,kb,act) 
+   = {benefit(id,kb,act),cost(id,kb,act)} .
+
+  eq equivZero({ff1,ff2}) = ff1 == 0.0 .
+
+endfm
+
 --- Agent decides by considering how stale and how far the points are.
 --- I am not considering resolution this time.
 
@@ -259,7 +305,7 @@ fmod VAL-PICS is
   vars t t0 t1 : Time .
   vars st1 st2 v dt : FiniteFloat .
   var times : TimesList .
-	
+  
   op valueCS : Id KB -> FiniteFloat .
   op valueCS2 : Id KB -> Nat .
   ops benefit benefit2 : Id KB Action -> FiniteFloat .
@@ -273,15 +319,14 @@ fmod VAL-PICS is
 
   eq valueCS(id,(clock(t)) (visitTimes(id,loc, times ; t0) @ t1) kb)
    = valueCS(id,(clock(t)) kb)
-	   + 
-		 (if t - t0 > periodicity then 0.0 else timeFactor(t1,t) fi) .
+     + 
+     (if t - t0 > periodicity then 0.0 else timeFactor(t1,t) fi) .
 
   eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have maximum priority  ???        
 ---           photo time, current time
   op timeFactor : Nat Nat -> FiniteFloat . 
   eq timeFactor(t1,t) = if 2 * (t - t1) > periodicity
                         then 0.1 * float((t - t1) / periodicity) else 1.0 fi .
-
 
  ceq cost(id,kb,goTo(id,loc)) = cost2locT(loc0,loc,v,time2Loc(loc0,loc,v)) 
    if v := getVel(id,kb) 
@@ -315,9 +360,34 @@ ceq benefit2(id,kb,goTo(id,loc)) = 0.0
    = countVisitsAbove(kb,n) + (if len(times) > n then 1 else 0 fi) .
   eq countVisitsAbove(kb,n) = 0 [owise] .
 
-
   eq val-pics(id,kb,act) 
    = {benefit(id,kb,act),cost(id,kb,act)} .
+
+endfm
+
+fmod VAL-VISITS-ENERGY is
+  inc VAL-VISITS .
+  inc VAL-ENERGY .
+
+  var id : Id . 
+  var kb : KB . 
+  var act : Action .
+  vars b1 b2 : BVal .
+  vars u1 u2 : FF .
+  
+  sort TFFVal .
+  op {_,_} : BVal FF -> TFFVal .
+
+  op val : Id KB -> TFFVal .
+  op val : Id KB Action -> TFFVal .
+  eq val(id,kb) = {val-energy(id,kb),{1.0,1.0}} .
+  eq val(id,kb,act) = {val-energy(id,kb,act),val-visits(id,kb,act)} .
+
+  op _<_ : TFFVal TFFVal -> Bool .
+  op equivZero : TFFVal -> Bool .
+
+  eq {b1,u1} < {b2,u2} = (b1 < b2) or (b1 == b2 and u1 < u2) .
+  eq equivZero({b1,u1}) = (equivZero(b1)) or (equivZero(u1)) .
 
 endfm
 
@@ -369,29 +439,29 @@ fmod VAL-PATROL is
 
 ***(
   eq val-patrol(id, 
-	    (atloc(id,pt(x,y)) @ t) class(id,Bot)
-	    (myDir(id,dir) @ t0) (myY(id,y0) @ t1) kb,
+      (atloc(id,pt(x,y)) @ t) class(id,Bot)
+      (myDir(id,dir) @ t0) (myY(id,y0) @ t1) kb,
       mv(id,dir1)) = 
       (if (y0 < y) 
-			 then (if  (dir1 == S) then 0.9 else 0.0 fi)
-			 else  (if (y < y0) 
-       			 then (if  (dir1 == N) then 0.9 else 0.0 fi)
+       then (if  (dir1 == S) then 0.9 else 0.0 fi)
+       else  (if (y < y0) 
+              then (if  (dir1 == N) then 0.9 else 0.0 fi)
              else (if  (dir == dir1) then 0.9 else 0.0 fi)
-       			fi)			
-   			fi)	.
+             fi)      
+         fi)  .
 )
   eq val-patrol(id, kb, charge(id))  = 1.0 .
-	
+  
 endfm
 
 fmod VAL-PATROL-ONLY is
   inc VAL-PATROL .
 
   var id : Id . var kb : KB . var act : Action .
-	
+  
   op val : Id KB Action -> Float .
-	eq val(id,kb,act) = val-patrol(id,kb,act) .
-	
+  eq val(id,kb,act) = val-patrol(id,kb,act) .
+  
 endfm
 
 fmod VAL-PATROL-ENERGY is
@@ -448,7 +518,7 @@ endfm
 
 view  valuation2valpatrolonly from VALUATION to VAL-PATROL-ONLY is
   sort Grade to Float .
-endv	
+endv  
 
 view  valuation2valpatrolenergy from VALUATION to VAL-PATROL-ENERGY is
   sort Grade to BUVal .
@@ -462,6 +532,9 @@ view  valuation2valpicsenergyconservative from VALUATION to VAL-PICS-ENERGY is
   sort Grade to TFFVal .
 endv  
 
+view  valuation2valvisit from VALUATION to VAL-VISITS-ENERGY is
+  sort Grade to TFFVal .
+endv  
 
 
 ***(
@@ -471,7 +544,7 @@ endv
 
 view  valuation2valpatrol from VALUATION to VAL-PATROL-DET is
   sort Grade to Float .
-endv	
+endv  
 
 view  valuationbvalxuval from VALUATION to BVALxUVAL is
   sort Grade to BValxFloat .
