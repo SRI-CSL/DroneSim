@@ -317,6 +317,14 @@ op getIdsX : Conf IdSet -> IdSet .
 eq getIdsX(aconf, ids) = ids [owise] .
 eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
 
+
+  *** VN: For now ingnoring direction
+  op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
+  eq updateEkb(ekb,id,sx,sy,sz,dx,dy,dz,v,e,dt,n) = 
+        addK(ekb,
+        (atloc(id,mkLoc(sx,sy,sz)) @ s n)
+        (vel(id,v) @ s n) (energy(id,e) @ s(n)) (timeElapsed(dt) @ s n)) .
+
 endm
 
 

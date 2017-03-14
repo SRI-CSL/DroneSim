@@ -1,0 +1,33 @@
+From the running drone verions I
+moved contents of sitl.maude into 2d-8p-scenario.maude
+and in load-scp-sitl removed
+load sitl 
+and 
+changed
+ (initAgentEset maude g2d g2d plambda SITL asysLowWind20 false)
+to
+ (initAgentEset maude g2d g2d plambda SCENARIO asysLowWind20 false)
+
+
+now the controller somehow needs to start n versions of
+maude/plambda
+
+maude loads a file that effectively does
+
+load load-scp
+
+load model-checker
+load ~/Repositories/imaude/ilib/load-lib
+load ../../../../Lib/meta-cp-e
+loop init .
+
+(seq
+ (pyexe plambda (load "../../../../Lib/sitl_drone.lsp"))
+ (pyexe plambda (define b0 (apply mkdrone "b0" (int 0) (int 0) (int 0) (boolean true) (boolean true) "log3.txt" )))
+ (pyexe plambda (define b1 (apply mkdrone "b1" (int 1) (int 10) (int 10) (boolean true) (boolean true) "log-hor.txt" )))
+ (pyexe plambda (apply setStartTime))
+ ****           maude local remote plambda module conf maudephyscs?
+ (initAgentEset maude g2d g2d plambda ANALYSIS asysLowWind20 false)
+****  Patrol is name of statsobj
+(augAgentEsetStats Patrol 400 nGenericApprox .5 .5 5)
+)
