@@ -34,8 +34,7 @@ search [1] asysNoWind(20.0) =>* asys such that success(asys,allTargets) .
 No solution.
 states: 272  rewrites: 366719 in 477ms cpu (480ms real) (767986 rewrites/second)
 
-search [1] in SCENARIO : asysNoWind(3.0e+1) =>* asys such that success(asys,
-    allTargets) = true .
+search [1]  asysNoWind(3.0e+1) =>* asys such that success(asys, allTargets) = true .
 
 Solution 1 (state 232)
 states: 233  rewrites: 310734 in 403ms cpu (409ms real) (769434 rewrites/second)
