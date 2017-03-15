@@ -119,7 +119,7 @@
 
 
 (define make_args (prefix instanceno)
-  (if (== prefix 'plambda')
+  (if (= prefix 'plambda')
       (concat  ' plambda' instanceno)
     (concat ' basura load'instanceno)))
 
@@ -130,7 +130,7 @@
       (if (> (apply len tokens) (int 1))
 	  (let ((verb (get tokens (int 0)))
 		(noun (get tokens (int 1))))
-	    (if (and (== verb 'startOK') (invoke noun 'startswith' prefix))
+	    (if (and (= verb 'startOK') (invoke noun 'startswith' prefix))
 		(seq
 		 (invoke clones 'append' noun)
 		 (if (< (apply len clones) count)
@@ -168,10 +168,10 @@
       (if (> (apply len tokens) (int 1))
 	  (let ((verb (get tokens (int 0)))
 		(noun (get tokens (int 1))))
-	    (if (and (== verb 'initedOK') (invoke noun 'startswith' 'plambda'))
+	    (if (and (= verb 'initedOK') (invoke noun 'startswith' 'plambda'))
 		(seq
 		 (invoke inited_clones 'append' noun)
-		 (if (== (apply len inited_clones) plambda_population)
+		 (if (= (apply len inited_clones) plambda_population)
 		     (seq
 		      (apply plambda.actors.actorlib.send 'g2d' 'plambda' '(load "g2dinit.lsp")')
 		      (apply logmsg 'Sent initialize message to g2d\n')
@@ -192,7 +192,7 @@
 
 (import 'time')
 (define init_clones (clones prefix)
-  (if (== prefix 'plambda')
+  (if (= prefix 'plambda')
       (seq
        (for clone clones
 	    (let ((loadfile (concat 'init_' clone '.lsp'))
@@ -207,7 +207,7 @@
 	      (concat 'start maude0 iop_maude_wrapper ' (apply make_args 'maude' (int 0))))
        )
     )
-  (if (== prefix 'maude')
+  (if (= prefix 'maude')
       (seq
        (for clone clones
 	    (seq 
