@@ -7,12 +7,12 @@
    "\n"
    "(invoke sys.stderr 'write' 'initializing {0}\\n')"
    "\n"
-   "(load '../../../../Lib/drone.lsp')"
+   "(load '../../../../Lib/sitl_drone.lsp')"
    "\n"
-   "(define b0 (apply mkdrone 'b0' (* (int 2) (int {1})) (boolean false) (boolean false) 'log0.txt' ))"
+   "(define b0 (apply mkdrone 'b0' (* (int 2) (int {1})) (int 0) (int 0) (boolean false) (boolean false) 'log0.txt' ))"
    "\n"
-   "(define b1 (apply mkdrone 'b1' (+ (* (int 2) (int {1})) (int 1)) (boolean false) (boolean false) 'log1.txt' ))"   
-   "\n"   
+   "(define b1 (apply mkdrone 'b1' (+ (* (int 2) (int {1})) (int 1)) (int 10) (int 10) (boolean false) (boolean false) 'log1.txt' ))"
+   "\n"
    "(apply setStartTime)"
    "\n"
    "(import 'plambda.actors.actorlib')"
@@ -86,7 +86,7 @@
 
 (import 'sys')
 (define logmsg (msg)
-  (if debug 
+  (if debug
       (invoke  sys.stderr 'write' msg)
     )
   )
@@ -184,7 +184,7 @@
 
 (define inited_clones (mklist))
 
-(define init_handler 
+(define init_handler
   (lambda (sender message)
     (let ((tokens (invoke message 'split')))
       (if (> (apply len tokens) (int 1))
@@ -207,7 +207,7 @@
 	)
       )
     )
-  )    
+  )
 
 (import 'time')
 (define init_clones (clones prefix)
@@ -229,7 +229,7 @@
   (if (= prefix 'maude')
       (seq
        (for clone clones
-	    (seq 
+	    (seq
 	     (apply logmsg (concat 'clone: ' clone ' with prefix ' prefix '\n'))
 	     )
 	    )
