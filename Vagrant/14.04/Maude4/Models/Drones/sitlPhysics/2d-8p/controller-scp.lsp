@@ -290,9 +290,6 @@ plambda0  .... plambdaN
 maude0 .... maudeN
 
 
-
-
-
 It configures itself first by adding several handlers, then
 starts the ball rolling by asking the system to create the first plambda clone.
 

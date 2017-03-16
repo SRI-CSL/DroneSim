@@ -8,3 +8,5 @@ export IOPBINDIR=${BINDIR}/IOP
 export MAUDE_LIB=${BINDIR}/Maude
 
 export PATH=${IOPBINDIR}:${MAUDE_LIB}:${HOME}/Repositories/jsbsim/src:${HOME}/Repositories/ardupilot/Tools/autotest:/usr/lib/ccache:${PATH}
+
+ulimit -s unlimited
