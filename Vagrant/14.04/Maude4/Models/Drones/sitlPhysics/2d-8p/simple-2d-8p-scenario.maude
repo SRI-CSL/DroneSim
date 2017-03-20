@@ -26,257 +26,28 @@ endm
 
 ***(
 
- search [1] asysNoWind(20.0) =>* asys such that success(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(2.0e+1) =>* asys such that success(asys,
-    allTargets) = true .
-
-No solution.
-states: 272  rewrites: 271733 in 319ms cpu (322ms real) (849997 rewrites/second)
-
-search [1] asysNoWind(30.0) =>* asys such that success(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(3.0e+1) =>* asys such that success(asys,
-    allTargets) = true .
-
-No solution.
-states: 272  rewrites: 277267 in 341ms cpu (344ms real) (813090 rewrites/second)
-
-search [1] asysNoWind(40.0) =>* asys such that success(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(4.0e+1) =>* asys such that success(asys,
-    allTargets) = true .
-
-No solution.
-states: 272  rewrites: 277267 in 324ms cpu (326ms real) (854617 rewrites/second)
-
-search [1] asysNoWind(50.0) =>* asys such that success(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(5.0e+1) =>* asys such that success(asys,
-    allTargets) = true .
-
-No solution.
-states: 204  rewrites: 203772 in 243ms cpu (247ms real) (835387 rewrites/second)
-
----> The experiments above make sense as either the drone lands far from home or it does not visit all points. 
-
-search [1] asysNoWind(20.0) =>* asys such that softFail(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(2.0e+1) =>* asys such that softFail(asys,
-    allTargets) = true .
-
-No solution.
-states: 272  rewrites: 271993 in 326ms cpu (329ms real) (834290 rewrites/second)
-Maude> search [1] asysNoWind(30.0) =>* asys such that softFail(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(3.0e+1) =>* asys such that softFail(asys,
-    allTargets) = true .
-
-Solution 1 (state 268)
-states: 269  rewrites: 272368 in 327ms cpu (330ms real) (832634 rewrites/second)
-asys --> {allStopConf(
-[eI
-  | clock(67) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
-    rand(0) @ 0) (atloc(b(0), pt(13, 2, 0)) @ 66) (atloc(b(1), pt(10, 9, 0)) @
-    57) (energy(b(0), 4.4000000000001016) @ 66) (energy(b(1),
-    1.7540000000000106e+1) @ 57) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (
-    landFarFromHome(b(0), pt(13, 2, 0), 6.5e+1) @ 66) (wind(1.0, 0.0, 0.0, 0) @
-    0) myHome(b(0), pt(0, 0, 0)) myHome(b(1), pt(10, 10, 0))]
-[b(0) : Bot |
-  lkb : (clock(67) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(66) @ 66) (
-    atloc(b(0), pt(13, 2, 0)) @ 66) (pending(b(0), stop(b(0))) @ 67) (energy(b(
-    0), 4.4000000000001016) @ 66) (caution(b(0), 3.0e+1) @ 0) (targetVel(b(0),
-    5.0) @ 0) (vel(b(0), 5.0) @ 0) (landFarFromHome(b(0), pt(13, 2, 0), 6.5e+1) @
-    66) (targets(b(0), pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), pt(50, 10,
-    5)) @ 39) (visitTimes(b(0), pt(10, 30, 5), 20) @ 20) (visitTimes(b(0), pt(50,
-    10, 5), 12) @ 12) (visitTimes(b(0), pt(-20, 50, 5), 27) @ 27) (visitTimes(b(
-    0), pt(-40, 5, 5), 38) @ 38) (eLoc(b(0), pt(0, 0, 0), 66) @ 56) (eLoc(b(0),
-    pt(10, 30, 5), 21) @ 12) (eLoc(b(0), pt(50, 10, 5), 11 ; 56) @ 38) (eLoc(b(
-    0), pt(-20, 50, 5), 28) @ 20) (eLoc(b(0), pt(-40, 5, 5), 37) @ 27) (wind(1.0,
-    0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5)),
-  ckb : (class(b(0), Bot) atloc(b(0), pt(13, 2, 0)) @ 66),
-  evs : (tick @ 0)]
-[b(1) : Bot |
-  lkb : (clock(67) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(132) @ 66) (
-    atloc(b(1), pt(10, 9, 0)) @ 57) (pending(b(1), stop(b(1))) @ 67) (energy(b(
-    1), 1.7540000000000106e+1) @ 57) (caution(b(1), 3.0e+1) @ 0) (targetVel(b(1),
-    5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), nil, pt(40, -10, 10) ; pt(-40,
-    -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10)) @ 39) (visitTimes(b(1), pt(10,
-    -30, 10), nil) @ 0) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(
-    b(1), pt(-35, -5, 10), 38) @ 38) (visitTimes(b(1), pt(-40, -40, 10), 30) @
-    30) (eLoc(b(1), pt(10, 10, 0), 56) @ 48) (eLoc(b(1), pt(10, -30, 10), 48) @
-    38) (eLoc(b(1), pt(40, -10, 10), 9) @ 2) (eLoc(b(1), pt(-35, -5, 10), 37) @
-    30) (eLoc(b(1), pt(-40, -40, 10), 27) @ 10) (wind(1.0, 0.0, 0.0, 0) @ 0)
-    myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
-  ckb : (class(b(1), Bot) atloc(b(1), pt(10, 9, 0)) @ 57),
-  evs : (tick @ 0)])}
-
-search [1] asysNoWind(20.0) =>* asys such that hardFail(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(2.0e+1) =>* asys such that hardFail(asys,
-    allTargets) = true .
-
-Solution 1 (state 264)
-states: 265  rewrites: 265223 in 297ms cpu (299ms real) (891991 rewrites/second)
-asys --> {
-[eI
-  | clock(66) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
-    rand(0) @ 0) (atloc(b(0), pt(13, 2, 0)) @ 66) (atloc(b(1), pt(12, 9, 0)) @
-    65) (energy(b(0), 4.4000000000001016) @ 66) (energy(b(1), 6.0000000000001066)
-    @ 65) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (landFarFromHome(b(0), pt(13,
-    2, 0), 6.5e+1) @ 66) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0))
-    myHome(b(1), pt(10, 10, 0))]
-[b(0) : Bot |
-  lkb : (clock(66) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(65) @ 65) (
-    atloc(b(0), pt(13, 2, 0)) @ 65) (pending(b(0), land(b(0))) @ 66) (energy(b(
-    0), 4.4000000000001016) @ 65) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0),
-    5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(10, 30, 5) ; pt(-20, 50, 5)
-    ; pt(-40, 5, 5), pt(50, 10, 5)) @ 39) (visitTimes(b(0), pt(10, 30, 5), 20) @
-    20) (visitTimes(b(0), pt(50, 10, 5), 12) @ 12) (visitTimes(b(0), pt(-20, 50,
-    5), 27) @ 27) (visitTimes(b(0), pt(-40, 5, 5), 38) @ 38) (eLoc(b(0), pt(0, 0,
-    0), 66) @ 56) (eLoc(b(0), pt(10, 30, 5), 21) @ 12) (eLoc(b(0), pt(50, 10, 5),
-    11 ; 56) @ 38) (eLoc(b(0), pt(-20, 50, 5), 28) @ 20) (eLoc(b(0), pt(-40, 5,
-    5), 37) @ 27) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myAlt(b(
-    0), 5)),
-  ckb : (class(b(0), Bot) atloc(b(0), pt(13, 2, 0)) @ 65),
-  evs : (tick @ 0)]
-[b(1) : Bot |
-  lkb : (clock(66) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(130) @ 65) (
-    atloc(b(1), pt(12, 9, 0)) @ 65) (pending(b(1), stop(b(1))) @ 66) (energy(b(
-    1), 6.0000000000001066) @ 65) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1),
-    5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(-40, -40, 10) ; pt(-35, -5,
-    10) ; pt(10, -30, 10), pt(40, -10, 10)) @ 49) (visitTimes(b(1), pt(10, -30,
-    10), 48) @ 48) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(b(1),
-    pt(-35, -5, 10), 38) @ 38) (visitTimes(b(1), pt(-40, -40, 10), 30) @ 30) (
-    eLoc(b(1), pt(10, 10, 0), 63) @ 56) (eLoc(b(1), pt(10, -30, 10), 48) @ 38) (
-    eLoc(b(1), pt(40, -10, 10), 9 ; 55) @ 48) (eLoc(b(1), pt(-35, -5, 10), 37) @
-    30) (eLoc(b(1), pt(-40, -40, 10), 27) @ 10) (wind(1.0, 0.0, 0.0, 0) @ 0)
-    myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
-  ckb : (class(b(1), Bot) atloc(b(1), pt(12, 9, 0)) @ 65),
-  evs : (tick @ 0)]}
-
-search [1] asysNoWind(30.0) =>* asys such that hardFail(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(3.0e+1) =>* asys such that hardFail(asys,
-    allTargets) = true .
-
-Solution 1 (state 264)
-states: 265  rewrites: 270757 in 313ms cpu (315ms real) (862712 rewrites/second)
-asys --> {
-[eI
-  | clock(66) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
-    rand(0) @ 0) (atloc(b(0), pt(13, 2, 0)) @ 66) (atloc(b(1), pt(10, 9, 0)) @
-    57) (energy(b(0), 4.4000000000001016) @ 66) (energy(b(1),
-    1.7540000000000106e+1) @ 57) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (
-    landFarFromHome(b(0), pt(13, 2, 0), 6.5e+1) @ 66) (wind(1.0, 0.0, 0.0, 0) @
-    0) myHome(b(0), pt(0, 0, 0)) myHome(b(1), pt(10, 10, 0))]
-[b(0) : Bot |
-  lkb : (clock(66) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(65) @ 65) (
-    atloc(b(0), pt(13, 2, 0)) @ 65) (pending(b(0), land(b(0))) @ 66) (energy(b(
-    0), 4.4000000000001016) @ 65) (caution(b(0), 3.0e+1) @ 0) (targetVel(b(0),
-    5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(10, 30, 5) ; pt(-20, 50, 5)
-    ; pt(-40, 5, 5), pt(50, 10, 5)) @ 39) (visitTimes(b(0), pt(10, 30, 5), 20) @
-    20) (visitTimes(b(0), pt(50, 10, 5), 12) @ 12) (visitTimes(b(0), pt(-20, 50,
-    5), 27) @ 27) (visitTimes(b(0), pt(-40, 5, 5), 38) @ 38) (eLoc(b(0), pt(0, 0,
-    0), 66) @ 56) (eLoc(b(0), pt(10, 30, 5), 21) @ 12) (eLoc(b(0), pt(50, 10, 5),
-    11 ; 56) @ 38) (eLoc(b(0), pt(-20, 50, 5), 28) @ 20) (eLoc(b(0), pt(-40, 5,
-    5), 37) @ 27) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myAlt(b(
-    0), 5)),
-  ckb : (class(b(0), Bot) atloc(b(0), pt(13, 2, 0)) @ 65),
-  evs : (tick @ 0)]
-[b(1) : Bot |
-  lkb : (clock(66) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(130) @ 65) (
-    atloc(b(1), pt(10, 9, 0)) @ 57) (pending(b(1), stop(b(1))) @ 66) (energy(b(
-    1), 1.7540000000000106e+1) @ 57) (caution(b(1), 3.0e+1) @ 0) (targetVel(b(1),
-    5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), nil, pt(40, -10, 10) ; pt(-40,
-    -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10)) @ 39) (visitTimes(b(1), pt(10,
-    -30, 10), nil) @ 0) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(
-    b(1), pt(-35, -5, 10), 38) @ 38) (visitTimes(b(1), pt(-40, -40, 10), 30) @
-    30) (eLoc(b(1), pt(10, 10, 0), 56) @ 48) (eLoc(b(1), pt(10, -30, 10), 48) @
-    38) (eLoc(b(1), pt(40, -10, 10), 9) @ 2) (eLoc(b(1), pt(-35, -5, 10), 37) @
-    30) (eLoc(b(1), pt(-40, -40, 10), 27) @ 10) (wind(1.0, 0.0, 0.0, 0) @ 0)
-    myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
-  ckb : (class(b(1), Bot) atloc(b(1), pt(10, 9, 0)) @ 57),
-  evs : (tick @ 0)]}
-
-search [1] asysNoWind(40.0) =>* asys such that hardFail(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(4.0e+1) =>* asys such that hardFail(asys,
-    allTargets) = true .
-
-Solution 1 (state 264)
-states: 265  rewrites: 270757 in 314ms cpu (316ms real) (861093 rewrites/second)
-asys --> {
-[eI
-  | clock(66) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
-    rand(0) @ 0) (atloc(b(0), pt(13, 2, 0)) @ 66) (atloc(b(1), pt(10, 9, 0)) @
-    57) (energy(b(0), 4.4000000000001016) @ 66) (energy(b(1),
-    1.7540000000000106e+1) @ 57) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (
-    landFarFromHome(b(0), pt(13, 2, 0), 6.5e+1) @ 66) (wind(1.0, 0.0, 0.0, 0) @
-    0) myHome(b(0), pt(0, 0, 0)) myHome(b(1), pt(10, 10, 0))]
-[b(0) : Bot |
-  lkb : (clock(66) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(65) @ 65) (
-    atloc(b(0), pt(13, 2, 0)) @ 65) (pending(b(0), land(b(0))) @ 66) (energy(b(
-    0), 4.4000000000001016) @ 65) (caution(b(0), 4.0e+1) @ 0) (targetVel(b(0),
-    5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), pt(10, 30, 5) ; pt(-20, 50, 5)
-    ; pt(-40, 5, 5), pt(50, 10, 5)) @ 39) (visitTimes(b(0), pt(10, 30, 5), 20) @
-    20) (visitTimes(b(0), pt(50, 10, 5), 12) @ 12) (visitTimes(b(0), pt(-20, 50,
-    5), 27) @ 27) (visitTimes(b(0), pt(-40, 5, 5), 38) @ 38) (eLoc(b(0), pt(0, 0,
-    0), 66) @ 56) (eLoc(b(0), pt(10, 30, 5), 21) @ 12) (eLoc(b(0), pt(50, 10, 5),
-    11 ; 56) @ 38) (eLoc(b(0), pt(-20, 50, 5), 28) @ 20) (eLoc(b(0), pt(-40, 5,
-    5), 37) @ 27) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myAlt(b(
-    0), 5)),
-  ckb : (class(b(0), Bot) atloc(b(0), pt(13, 2, 0)) @ 65),
-  evs : (tick @ 0)]
-[b(1) : Bot |
-  lkb : (clock(66) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(130) @ 65) (
-    atloc(b(1), pt(10, 9, 0)) @ 57) (pending(b(1), stop(b(1))) @ 66) (energy(b(
-    1), 1.7540000000000106e+1) @ 57) (caution(b(1), 4.0e+1) @ 0) (targetVel(b(1),
-    5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), nil, pt(40, -10, 10) ; pt(-40,
-    -40, 10) ; pt(-35, -5, 10) ; pt(10, -30, 10)) @ 39) (visitTimes(b(1), pt(10,
-    -30, 10), nil) @ 0) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(
-    b(1), pt(-35, -5, 10), 38) @ 38) (visitTimes(b(1), pt(-40, -40, 10), 30) @
-    30) (eLoc(b(1), pt(10, 10, 0), 56) @ 48) (eLoc(b(1), pt(10, -30, 10), 48) @
-    38) (eLoc(b(1), pt(40, -10, 10), 9) @ 2) (eLoc(b(1), pt(-35, -5, 10), 37) @
-    30) (eLoc(b(1), pt(-40, -40, 10), 27) @ 10) (wind(1.0, 0.0, 0.0, 0) @ 0)
-    myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
-  ckb : (class(b(1), Bot) atloc(b(1), pt(10, 9, 0)) @ 57),
-  evs : (tick @ 0)]}
-
-  search [1] asysNoWind(50.0) =>* asys such that hardFail(asys,allTargets) .
-search [1] in SCENARIO : asysNoWind(5.0e+1) =>* asys such that hardFail(asys,
-    allTargets) = true .
-
-No solution.
-states: 204  rewrites: 206780 in 244ms cpu (246ms real) (845418 rewrites/second)
-
-================================================================
-
-The values are [home, minEnergy, crashes, farfromhome, pointsVisited]
-
-
 asysLowWind20
 
-[ 0.4117647058823529, 3.4352941176470577, 0.0, 1.588235294117647, 7.764705882352941]
+[ 0.3333333333333333, 27.666666666666668, 0.0, 0.0, 7.333333333333333]
 
 asysLowWind30
 
-[ 1.2352941176470589, 5.247058823529413, 0.0, 0.7647058823529411, 6.82352]
+[ 1.0, 27.333333333333332, 0.0, 0.0, 8.0]
 
 asysLowWind40
 
-[ 1.7058823529411764, 13.882352941176473, 0.0, 0.29411764705882354, 5.647058823529412]
+[ 1.6666666666666667, 38.333333333333336, 0.0, 0.0, 6.333333333333333]
 
-asysLowWind50
+asysLowWind 50
 
-[ 2.0, 25.11764705882353, 0.0, 0.0, 4.117647058823529]
+[ 0.6666666666666666, 42.666666666666664, 0.0, 0.0, 5.666666666666667]
 
 asysHighWind20
 
-[ 0.4117647058823529, 3.188235294117647, 0.0, 1.411764705882353, 6.47058
+averages ===> [ 0.3333333333333333, 10.333333333333334, 0.0, 0.0, 7.666666666666667]
 
 asysHighWind30
 
- [ 1.1764705882352942, 4.811764705882354, 0.0, 0.5882352941176471, 5.470588235294118]
-
-asysHighWind40
-
-[ 1.8235294117647058, 11.58235294117647, 0.0, 0.058823529411764705, 4.176470588235294]
-
-asysHighWind50
-
-[ 1.9411764705882353, 15.717647058823532, 0.0, 0.0, 3.3529411764705883]
 
 
 
