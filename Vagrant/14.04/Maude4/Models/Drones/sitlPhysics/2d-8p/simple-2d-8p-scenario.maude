@@ -21,6 +21,12 @@ eq asysHighWind20 = asysHighWind(20.0) .
 eq asysHighWind40 = asysHighWind(40.0) .
 eq asysHighWind50 = asysHighWind(50.0) .
 
+ops asysVeryHighWind30 asysVeryHighWind20 asysVeryHighWind40 asysVeryHighWind50 : -> ASystem .
+eq asysVeryHighWind20 = asysVeryHighWind(20.0) .
+eq asysVeryHighWind30 = asysVeryHighWind(30.0) .
+eq asysVeryHighWind40 = asysVeryHighWind(40.0) .
+eq asysVeryHighWind50 = asysVeryHighWind(50.0) .
+
 
 endm
 
@@ -28,27 +34,39 @@ endm
 
 asysLowWind20
 
-[ 0.3333333333333333, 27.666666666666668, 0.0, 0.0, 7.333333333333333]
+[ 0.3333333333333333, 0.0, 0.0, 0.0, 6.0]
 
 asysLowWind30
 
-[ 1.0, 27.333333333333332, 0.0, 0.0, 8.0]
+[ 0.6666666666666666, 3.0, 0.0, 0.0, 7.666666666666667]
 
-asysLowWind40
+asysLowWind40 
 
-[ 1.6666666666666667, 38.333333333333336, 0.0, 0.0, 6.333333333333333]
+[ 0.3333333333333333, 9.666666666666666, 0.0, 0.0, 5.666666666666667]
 
-asysLowWind 50
+asysLowWind50 (Points Strange)
 
-[ 0.6666666666666666, 42.666666666666664, 0.0, 0.0, 5.666666666666667]
+[ 0.3333333333333333, 28.666666666666668, 0.0, 0.0, 6.333333333333333]
 
-asysHighWind20
+asysHighWind20 (Strange)
 
-averages ===> [ 0.3333333333333333, 10.333333333333334, 0.0, 0.0, 7.666666666666667]
+[ 0.0, 0.0, 0.0, 0.0, 7.0]
 
 asysHighWind30
 
+[ 0.3333333333333333, 4.666666666666667, 0.0, 0.0, 7.0]
 
+asysHighWind40
+
+[ 0.0, 13.333333333333334, 0.0, 0.0, 6.0]
+
+asysHighWind50
+
+[ 0.0, 21.333333333333332, 0.0, 0.0, 5.666666666666667]
+
+asysVeryHighWind20 
+
+does not work...
 
 
 )
