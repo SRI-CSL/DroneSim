@@ -63,7 +63,8 @@ The communication uses a MavProxy process that forwards MavLink
 commands over the local IP network. 
 
 The SITL (software in the loop) simulator allows us to simulate a Plane,
-Copter or Rover without any hardware. 
+Copter or Rover without any actual hardware. The physics of the simulation
+is provided by the JSBSim software package.
 
 
 ArdupilotSoftwareintheLoopSITL.jpg
