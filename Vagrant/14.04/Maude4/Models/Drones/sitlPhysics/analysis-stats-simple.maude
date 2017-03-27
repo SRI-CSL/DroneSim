@@ -8,7 +8,7 @@ var dir : Dir .
 vars wkb kb lkb ekb : KB .
 var aconf : Conf .
 var attrs : AttributeSet .
-var id eid : Id .
+var ˚∫id eid : Id .
 var ids : IdSet .
 var cl : Class .
 var l home loc : Loc .
