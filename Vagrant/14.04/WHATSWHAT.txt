@@ -67,4 +67,6 @@ Copter or Rover without any actual hardware. The physics of the simulation
 is provided by the JSBSim software package.
 
 
+A picture stolen from http://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html
+
 ArdupilotSoftwareintheLoopSITL.jpg
