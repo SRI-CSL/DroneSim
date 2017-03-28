@@ -1,0 +1,72 @@
+================  Repository Blurbs ===========
+
+The ingredients:
+
+https://github.com/tridge/jsbsim.git
+
+"JSBSim is a multi-platform, general purpose object-oriented Flight
+Dynamics Model (FDM) written in C++. Jon Berndt and Tony Peden began
+about mid-1998 writing JSBSim. As of this writing it is the default
+FDM for FlightGear. JSBSim can also be run in a standalone batch mode
+for testing and study. More information on JSBSim can be found at the
+JSBSim home page here:
+
+http://www.jsbsim.org
+"
+
+https://github.com/ArduPilot/MAVProxy    PYTHON
+
+"A UAV ground station software package for MAVLink based systems
+
+This is a MAVLink ground station written in python.
+
+
+MAVProxy is a fully-functioning GCS for UAV’s. The intent is for a
+minimalist, portable and extendable GCS for any UAV supporting the
+MAVLink protocol (such as the APM).  "
+
+https://github.com/ArduPilot/ardupilot   C/C++
+
+"Ardupilot is the most advanced, full-featured and reliable autopilot
+software available. It has been developed over 5+ years by a team of
+diverse professional engineers and computer scientists. It is the only
+autopilot software capable of controlling any vehicle system
+imaginable, from conventional airplanes, multirotors, and helicopters,
+to boats and even submarines. And now being expanded to feature
+support for new emerging vehicle types such as quad-planes and
+compound helicopters."
+
+
+https://github.com/dronekit/dronekit-sitl.git
+
+"The ArduPilot SITL (Software In The Loop) simulator allows you to
+simulate an ArduPilot based autopilot and communicate with it using
+MAVLink over the local IP network.
+
+DroneKit-SITL is the fastest and easiest way to run SITL on Windows,
+Linux, or MAC OSX. It is installed from Python’s pip tool on all
+platforms, and provides a few simple commands to run pre-built vehicle
+binaries that are appropriate for the host operating system
+(downloading them if needed). You can even use it to run binaries
+you've build locally.  "
+
+
+https://github.com/ArduPilot/mavlink.git
+
+"MAVLink micro air vehicle marshalling / communication library"
+
+
+===================== Our description 
+
+We use the python library DroneKit-SITL to communicate to a ArduPilot SITL instance.
+The communication uses a MavProxy process that forwards MavLink
+commands over the local IP network. 
+
+The SITL (software in the loop) simulator allows us to simulate a Plane,
+Copter or Rover without any actual hardware. The physics of the simulation
+is provided by the JSBSim software package.
+
+
+A picture stolen from http://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html
+
+ArdupilotSoftwareintheLoopSITL.jpg

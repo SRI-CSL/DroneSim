@@ -8,7 +8,7 @@ var dir : Dir .
 vars wkb kb lkb ekb : KB .
 var aconf : Conf .
 var attrs : AttributeSet .
-var ˚∫id eid : Id .
+var id eid : Id .
 var ids : IdSet .
 var cl : Class .
 var l home loc : Loc .
@@ -56,13 +56,31 @@ eq card(ki:KItem kb) = s(card(kb)) .
       =  mkdouble(float(h)) + " " + mkdouble(e)  + " " + mkdouble(float(c)) + " " + mkdouble(float(f)) + " " + mkdouble(float(v))
    if h := getObsHome([eid | ekb ] aconf)
    /\ e := minEnergy(ekb,100.0)
-   /\ c := card(getCrashed(ekb))
-   /\ f := card(getLandedFarFromHome(ekb))
+   /\ c := getCrashedSitl(ekb)
+   /\ f := getLandedFarFromHomeSitl(ekb)
    /\ v := card(getVisited([eid | ekb ] aconf)) .
 
   op mkdouble : FiniteFloat -> String .
   eq mkdouble(e) = 
     "(" + "double" + " " + makeString(decFloat(e,2)) + ")"  .
+
+  op getCrashedSitl : KB -> Nat .
+  op getLandedFarFromHomeSitl : KB -> Nat .
+
+  ceq getCrashedSitl((atloc(id,pt(x,y,z)) @ t1),
+                      (energy(id,e) @ t2) kb) 
+   = s (getCrashedSitl (kb)) 
+   if z > 1 
+   /\ e == 0.0 .
+  eq getCrashedSitl(kb) = 0 [owise] . 
+
+  ceq getLandedFarFromHomeSitl((atloc(id,pt1) @ t1) kb) 
+   = s (getLandedFarFromHomeSitl(kb)
+   if myHome(id,home) kb1 := ekb 
+   /\ pt(x0,y0,z0) := getLoc(id,kb) 
+   /\ near(pt(x0,y0,0),home) .
+
+  eq getLandedFarFromHomeSitl(kb) = 0 [owise] .
 
   op getObsKB : KB KB -> Bool .
   eq getObs({allStopConf(aconf) }) = br(true,getObsN(aconf)) .
