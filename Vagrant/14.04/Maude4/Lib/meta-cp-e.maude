@@ -46,7 +46,7 @@ var n : Nat .
 
 **** gensym hack for generating new ids 
 
-  eq rat("None",n) = 0 .
+***  eq rat("None",n) = 0 .
 
   op getGlobalCounter : ESet -> String .
   op incGlobalCounter : ESet -> ESet .

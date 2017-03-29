@@ -1,0 +1,4 @@
+# start g2d iop_graphics2d_wrapper $IOPBINDIR -Xms256m -Xmx1024m
+start plambda pyactor plambda 
+start maude iop_maude_wrapper basura load-simple-sitl
+select maude

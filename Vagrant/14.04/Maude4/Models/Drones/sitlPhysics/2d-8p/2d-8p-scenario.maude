@@ -326,8 +326,8 @@ eq getIdsX([id : cl | attrs] aconf, ids) = getIdsX(aconf, id ids) .
 
 
 *** This is needed until we understand why SITL is returning None.
-  op None : -> FiniteFloat .
-  eq None = 0.0 .
+***  op None : -> FiniteFloat .
+***  eq None = 0.0 .
 
   *** VN: For now ingnoring direction
   op updateEkb : KB Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat -> KB .
