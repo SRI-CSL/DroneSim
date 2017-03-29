@@ -24,6 +24,12 @@ eq asysHighWind50 = asysHighWind(50.0) .
 endm
 
 ***(
+No concurrent:
+asysLowWind20
+
+
+=====================
+Concurrent
 
 With SITL:
 

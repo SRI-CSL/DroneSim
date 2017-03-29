@@ -1,6 +1,6 @@
 mod TEST is
  inc SCENARIO .
- --- inc ANALYSIS .
+ inc ANALYSIS .
   inc SOLVE-SCP{valuation2valvisit} . 
  
  
@@ -12,41 +12,69 @@ ops acts : -> ActSet .
 ops lkb0 lkb1 ekb1  : -> KB .
 op conf : -> Conf .
 
-eq conf = (
+eq conf = 
 [eI
-    | clock(50) class(b(0), Bot) class(b(1), Bot) (timeElapsed(0.0) @ 0) (
-    rand(0) @ 0) (atloc(b(0), pt(-20, 10, 0)) @ 47) (atloc(b(1), pt(9, 10, 0)) @
-    49) (energy(b(0), 3.2480000000000096e+1) @ 47) (energy(b(1),
-    2.9460000000000093e+1) @ 49) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (wind(
-    1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myHome(b(1), pt(10, 10, 0))]
-
-[b(0) : Bot |
-  lkb : (clock(50) class(b(0), Bot) (timeElapsed(0.0) @ 0) (rand(49) @ 49) (
-    atloc(b(0), pt(-20, 1, 0)) @ 47) (pending(b(0), goTo(b(0),pt(50, 10, 5))) @ 50) (energy(b(
-    0), 3.2480000000000096e+1) @ 47) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0),
-    5.0) @ 0) (vel(b(0), 5.0) @ 0) (targets(b(0), nil, pt(50, 10, 5) ; pt(10, 30,
-    5) ; pt(-20, 50, 5) ; pt(-40, 5, 5)) @ 28) (visitTimes(b(0), pt(10, 30, 5),
-    20) @ 20) (visitTimes(b(0), pt(50, 10, 5), 12) @ 12) (visitTimes(b(0), pt(
-    -20, 50, 5), 27) @ 27) (visitTimes(b(0), pt(-40, 5, 5), 21) @ 0) (eLoc(b(0),
-    pt(0, 0, 0), 46) @ 38) (eLoc(b(0), pt(10, 30, 5), 21) @ 12) (eLoc(b(0), pt(
-    50, 10, 5), 11) @ 1) (eLoc(b(0), pt(-20, 50, 5), 28) @ 20) (eLoc(b(0), pt(
-    -40, 5, 5), 37) @ 27) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0))
-    myAlt(b(0), 5)),
-  ckb : (class(b(0), Bot) atloc(b(0), pt(-2, 1, 0)) @ 47),
-  evs : (tick @ 0)]
-[b(1) : Bot |
-  lkb : (clock(50) class(b(1), Bot) (timeElapsed(0.0) @ 0) (rand(98) @ 49) (
-    atloc(b(1), pt(9, 10, 0)) @ 49) (pending(b(1), stop(b(1))) @ 50) (energy(b(
-    1), 2.9460000000000093e+1) @ 49) (caution(b(1), 5.0e+1) @ 0) (targetVel(b(1),
-    5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(10, -30, 10), pt(40, -10,
-    10) ; pt(-40, -40, 10) ; pt(-35, -5, 10)) @ 31) (visitTimes(b(1), pt(10, -30,
-    10), nil) @ 0) (visitTimes(b(1), pt(40, -10, 10), 10) @ 10) (visitTimes(b(1),
-    pt(-35, -5, 10), nil) @ 0) (visitTimes(b(1), pt(-40, -40, 10), 30) @ 30) (
-    eLoc(b(1), pt(10, 10, 0), 48) @ 38) (eLoc(b(1), pt(40, -10, 10), 9) @ 2) (
-    eLoc(b(1), pt(-35, -5, 10), 37) @ 30) (eLoc(b(1), pt(-40, -40, 10), 27) @ 10)
-    (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10)),
-  ckb : (class(b(1), Bot) atloc(b(1), pt(9, 10, 0)) @ 49),
-  evs : (tick @ 0)]) .
+  | clock(37)class(b(0),Bot)class(b(1),Bot)class(b(2),Bot)class(b(3),
+    Bot)(timeElapsed(5.3065980000000003e+1)@ 37)(timeElapsed(
+    5.3396006999999997e+1)@ 37)(timeElapsed(5.3745277000000002e+1)@ 37)(
+    timeElapsed(5.4102936e+1)@ 37)(rand(0)@ 0)(atloc(b(0),pt(6,-2,-1))@ 37)(
+    atloc(b(1),pt(96,100,0))@ 37)(atloc(b(2),pt(4,16,0))@ 37)(atloc(b(3),pt(
+    108,129,0))@ 37)(energy(b(0),1.5e+1)@ 37)(energy(b(1),1.1e+1)@ 37)(energy(
+    b(2),1.5e+1)@ 37)(energy(b(3),0.0)@ 37)(vel(b(0),1.83847763109e-1)@ 37)(
+    vel(b(1),1.6155494421399999e-1)@ 37)(vel(b(2),1.3928388277199999e-1)@ 37)(
+    vel(b(3),1.07703296143e-1)@ 37)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(0),
+    pt(0,0,0))myHome(b(1),pt(100,100,0))myHome(b(2),pt(10,10,0))myHome(b(3),pt(
+    110,110,0))]
+[b(0): Bot |
+  lkb :(clock(37)class(b(0),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    36)@ 36)(atloc(b(0),pt(6,-2,-1))@ 36)(pending(b(0),stop(b(0)))@ 37)(energy(
+    b(0),1.5e+1)@ 36)(caution(b(0),2.0e+1)@ 0)(targetVel(b(0),5.0)@ 0)(vel(b(
+    0),1.83847763109e-1)@ 36)(targets(b(0),pt(50,10,5); pt(10,30,5); pt(-20,50,
+    5); pt(-40,5,5),nil)@ 0)(visitTimes(b(0),pt(10,30,5),6)@ 6)(visitTimes(b(
+    0),pt(50,10,5),nil)@ 0)(visitTimes(b(0),pt(-20,50,5),13)@ 13)(visitTimes(b(
+    0),pt(-40,5,5),23)@ 23)(eLoc(b(0),pt(0,0,0),31)@ 23)(eLoc(b(0),pt(10,30,5),
+    8)@ 2)(eLoc(b(0),pt(-20,50,5),13)@ 6)(eLoc(b(0),pt(-40,5,5),23)@ 13)(wind(
+    1.0,0.0,0.0,536870912)@ 0)myHome(b(0),pt(0,0,0))myAlt(b(0),5)),
+  ckb :(class(b(0),Bot)atloc(b(0),pt(6,-2,-1))@ 36),
+  evs :(tick @ 0)]
+[b(1): Bot |
+  lkb :(clock(37)class(b(1),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    72)@ 36)(atloc(b(1),pt(96,100,0))@ 36)(pending(b(1),stop(b(1)))@ 37)(
+    energy(b(1),1.1e+1)@ 36)(caution(b(1),2.0e+1)@ 0)(targetVel(b(1),5.0)@ 0)(
+    vel(b(1),1.5231546211700001e-1)@ 36)(targets(b(1),pt(150,110,5); pt(110,
+    130,5); pt(80,150,5); pt(60,105,5),nil)@ 0)(visitTimes(b(1),pt(60,105,5),
+    23)@ 23)(visitTimes(b(1),pt(80,150,5),11)@ 11)(visitTimes(b(1),pt(110,130,
+    5),6)@ 6)(visitTimes(b(1),pt(150,110,5),nil)@ 0)(eLoc(b(1),pt(60,105,5),
+    21)@ 11)(eLoc(b(1),pt(80,150,5),13)@ 6)(eLoc(b(1),pt(100,100,0),31)@ 23)(
+    eLoc(b(1),pt(110,130,5),8)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(1),
+    pt(100,100,0))myAlt(b(1),5)),
+  ckb :(class(b(1),Bot)atloc(b(1),pt(96,100,0))@ 36),
+  evs :(tick @ 0)]
+[b(2): Bot |
+  lkb :(clock(37)class(b(2),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    108)@ 36)(atloc(b(2),pt(4,16,0))@ 36)(pending(b(2),stop(b(2)))@ 37)(energy(
+    b(2),1.5e+1)@ 36)(caution(b(2),2.0e+1)@ 0)(targetVel(b(2),5.0)@ 0)(vel(b(
+    2),1.20830459736e-1)@ 36)(targets(b(2),pt(40,-10,10); pt(-40,-40,10); pt(
+    -35,-5,10); pt(10,-30,10),nil)@ 0)(visitTimes(b(2),pt(10,-30,10),nil)@ 0)(
+    visitTimes(b(2),pt(40,-10,10),23)@ 23)(visitTimes(b(2),pt(-35,-5,10),nil)@
+    0)(visitTimes(b(2),pt(-40,-40,10),nil)@ 0)(eLoc(b(2),pt(10,10,0),31)@ 23)(
+    eLoc(b(2),pt(40,-10,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(2),
+    pt(10,10,0))myAlt(b(2),10)),
+  ckb :(class(b(2),Bot)atloc(b(2),pt(4,16,0))@ 36),
+  evs :(tick @ 0)]
+[b(3): Bot |
+  lkb :(clock(37)class(b(3),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    144)@ 36)(atloc(b(3),pt(108,108,2))@ 36)(pending(b(3),stop(b(3)))@ 37)(
+    energy(b(3),1.0)@ 36)(caution(b(3),2.0e+1)@ 0)(targetVel(b(3),5.0)@ 0)(vel(
+    b(3),4.8301138702899998e-1)@ 36)(targets(b(3),pt(140,90,10); pt(60,60,10);
+    pt(65,95,10); pt(110,70,10),nil)@ 0)(visitTimes(b(3),pt(60,60,10),26)@ 26)(
+    visitTimes(b(3),pt(65,95,10),nil)@ 0)(visitTimes(b(3),pt(110,70,10),19)@
+    19)(visitTimes(b(3),pt(140,90,10),7)@ 7)(eLoc(b(3),pt(60,60,10),29)@ 19)(
+    eLoc(b(3),pt(110,70,10),14)@ 7)(eLoc(b(3),pt(110,110,0),40)@ 26)(eLoc(b(3),
+    pt(140,90,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(3),pt(110,110,
+    0))myAlt(b(3),10)),
+  ckb :(class(b(3),Bot)atloc(b(3),pt(108,108,2))@ 36),
+  evs :(tick @ 0)] .
 
 eq acts = myActs(Bot,b(1),lkb1) .
 

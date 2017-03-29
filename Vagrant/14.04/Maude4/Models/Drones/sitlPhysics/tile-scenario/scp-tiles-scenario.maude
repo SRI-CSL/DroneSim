@@ -12,6 +12,12 @@ eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 op numTiles : -> Nat .
 eq numTiles = 2 . *** Each tile has 2 drones
 
+ops asysNoWind30 asysNoWind20 asysNoWind40 asysNoWind50 : -> ASystem .
+eq asysNoWind20 = asysNoWind(numTiles,20.0) .
+eq asysNoWind30 = asysNoWind(numTiles,30.0) .
+eq asysNoWind40 = asysNoWind(numTiles,40.0) .
+eq asysNoWind50 = asysNoWind(numTiles,50.0) .
+
 ops asysLowWind30 asysLowWind20 asysLowWind40 asysLowWind50 : -> ASystem .
 eq asysLowWind30 = asysLowWind(numTiles,30.0) .
 eq asysLowWind20 = asysLowWind(numTiles,20.0) .
@@ -28,34 +34,92 @@ endm
 
 ***(
 
-Realizability Problem:
+eq numTiles = 2 . *** Each tile has 2 drones
 
-search [1] in SCENARIO : asysNoWind(3, 2.0e+1) =>* asys such that success(asys, allTargets(3)) = true .
+SITL works
 
-No solution.
-states: 4352  rewrites: 17267570 in 21248ms cpu (21822ms real) (812654
-    rewrites/second)
+But the energy of b3 is 0 and of b1 is close to zero.
+This may mean that the points for b1 and b3 are too far...
 
-search [1] in SCENARIO : asysNoWind(4, 2.0e+1) =>* asys such that success(asys,
-    allTargets(4)) = true .
+(tval SCENARIO{allStopConf(
+[eI
+  | clock(37)class(b(0),Bot)class(b(1),Bot)class(b(2),Bot)class(b(3),
+    Bot)(timeElapsed(5.3065980000000003e+1)@ 37)(timeElapsed(
+    5.3396006999999997e+1)@ 37)(timeElapsed(5.3745277000000002e+1)@ 37)(
+    timeElapsed(5.4102936e+1)@ 37)(rand(0)@ 0)(atloc(b(0),pt(6,-2,-1))@ 37)(
+    atloc(b(1),pt(96,100,0))@ 37)(atloc(b(2),pt(4,16,0))@ 37)(atloc(b(3),pt(
+    108,108,0))@ 37)(energy(b(0),1.5e+1)@ 37)(energy(b(1),1.1e+1)@ 37)(energy(
+    b(2),1.5e+1)@ 37)(energy(b(3),0.0)@ 37)(vel(b(0),1.83847763109e-1)@ 37)(
+    vel(b(1),1.6155494421399999e-1)@ 37)(vel(b(2),1.3928388277199999e-1)@ 37)(
+    vel(b(3),1.07703296143e-1)@ 37)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(0),
+    pt(0,0,0))myHome(b(1),pt(100,100,0))myHome(b(2),pt(10,10,0))myHome(b(3),pt(
+    110,110,0))]
+[b(0): Bot |
+  lkb :(clock(37)class(b(0),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    36)@ 36)(atloc(b(0),pt(6,-2,-1))@ 36)(pending(b(0),stop(b(0)))@ 37)(energy(
+    b(0),1.5e+1)@ 36)(caution(b(0),2.0e+1)@ 0)(targetVel(b(0),5.0)@ 0)(vel(b(
+    0),1.83847763109e-1)@ 36)(targets(b(0),pt(50,10,5); pt(10,30,5); pt(-20,50,
+    5); pt(-40,5,5),nil)@ 0)(visitTimes(b(0),pt(10,30,5),6)@ 6)(visitTimes(b(
+    0),pt(50,10,5),nil)@ 0)(visitTimes(b(0),pt(-20,50,5),13)@ 13)(visitTimes(b(
+    0),pt(-40,5,5),23)@ 23)(eLoc(b(0),pt(0,0,0),31)@ 23)(eLoc(b(0),pt(10,30,5),
+    8)@ 2)(eLoc(b(0),pt(-20,50,5),13)@ 6)(eLoc(b(0),pt(-40,5,5),23)@ 13)(wind(
+    1.0,0.0,0.0,536870912)@ 0)myHome(b(0),pt(0,0,0))myAlt(b(0),5)),
+  ckb :(class(b(0),Bot)atloc(b(0),pt(6,-2,-1))@ 36),
+  evs :(tick @ 0)]
+[b(1): Bot |
+  lkb :(clock(37)class(b(1),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    72)@ 36)(atloc(b(1),pt(96,100,0))@ 36)(pending(b(1),stop(b(1)))@ 37)(
+    energy(b(1),1.1e+1)@ 36)(caution(b(1),2.0e+1)@ 0)(targetVel(b(1),5.0)@ 0)(
+    vel(b(1),1.5231546211700001e-1)@ 36)(targets(b(1),pt(150,110,5); pt(110,
+    130,5); pt(80,150,5); pt(60,105,5),nil)@ 0)(visitTimes(b(1),pt(60,105,5),
+    23)@ 23)(visitTimes(b(1),pt(80,150,5),11)@ 11)(visitTimes(b(1),pt(110,130,
+    5),6)@ 6)(visitTimes(b(1),pt(150,110,5),nil)@ 0)(eLoc(b(1),pt(60,105,5),
+    21)@ 11)(eLoc(b(1),pt(80,150,5),13)@ 6)(eLoc(b(1),pt(100,100,0),31)@ 23)(
+    eLoc(b(1),pt(110,130,5),8)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(1),
+    pt(100,100,0))myAlt(b(1),5)),
+  ckb :(class(b(1),Bot)atloc(b(1),pt(96,100,0))@ 36),
+  evs :(tick @ 0)]
+[b(2): Bot |
+  lkb :(clock(37)class(b(2),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    108)@ 36)(atloc(b(2),pt(4,16,0))@ 36)(pending(b(2),stop(b(2)))@ 37)(energy(
+    b(2),1.5e+1)@ 36)(caution(b(2),2.0e+1)@ 0)(targetVel(b(2),5.0)@ 0)(vel(b(
+    2),1.20830459736e-1)@ 36)(targets(b(2),pt(40,-10,10); pt(-40,-40,10); pt(
+    -35,-5,10); pt(10,-30,10),nil)@ 0)(visitTimes(b(2),pt(10,-30,10),nil)@ 0)(
+    visitTimes(b(2),pt(40,-10,10),23)@ 23)(visitTimes(b(2),pt(-35,-5,10),nil)@
+    0)(visitTimes(b(2),pt(-40,-40,10),nil)@ 0)(eLoc(b(2),pt(10,10,0),31)@ 23)(
+    eLoc(b(2),pt(40,-10,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(2),
+    pt(10,10,0))myAlt(b(2),10)),
+  ckb :(class(b(2),Bot)atloc(b(2),pt(4,16,0))@ 36),
+  evs :(tick @ 0)]
+[b(3): Bot |
+  lkb :(clock(37)class(b(3),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
+    144)@ 36)(atloc(b(3),pt(108,108,2))@ 36)(pending(b(3),stop(b(3)))@ 37)(
+    energy(b(3),1.0)@ 36)(caution(b(3),2.0e+1)@ 0)(targetVel(b(3),5.0)@ 0)(vel(
+    b(3),4.8301138702899998e-1)@ 36)(targets(b(3),pt(140,90,10); pt(60,60,10);
+    pt(65,95,10); pt(110,70,10),nil)@ 0)(visitTimes(b(3),pt(60,60,10),26)@ 26)(
+    visitTimes(b(3),pt(65,95,10),nil)@ 0)(visitTimes(b(3),pt(110,70,10),19)@
+    19)(visitTimes(b(3),pt(140,90,10),7)@ 7)(eLoc(b(3),pt(60,60,10),29)@ 19)(
+    eLoc(b(3),pt(110,70,10),14)@ 7)(eLoc(b(3),pt(110,110,0),40)@ 26)(eLoc(b(3),
+    pt(140,90,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(3),pt(110,110,
+    0))myAlt(b(3),10)),
+  ckb :(class(b(3),Bot)atloc(b(3),pt(108,108,2))@ 36),
+  evs :(tick @ 0)])})
 
-No solution.
-states: 17408  rewrites: 92126910 in 115178ms cpu (119973ms real) (799864
-    rewrites/second)
+CONCURRENT:
 
-search [1] in SCENARIO : asysNoWind(5, 2.0e+1) =>* asys such that success(asys, allTargets(5)) = true .
-search [1] in SCENARIO : asysNoWind(5, 2.0e+1) =>* asys such that success(asys,
-    allTargets(5)) = true .
+asysNoWind20 (again strange energy)
 
-No solution.
-states: 69632  rewrites: 466559427 in 680450ms cpu (700087ms real) (685662
-    rewrites/second)
+averages ===> [ 1.0, -1.3333333333333333, 0.0, 3.3333333333333335, 12.0]
 
+asysNoWind30 (energy seems better)
 
-search [1] in SCENARIO : asysNoWind(6, 2.0e+1) =>* asys such that success(asys, allTargets(6)) = true .
+averages ===> [ 0.6666666666666666, 5.333333333333333, 0.0, 3.6666666666666665, 9.666666666666666]
 
-Timeout!
+asysNoWind40
 
+Wed Mar 29 09:58:31 UTC 2017
+averages ===> [ 0.6666666666666666, 14.0, 0.0, 3.3333333333333335, 6.666666666666667]
+Wed Mar 29 10:05:54 UTC 2017
 
 
 )
