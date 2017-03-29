@@ -288,6 +288,8 @@ class SitlDrone(object):
             retval['alt'] = -self.vehicle.location.local_frame.down
             retval['auxVel'] = self.vehicle.velocity
             retval['bat'] = self.vehicle.battery.level
+            if retval['bat'] is None:
+                retval['bat'] = 0
             retval['dx'] = retval['auxVel'][0]
             retval['dy'] = retval['auxVel'][1]
             retval['dz'] = retval['auxVel'][2]
