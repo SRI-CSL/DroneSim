@@ -27,46 +27,148 @@ eq asysVeryHighWind30 = asysVeryHighWind(30.0) .
 eq asysVeryHighWind40 = asysVeryHighWind(40.0) .
 eq asysVeryHighWind50 = asysVeryHighWind(50.0) .
 
+ops asysHighWind30w2 asysHighWind20w2 asysHighWind40w2 asysHighWind50w2 : -> ASystem .
+eq asysHighWind30w2 = asysHighWind(30.0,2.0) .
+eq asysHighWind20w2 = asysHighWind(20.0,2.0) .
+eq asysHighWind40w2 = asysHighWind(40.0,2.0) .
+eq asysHighWind50w2 = asysHighWind(50.0,2.0) .
+
+ops asysHighWind30w3 asysHighWind20w3 asysHighWind40w3 asysHighWind50w3 : -> ASystem .
+eq asysHighWind30w3 = asysHighWind(30.0,3.0) .
+eq asysHighWind20w3 = asysHighWind(20.0,3.0) .
+eq asysHighWind40w3 = asysHighWind(40.0,3.0) .
+eq asysHighWind50w3 = asysHighWind(50.0,3.0) .
+
+ops asysHighWind30w30 asysHighWind20w30 asysHighWind40w30 asysHighWind50w30 : -> ASystem .
+eq asysHighWind30w30 = asysHighWind(30.0,30.0) .
+eq asysHighWind20w30 = asysHighWind(20.0,30.0) .
+eq asysHighWind40w30 = asysHighWind(40.0,30.0) .
+eq asysHighWind50w30 = asysHighWind(50.0,30.0) .
+
+
 
 endm
 
 ***(
 
+SITL only:
+
 asysLowWind20
 
-[ 0.3333333333333333, 0.0, 0.0, 0.0, 6.0]
+Thu Mar 30 09:27:38 UTC 2017
+Thu Mar 30 09:31:29 UTC 2017
+Works:
+
+(tval SCENARIO{allStopConf(
+[eI
+  | clock(72)class(b(0),Bot)class(b(1),Bot)(timeElapsed(
+    3.6836399999999998e+1)@ 72)(timeElapsed(3.7024698999999998e+1)@ 72)(rand(
+    0)@ 0)(atloc(b(0),pt(41,2,-2))@ 72)(atloc(b(1),pt(92,-40,-3))@ 72)(energy(
+    b(0),0.0)@ 72)(energy(b(1),0.0)@ 72)(vel(b(0),2.19317121995e-1)@ 72)(vel(b(
+    1),5.2335456432500005e-1)@ 72)(wind(1.0,0.0,0.0,2147483648)@ 0)myHome(b(0),
+    pt(0,0,0))myHome(b(1),pt(10,10,0))]
+[b(0): Bot |
+  lkb :(clock(72)class(b(0),Bot)(timeElapsed(3.6478594999999999e+1)@ 71)(rand(
+    71)@ 71)(atloc(b(0),pt(41,2,-2))@ 71)(pending(b(0),stop(b(0)))@ 72)(energy(
+    b(0),0.0)@ 71)(caution(b(0),2.0e+1)@ 0)(targetVel(b(0),5.0)@ 0)(vel(b(0),
+    2.19317121995e-1)@ 71)(targets(b(0),pt(10,30,5); pt(-20,50,5); pt(-40,5,5),
+    pt(50,10,5))@ 53)(visitTimes(b(0),pt(10,30,5),37)@ 37)(visitTimes(b(0),pt(
+    50,10,5),8)@ 8)(visitTimes(b(0),pt(-20,50,5),45)@ 45)(visitTimes(b(0),pt(
+    -40,5,5),52)@ 52)(eLoc(b(0),pt(0,0,0),72)@ 62)(eLoc(b(0),pt(10,30,5),17)@
+    8)(eLoc(b(0),pt(50,10,5),12 ; 70)@ 52)(eLoc(b(0),pt(-20,50,5),44)@ 37)(
+    eLoc(b(0),pt(-40,5,5),55)@ 45)(wind(1.0,0.0,0.0,2147483648)@ 0)myHome(b(0),
+    pt(0,0,0))myAlt(b(0),5)),
+  ckb :(class(b(0),Bot)atloc(b(0),pt(41,2,-2))@ 71),
+  evs :(tick @ 0)]
+[b(1): Bot |
+  lkb :(clock(72)class(b(1),Bot)(timeElapsed(3.6478594999999999e+1)@ 71)(rand(
+    142)@ 71)(atloc(b(1),pt(92,-40,2))@ 71)(pending(b(1),stop(b(1)))@ 72)(
+    energy(b(1),0.0)@ 71)(caution(b(1),2.0e+1)@ 0)(targetVel(b(1),5.0)@ 0)(vel(
+    b(1),5.1894122981299995e-1)@ 71)(targets(b(1),pt(-35,-5,10); pt(10,-30,10),
+    pt(40,-10,10); pt(-40,-40,10))@ 41)(visitTimes(b(1),pt(10,-30,10),36)@ 36)(
+    visitTimes(b(1),pt(40,-10,10),7 ; 40)@ 40)(visitTimes(b(1),pt(-35,-5,10),
+    29)@ 29)(visitTimes(b(1),pt(-40,-40,10),23)@ 23)(eLoc(b(1),pt(10,-30,10),
+    39)@ 29)(eLoc(b(1),pt(40,-10,10),9 ; 42)@ 36)(eLoc(b(1),pt(-35,-5,10),30)@
+    23)(eLoc(b(1),pt(-40,-40,10),25 ; 57)@ 40)(wind(1.0,0.0,0.0,2147483648)@
+    0)myHome(b(1),pt(10,10,0))myAlt(b(1),10)),
+  ckb :(class(b(1),Bot)atloc(b(1),pt(92,-40,2))@ 71),
+  evs :(tick @ 0)])})
+
+With Concurrency:
+
+(define generic_alpha "0.5")
+(define generic_beta "0.5")
+(define generic_num  "5")
+
+Definition of close < 8
+              near < 16
+
+
+asysLowWind20
+Thu Mar 30 09:33:00 UTC 2017
+averages ===> [ 1.3333333333333333, 2.0, 0.0, 1.6666666666666667, 8.0]
+Thu Mar 30 09:39:23 UTC 2017
 
 asysLowWind30
+Thu Mar 30 09:40:08 UTC 2017
+averages ===> [ 2.0, 12.0, 0.0, 2.0, 8.0]
+Thu Mar 30 09:45:57 UTC 2017
 
-[ 0.6666666666666666, 3.0, 0.0, 0.0, 7.666666666666667]
+asysLowWind40
+Thu Mar 30 09:47:04 UTC 2017
+averages ===> [ 1.3333333333333333, 14.333333333333334, 0.0, 2.0, 8.0]
+Thu Mar 30 09:52:43 UTC 2017
 
-asysLowWind40 
+asysLowWind50
+Thu Mar 30 09:54:19 UTC 2017
+averages ===> [ 1.6666666666666667, 26.0, 0.0, 2.0, 8.0]
+Thu Mar 30 09:59:33 UTC 2017
 
-[ 0.3333333333333333, 9.666666666666666, 0.0, 0.0, 5.666666666666667]
-
-asysLowWind50 (Points Strange)
-
-[ 0.3333333333333333, 28.666666666666668, 0.0, 0.0, 6.333333333333333]
-
-asysHighWind20 (Strange)
-
-[ 0.0, 0.0, 0.0, 0.0, 7.0]
+asysHighWind20
+Thu Mar 30 10:06:17 UTC 2017
+averages ===> [ 0.6666666666666666, 0.3333333333333333, 0.0, 0.6666666666666666, 8.0]
+count ===> 3
+Thu Mar 30 10:13:02 UTC 2017
 
 asysHighWind30
 
-[ 0.3333333333333333, 4.666666666666667, 0.0, 0.0, 7.0]
+Thu Mar 30 10:13:49 UTC 2017
+averages ===> [ 1.3333333333333333, 10.333333333333334, 0.0, 2.0, 8.0]
+Thu Mar 30 10:19:45 UTC 2017
 
-asysHighWind40
-
-[ 0.0, 13.333333333333334, 0.0, 0.0, 6.0]
 
 asysHighWind50
+Thu Mar 30 10:00:21 UTC 2017
+averages ===> [ 1.6666666666666667, 22.333333333333332, 0.0, 2.0, 8.0]
+Thu Mar 30 10:05:35 UTC 2017
 
-[ 0.0, 21.333333333333332, 0.0, 0.0, 5.666666666666667]
+asysVeryHighWind20
+Thu Mar 30 10:20:32 UTC 2017
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 0.6666666666666666, 7.333333333333333]
+Thu Mar 30 10:27:22 UTC 2017
 
-asysVeryHighWind20 
+asysVeryHighWind30
+Thu Mar 30 10:28:01 UTC 2017
+averages ===> [ 0.6666666666666666, 3.0, 0.0, 1.3333333333333333, 6.666666666666667]
+Thu Mar 30 10:34:19 UTC 2017
 
-does not work...
+asysVeryHighWind40
+Thu Mar 30 11:34:44 UTC 2017
+averages ===> [ 0.3333333333333333, 4.0, 0.0, 1.0, 6.333333333333333]
+Thu Mar 30 11:41:06 UTC 2017
 
+asysHighWind20w2
+Thu Mar 30 11:48:47 UTC 2017
+averages ===> [ 1.0, 0.0, 0.0, 1.0, 8.0]
+Thu Mar 30 11:55:41 UTC 2017
+
+asysHighWind20w3
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 1.0, 8.0]
+
+asysHighWind20w30
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 1.3333333333333333, 8.0]
+
+
+OK
 
 )

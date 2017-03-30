@@ -243,7 +243,7 @@ eq notDone(goToW(id,loc0,v), loc)  =  not close(loc0,loc) .
 eq notDone(act,loc) = false [owise] .
 
 eq close(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
-  =  abs(ix0 - ix) + abs(iy0 - iy) < 4 .
+  =  abs(ix0 - ix) + abs(iy0 - iy) < 8 .
 eq close(loc0,loc) = false [owise] .
 
 
@@ -255,7 +255,7 @@ eq isGoTo(acts) = false [owise] .
 
 op near : Loc Loc -> Bool .
 eq near(pt(ix,iy,iz),pt(ix0,iy0,iz0)) 
-  =  abs(ix0 - ix) + abs(iy0 - iy) < 10 .
+  =  abs(ix0 - ix) + abs(iy0 - iy) < 16 .
 eq near(l,l0) = false [owise] .
 
 

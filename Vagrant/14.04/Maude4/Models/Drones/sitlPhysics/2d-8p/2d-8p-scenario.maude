@@ -10,7 +10,7 @@ mod SCENARIO-BASIC is
 var check : Bool .
 vars n n' t t0 m t1 thr : Nat .
 vars i j x y z x0 y0 z0 : Int .
-vars sx sy sz dx dy dz v e c dt te caution : FiniteFloat .
+vars sx sy sz dx dy dz v e c dt te caution wint : FiniteFloat .
 var dir : Dir .
 vars wkb kb lkb ekb : KB .
 var aconf conf : Conf .
@@ -126,10 +126,10 @@ eq mkB(n,sx,sy,sz,v,e,c,a,locs) =
  [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs),
                ckb : none, evs : (tick @ 0)] .
  
-ops mkE : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat FiniteFloat -> Env .  **** bot env
+ops mkE : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Nat FiniteFloat FiniteFloat -> Env .  **** bot env
 
-eq mkE(n,sx,sy,sz,v,thr,e) = 
-      [eI | clock(0) (rand(0) @ 0) (wind(1.0,0.0,0.0,thr) @ 0) (timeElapsed(0.0) @ 0)
+eq mkE(n,sx,sy,sz,v,thr,wint,e) = 
+      [eI | clock(0) (rand(0) @ 0) (wind(wint,0.0,0.0,thr) @ 0) (timeElapsed(0.0) @ 0)
             mkBekb(n,sx,sy,sz,v,e) 
             mkBekb(s n,sx + 10.0,sy + 10.0, sz,v,e)] .
 
@@ -154,27 +154,33 @@ eq veryHighWind = round(float(2 * rand.25)) .
 
 
 ops confNoWind confLowWind confHighWind confVeryHighWind : FiniteFloat -> Conf .
+ops confHighWind : FiniteFloat FiniteFloat -> Conf .
 ****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
 ****          (n,sx, sy, sz, v,  e,    c,   a,locs)
 eq confNoWind(caution) 
  = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
    mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
-   mkE(0,0.0,0.0,0.0,5.0,noWind,100.0) . 
+   mkE(0,0.0,0.0,0.0,5.0,noWind,1.0,100.0) . 
 
 eq confLowWind(caution) 
  = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
            mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
-           mkE(0,0.0,0.0,0.0,5.0,lowWind,100.0) . 
+           mkE(0,0.0,0.0,0.0,5.0,lowWind,1.0,100.0) . 
 
 eq confHighWind(caution) 
  = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
    mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
-   mkE(0,0.0,0.0,0.0,5.0,highWind,100.0) . 
+   mkE(0,0.0,0.0,0.0,5.0,highWind,1.0,100.0) . 
 
 eq confVeryHighWind(caution) 
  = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
    mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
-   mkE(0,0.0,0.0,0.0,5.0,veryHighWind,100.0) . 
+   mkE(0,0.0,0.0,0.0,5.0,veryHighWind,1.0,100.0) . 
+
+eq confHighWind(caution,wint) 
+ = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
+   mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
+   mkE(0,0.0,0.0,0.0,5.0,highWind,wint,100.0) . 
 
 
 ops asysNoWind asysLowWind asysHighWind asysVeryHighWind : FiniteFloat -> ASystem .
@@ -182,6 +188,10 @@ eq asysNoWind(caution) = { confNoWind(caution) } .
 eq asysLowWind(caution) = { confLowWind(caution) } .
 eq asysHighWind(caution) = { confHighWind(caution) } .
 eq asysVeryHighWind(caution) = { confVeryHighWind(caution) } .
+
+op asysHighWind : FiniteFloat FiniteFloat -> ASystem .
+eq asysHighWind(caution,wint) = { confHighWind(caution,wint) } .
+
 
 --- op asys : Nat -> ASystem .
 --- eq asys(n) = { conf1 bound(n) } .
