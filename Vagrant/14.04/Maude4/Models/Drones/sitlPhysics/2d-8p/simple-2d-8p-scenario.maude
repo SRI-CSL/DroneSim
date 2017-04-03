@@ -27,24 +27,11 @@ eq asysVeryHighWind30 = asysVeryHighWind(30.0) .
 eq asysVeryHighWind40 = asysVeryHighWind(40.0) .
 eq asysVeryHighWind50 = asysVeryHighWind(50.0) .
 
-ops asysHighWind30w2 asysHighWind20w2 asysHighWind40w2 asysHighWind50w2 : -> ASystem .
-eq asysHighWind30w2 = asysHighWind(30.0,2.0) .
-eq asysHighWind20w2 = asysHighWind(20.0,2.0) .
-eq asysHighWind40w2 = asysHighWind(40.0,2.0) .
-eq asysHighWind50w2 = asysHighWind(50.0,2.0) .
-
-ops asysHighWind30w3 asysHighWind20w3 asysHighWind40w3 asysHighWind50w3 : -> ASystem .
-eq asysHighWind30w3 = asysHighWind(30.0,3.0) .
-eq asysHighWind20w3 = asysHighWind(20.0,3.0) .
-eq asysHighWind40w3 = asysHighWind(40.0,3.0) .
-eq asysHighWind50w3 = asysHighWind(50.0,3.0) .
-
-ops asysHighWind30w30 asysHighWind20w30 asysHighWind40w30 asysHighWind50w30 : -> ASystem .
-eq asysHighWind30w30 = asysHighWind(30.0,30.0) .
-eq asysHighWind20w30 = asysHighWind(20.0,30.0) .
-eq asysHighWind40w30 = asysHighWind(40.0,30.0) .
-eq asysHighWind50w30 = asysHighWind(50.0,30.0) .
-
+ops asysVVHighWind30 asysVVHighWind20 asysVVHighWind40 asysVVHighWind50 : -> ASystem .
+eq asysVVHighWind20 = asysVVHighWind(20.0) .
+eq asysVVHighWind30 = asysVVHighWind(30.0) .
+eq asysVVHighWind40 = asysVVHighWind(40.0) .
+eq asysVVHighWind50 = asysVVHighWind(50.0) .
 
 
 endm
@@ -136,7 +123,6 @@ Thu Mar 30 10:13:49 UTC 2017
 averages ===> [ 1.3333333333333333, 10.333333333333334, 0.0, 2.0, 8.0]
 Thu Mar 30 10:19:45 UTC 2017
 
-
 asysHighWind50
 Thu Mar 30 10:00:21 UTC 2017
 averages ===> [ 1.6666666666666667, 22.333333333333332, 0.0, 2.0, 8.0]
@@ -157,16 +143,45 @@ Thu Mar 30 11:34:44 UTC 2017
 averages ===> [ 0.3333333333333333, 4.0, 0.0, 1.0, 6.333333333333333]
 Thu Mar 30 11:41:06 UTC 2017
 
-asysHighWind20w2
-Thu Mar 30 11:48:47 UTC 2017
-averages ===> [ 1.0, 0.0, 0.0, 1.0, 8.0]
-Thu Mar 30 11:55:41 UTC 2017
+asysVeryHighWind50
+elapsed ===> 170537580095
+averages ===> [ 1.0, 24.666666666666668, 0.0, 2.0, 3.3333333333333335]
 
-asysHighWind20w3
-averages ===> [ 0.6666666666666666, 0.0, 0.0, 1.0, 8.0]
+asysVVHighWind20
+elapsed ===> 179075905649
+averages ===> [ 0.0, 0.0, 0.0, 0.0, 4.0]
 
-asysHighWind20w30
-averages ===> [ 0.6666666666666666, 0.0, 0.0, 1.3333333333333333, 8.0]
+asysVVHighWind30
+elapsed ===> 178688105832
+averages ===> [ 0.0, 0.0, 0.0, 0.0, 2.3333333333333335]
+
+asysVVHighWind40
+elapsed ===> 185774628549
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 0.6666666666666666, 3.0]
+
+asysVVHighWind50
+
+elapsed ===> 317155738419
+averages ===> [ 0.6666666666666666, 7.333333333333333, 0.0, 1.0, 2.6666666666666665]
+
+Change def:
+     close < 10
+     near < 20
+
+asysVVHighWind20
+elapsed ===> 179392154124
+averages ===> [ 0.0, 0.0, 0.0, 0.0, 4.333333333333333]
+
+asysVVHighWind30
+Patrol:
+elapsed ===> 183272479610
+averages ===> [ 0.3333333333333333, 0.0, 0.0, 0.6666666666666666, 4.0]
+
+asysVVHighWind40
+elapsed ===> 185627301177
+averages ===> [ 0.3333333333333333, 0.0, 0.0, 0.3333333333333333, 2.3333333333333335]
+
+
 
 
 OK

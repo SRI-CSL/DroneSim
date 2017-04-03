@@ -37,7 +37,7 @@
    "\n"
    "loop init ."
    "\n"
-   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysHighWind20w30 false)\n (augAgentEsetConcurrentStats Patrol 400))"
+   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysVVHighWind50 false)\n (augAgentEsetConcurrentStats Patrol 400))"
    "\n"
    )
   )
