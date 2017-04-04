@@ -10,7 +10,7 @@ eq act(id,kb) = actBasic(id,kb) .
 eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
 op numTiles : -> Nat .
-eq numTiles = 25 .
+eq numTiles = 30 .
 
 ops asysLowWind30 asysLowWind20 asysLowWind40 asysLowWind50 : -> ASystem .
 eq asysLowWind30 = asysLowWind(numTiles,30.0) .
@@ -130,5 +130,78 @@ eq numTiles = 25 .
 asysLowWind20
 
 [ 48.529411764705884, 4.5588235294117645, 0.0, 0.35294117647058826, 200.0]
+
+===========================================
+Redoing scalability
+
+0.25 0.25
+
+asysLowWind20
+
+
+numtiles 2
+
+elapsed ===> 20931
+average_1 ===> 9.952941176470588
+average_0 ===> 3.823529411764706
+averages ===> [ 3.823529411764706, 9.952941176470588, 0.0, 0.11764705882352941, 16.0]
+count ===> 17
+accumulator ===> [D@7411dd65
+average_3 ===> 0.11764705882352941
+average_2 ===> 0.0
+
+
+numtiles = 4
+
+elapsed ===> 54598
+average_1 ===> 8.33529411764706
+average_0 ===> 7.823529411764706
+averages ===> [ 7.823529411764706, 8.33529411764706, 0.0, 0.11764705882352941, 32.0]
+count ===> 17
+
+numtiles = 8
+elapsed ===> 197796
+average_1 ===> 6.929411764705883
+average_0 ===> 15.764705882352942
+averages ===> [ 15.764705882352942, 6.929411764705883, 0.0, 0.11764705882352941, 63.94117647058823]
+count ===> 17
+
+eq numTiles = 12 .
+elapsed ===> 371677
+average_1 ===> 6.370588235294117
+average_0 ===> 23.58823529411765
+averages ===> [ 23.58823529411765, 6.370588235294117, 0.0, 0.11764705882352941, 95.88235294117646]
+count ===> 17
+
+eq numTiles = 16 .
+
+elapsed ===> 699253
+average_1 ===> 5.5058823529411764
+average_0 ===> 31.11764705882353
+averages ===> [ 31.11764705882353, 5.5058823529411764, 0.0, 0.17647058823529413, 130.0]
+count ===> 17
+
+eq numTiles = 20 .
+Patrol:
+elapsed ===> 1223688
+average_1 ===> 4.705882352941177
+average_0 ===> 38.8235294117647
+averages ===> [ 38.8235294117647, 4.705882352941177, 0.0, 0.29411764705882354, 160.0]
+count ===> 17
+accumulator ===> [D@6636a143
+average_3 ===> 0.29411764705882354
+
+eq numTiles = 25 .
+runResult: [D@5bc4cd19
+Patrol:
+elapsed ===> 1985087
+average_1 ===> 4.5588235294117645
+average_0 ===> 48.529411764705884
+averages ===> [ 48.529411764705884, 4.5588235294117645, 0.0, 0.35294117647058826, 200.0]
+count ===> 17
+
+eq numTiles = 30 .
+
+
 
 )
