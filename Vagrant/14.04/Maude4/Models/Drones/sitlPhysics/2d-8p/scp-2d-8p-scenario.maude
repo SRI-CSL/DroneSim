@@ -33,6 +33,13 @@ eq asysVeryHighWind20 = asysVeryHighWind(20.0) .
 eq asysVeryHighWind40 = asysVeryHighWind(40.0) .
 eq asysVeryHighWind50 = asysVeryHighWind(50.0) .
 
+ops asysVVHighWind30 asysVVHighWind20 asysVVHighWind40 asysVVHighWind50 : -> ASystem .
+eq asysVVHighWind20 = asysVVHighWind(20.0) .
+eq asysVVHighWind30 = asysVVHighWind(30.0) .
+eq asysVVHighWind40 = asysVVHighWind(40.0) .
+eq asysVVHighWind50 = asysVVHighWind(50.0) .
+
+
 
 endm
 
@@ -131,6 +138,22 @@ Thu Mar 30 08:49:49 UTC 2017
 erages ===> [ 2.0, 39.0, 0.0, 2.0, 8.0]
 Thu Mar 30 08:54:24 UTC 2017
 
+asysHighWind30
+elapsed ===> 129429446465
+average_1 ===> 40.0
+average_0 ===> 1.0
+averages ===> [ 1.0, 40.0, 0.0, 2.0, 8.0]
+count ===> 3
+accumulator ===> [D@5feeefc2
+
+asysHighWind40
+elapsed ===> 122038321896
+averages ===> [ 1.6666666666666667, 38.0, 0.0, 2.0, 7.666666666666667]
+
+asysHighWind50
+elapsed ===> 127857521822
+averages ===> [ 2.0, 41.666666666666664, 0.0, 2.0, 6.666666666666667]
+
 asysVeryHighWind20
 
 averages ===> [ 0.3333333333333333, 12.666666666666666, 0.0, 1.3333333333333333, 6.666666666666667]
@@ -144,5 +167,41 @@ asysVeryHighWind40
 Thu Mar 30 09:11:08 UTC 2017
 averages ===> [ 1.3333333333333333, 23.0, 0.0, 2.0, 6.0]
 Thu Mar 30 09:17:27 UTC 2017
+
+asysVeryHighWind50
+elapsed ===> 214366880124
+averages ===> [ 1.3333333333333333, 14.0, 0.0, 1.6666666666666667, 4.333333333333333]
+
+asysVVHighWind20
+elapsed ===> 179924627830
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 1.0, 4.0]
+
+asysVVHighWind30
+Patrol:
+elapsed ===> 179510931956
+averages ===> [ 0.0, 0.0, 0.0, 0.6666666666666666, 3.3333333333333335]
+
+asysVVHighWind40
+elapsed ===> 264514217000
+averages ===> [ 0.6666666666666666, 0.3333333333333333, 0.0, 1.0, 3.0]
+
+asysVVHighWInd50
+elapsed ===> 210558157507
+averages ===> [ 0.3333333333333333, 0.0, 0.0, 0.3333333333333333, 2.6666666666666665]
+
+
+===================================================
+
+Increasing confidence to 0.25 and 0.25
+
+asysNoWind20
+elapsed ===> 872080344748
+averages ===> [ 1.411764705882353, 44.294117647058826, 0.0, 2.0, 8.0]
+
+asysLowWind20
+
+
+
+
 
 )
