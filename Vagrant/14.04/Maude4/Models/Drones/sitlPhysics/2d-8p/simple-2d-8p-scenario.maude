@@ -9,6 +9,13 @@ eq act(id,kb) = actBasic(id,kb) .
 eq nextLoc(id,kb) = nextLocSimple(id,kb) .
 --- eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
+ops asysNoWind30 asysNoWind20 asysNoWind40 asysNoWind50 : -> ASystem .
+eq asysNoWind20 = asysNoWind(20.0) .
+eq asysNoWind30 = asysNoWind(30.0) .
+eq asysNoWind40 = asysNoWind(40.0) .
+eq asysNoWind50 = asysNoWind(50.0) .
+
+
 ops asysLowWind30 asysLowWind20 asysLowWind40 asysLowWind50 : -> ASystem .
 eq asysLowWind30 = asysLowWind(30.0) .
 eq asysLowWind20 = asysLowWind(20.0) .
@@ -180,8 +187,62 @@ averages ===> [ 0.3333333333333333, 0.0, 0.0, 0.6666666666666666, 4.0]
 asysVVHighWind40
 elapsed ===> 185627301177
 averages ===> [ 0.3333333333333333, 0.0, 0.0, 0.3333333333333333, 2.3333333333333335]
+===================================================
 
+Increasing confidence to 0.25 and 0.25
 
+asysNoWind20
+elapsed ===> 180270
+average_1 ===> 0.6666666666666666
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 0.6666666666666666, 0.0, 1.6666666666666667, 8.0]
+count ===> 3
+
+asysLowWind20
+elapsed ===> 185019
+average_1 ===> 0.0
+average_0 ===> 1.0
+averages ===> [ 1.0, 0.0, 0.0, 1.3333333333333333, 8.0]
+count ===> 3
+accumulator ===> [D@46837e8a
+average_3 ===> 1.3333333333333333
+average_2 ===> 0.0
+
+asysLowWind30
+elapsed ===> 171772
+average_1 ===> 11.333333333333334
+average_0 ===> 1.6666666666666667
+averages ===> [ 1.6666666666666667, 11.333333333333334, 0.0, 2.0, 8.0]
+count ===> 3
+accumulator ===> [D@2e744307
+average_3 ===> 2.0
+
+asysLowWind40
+elapsed ===> 153997
+average_1 ===> 17.666666666666668
+average_0 ===> 2.0
+averages ===> [ 2.0, 17.666666666666668, 0.0, 2.0, 8.0]
+count ===> 3
+accumulator ===> [D@69d9c602
+
+asysLowWind50
+
+elapsed ===> 174268
+average_1 ===> 24.0
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 24.0, 0.0, 2.0, 8.0]
+
+asysHighWind50
+
+runResult from maude0 : [D@d570c1e
+Patrol:
+elapsed ===> 180523
+average_1 ===> 0.0
+average_0 ===> 0.6666666666666666
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 0.6666666666666666, 8.0]
+count ===> 3
+accumulator ===> [D@69d9c602
+average_3 ===> 0.666666666666666
 
 
 OK
