@@ -53,7 +53,7 @@ pip install antlr4-python2-runtime
 git clone https://github.com/SRI-CSL/PLambda
 cd PLambda
 make clean
-make antlr4_6
+make antlr4_7
 make develop
 
 
