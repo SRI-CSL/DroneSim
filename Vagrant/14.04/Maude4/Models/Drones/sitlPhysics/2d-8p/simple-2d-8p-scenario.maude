@@ -232,7 +232,7 @@ average_1 ===> 24.0
 average_0 ===> 1.3333333333333333
 averages ===> [ 1.3333333333333333, 24.0, 0.0, 2.0, 8.0]
 
-asysHighWind50
+asysHighWind20
 
 runResult from maude0 : [D@d570c1e
 Patrol:
@@ -244,6 +244,88 @@ count ===> 3
 accumulator ===> [D@69d9c602
 average_3 ===> 0.666666666666666
 
+asysHighWind30
+elapsed ===> 180936
+average_1 ===> 0.0
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 0.0, 0.0, 1.3333333333333333, 8.0]
+count ===> 3
+accumulator ===> [D@69d9c602
+average_3 ===> 1.3333333333333333
+average_2 ===> 0.0
+
+
+asysHighWind40
+elapsed ===> 163956
+average_1 ===> 18.0
+average_0 ===> 1.0
+averages ===> [ 1.0, 18.0, 0.0, 2.0, 8.0]
+count ===> 3
+
+asysHighWind50
+elapsed ===> 129484
+average_1 ===> 30.0
+average_0 ===> 1.6666666666666667
+averages ===> [ 1.6666666666666667, 30.0, 0.0, 2.0, 7.0]
+count ===> 3
+
+asysVeryHighWind20
+elapsed ===> 181579
+average_1 ===> 0.0
+average_0 ===> 0.6666666666666666
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 0.6666666666666666, 7.333333333333333]
+count ===> 3
+
+asysVeryHighWind30
+elapsed ===> 163582
+average_1 ===> 3.0
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 3.0, 0.0, 1.3333333333333333, 6.333333333333333]
+count ===> 3
+
+asysVeryHighWind40
+elapsed ===> 157618
+average_1 ===> 3.6666666666666665
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 3.6666666666666665, 0.0, 1.3333333333333333, 5.666666666666667]
+count ===> 3
+
+asysVeryHighWind50
+elapsed ===> 162983
+average_1 ===> 6.0
+average_0 ===> 0.6666666666666666
+averages ===> [ 0.6666666666666666, 6.0, 0.0, 1.3333333333333333, 4.666666666666667]
+count ===> 3
+accumulator ===> [D@3345690f
+average_3 ===> 1.3333333333333333
+
+asysVVHighWind20
+elapsed ===> 179165
+average_1 ===> 0.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 0.0, 0.0, 0.0, 3.6666666666666665]
+count ===> 3
+
+asysVVHighWind30
+elapsed ===> 181649
+average_1 ===> 0.0
+average_0 ===> 0.3333333333333333
+averages ===> [ 0.3333333333333333, 0.0, 0.0, 0.3333333333333333, 2.0]
+
+asysVVHighWind40
+elapsed ===> 177996
+average_1 ===> 0.0
+average_0 ===> 0.6666666666666666
+averages ===> [ 0.6666666666666666, 0.0, 0.0, 1.0, 2.0]
+count ===> 3
+
+asysVVHighWind50
+
+elapsed ===> 179783
+average_1 ===> 0.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 0.0, 0.0, 0.3333333333333333, 2.0]
+count ===> 3
 
 OK
 

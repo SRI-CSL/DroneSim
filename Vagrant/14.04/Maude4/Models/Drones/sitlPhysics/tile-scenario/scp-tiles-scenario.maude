@@ -10,7 +10,7 @@ eq act(id,kb) = actBasic(id,kb) .
 eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
 op numTiles : -> Nat .
-eq numTiles = 2 . *** Each tile has 2 drones
+eq numTiles = 3 . *** Each tile has 2 drones
 
 ops asysNoWind30 asysNoWind20 asysNoWind40 asysNoWind50 : -> ASystem .
 eq asysNoWind20 = asysNoWind(numTiles,20.0) .
@@ -36,90 +36,186 @@ endm
 
 eq numTiles = 2 . *** Each tile has 2 drones
 
+asysLowWind20
 SITL works
 
 But the energy of b3 is 0 and of b1 is close to zero.
 This may mean that the points for b1 and b3 are too far...
-
 (tval SCENARIO{allStopConf(
 [eI
-  | clock(37)class(b(0),Bot)class(b(1),Bot)class(b(2),Bot)class(b(3),
-    Bot)(timeElapsed(5.3065980000000003e+1)@ 37)(timeElapsed(
-    5.3396006999999997e+1)@ 37)(timeElapsed(5.3745277000000002e+1)@ 37)(
-    timeElapsed(5.4102936e+1)@ 37)(rand(0)@ 0)(atloc(b(0),pt(6,-2,-1))@ 37)(
-    atloc(b(1),pt(96,100,0))@ 37)(atloc(b(2),pt(4,16,0))@ 37)(atloc(b(3),pt(
-    108,108,0))@ 37)(energy(b(0),1.5e+1)@ 37)(energy(b(1),1.1e+1)@ 37)(energy(
-    b(2),1.5e+1)@ 37)(energy(b(3),0.0)@ 37)(vel(b(0),1.83847763109e-1)@ 37)(
-    vel(b(1),1.6155494421399999e-1)@ 37)(vel(b(2),1.3928388277199999e-1)@ 37)(
-    vel(b(3),1.07703296143e-1)@ 37)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(0),
-    pt(0,0,0))myHome(b(1),pt(100,100,0))myHome(b(2),pt(10,10,0))myHome(b(3),pt(
-    110,110,0))]
+  | clock(38)class(b(0),Bot)class(b(1),Bot)class(b(2),Bot)class(b(3),
+    Bot)(timeElapsed(7.7659267e+1)@ 38)(timeElapsed(7.8034959000000001e+1)@
+    38)(timeElapsed(7.8399220999999997e+1)@ 38)(timeElapsed(
+    7.8778998999999999e+1)@ 38)(rand(0)@ 0)(atloc(b(0),pt(25,0,-1))@ 38)(atloc(
+    b(1),pt(104,100,-1))@ 38)(atloc(b(2),pt(12,10,-1))@ 38)(atloc(b(3),pt(111,
+    110,-1))@ 38)(energy(b(0),0.0)@ 38)(energy(b(1),2.5e+1)@ 38)(energy(b(2),
+    2.0)@ 38)(energy(b(3),0.0)@ 38)(vel(b(0),1.83847763109e-1)@ 38)(vel(b(1),
+    2.15406592285e-1)@ 38)(vel(b(2),1.96977156036e-1)@ 38)(vel(b(3),
+    1.65529453572e-1)@ 38)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(0),pt(0,0,
+    0))myHome(b(1),pt(100,100,0))myHome(b(2),pt(10,10,0))myHome(b(3),pt(110,
+    110,0))]
 [b(0): Bot |
-  lkb :(clock(37)class(b(0),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
-    36)@ 36)(atloc(b(0),pt(6,-2,-1))@ 36)(pending(b(0),stop(b(0)))@ 37)(energy(
-    b(0),1.5e+1)@ 36)(caution(b(0),2.0e+1)@ 0)(targetVel(b(0),5.0)@ 0)(vel(b(
-    0),1.83847763109e-1)@ 36)(targets(b(0),pt(50,10,5); pt(10,30,5); pt(-20,50,
-    5); pt(-40,5,5),nil)@ 0)(visitTimes(b(0),pt(10,30,5),6)@ 6)(visitTimes(b(
-    0),pt(50,10,5),nil)@ 0)(visitTimes(b(0),pt(-20,50,5),13)@ 13)(visitTimes(b(
-    0),pt(-40,5,5),23)@ 23)(eLoc(b(0),pt(0,0,0),31)@ 23)(eLoc(b(0),pt(10,30,5),
-    8)@ 2)(eLoc(b(0),pt(-20,50,5),13)@ 6)(eLoc(b(0),pt(-40,5,5),23)@ 13)(wind(
-    1.0,0.0,0.0,536870912)@ 0)myHome(b(0),pt(0,0,0))myAlt(b(0),5)),
-  ckb :(class(b(0),Bot)atloc(b(0),pt(6,-2,-1))@ 36),
+  lkb :(clock(38)class(b(0),Bot)(timeElapsed(7.6225340000000003e+1)@ 37)(rand(
+    37)@ 37)(atloc(b(0),pt(25,0,-1))@ 37)(pending(b(0),stop(b(0)))@ 38)(energy(
+    b(0),0.0)@ 37)(caution(b(0),2.0e+1)@ 0)(targetVel(b(0),5.0)@ 0)(vel(b(0),
+    1.96977156036e-1)@ 37)(targets(b(0),pt(50,10,5); pt(10,30,5); pt(-20,50,5);
+    pt(-40,5,5),nil)@ 0)(visitTimes(b(0),pt(10,30,5),6)@ 6)(visitTimes(b(0),pt(
+    50,10,5),26)@ 26)(visitTimes(b(0),pt(-20,50,5),10)@ 10)(visitTimes(b(0),pt(
+    -40,5,5),16)@ 16)(eLoc(b(0),pt(0,0,0),37)@ 26)(eLoc(b(0),pt(10,30,5),8)@
+    2)(eLoc(b(0),pt(50,10,5),33)@ 16)(eLoc(b(0),pt(-20,50,5),13)@ 6)(eLoc(b(0),
+    pt(-40,5,5),20)@ 10)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(0),pt(0,0,
+    0))myAlt(b(0),5)),
+  ckb :(class(b(0),Bot)atloc(b(0),pt(25,0,-1))@ 37),
   evs :(tick @ 0)]
 [b(1): Bot |
-  lkb :(clock(37)class(b(1),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
-    72)@ 36)(atloc(b(1),pt(96,100,0))@ 36)(pending(b(1),stop(b(1)))@ 37)(
-    energy(b(1),1.1e+1)@ 36)(caution(b(1),2.0e+1)@ 0)(targetVel(b(1),5.0)@ 0)(
-    vel(b(1),1.5231546211700001e-1)@ 36)(targets(b(1),pt(150,110,5); pt(110,
-    130,5); pt(80,150,5); pt(60,105,5),nil)@ 0)(visitTimes(b(1),pt(60,105,5),
-    23)@ 23)(visitTimes(b(1),pt(80,150,5),11)@ 11)(visitTimes(b(1),pt(110,130,
-    5),6)@ 6)(visitTimes(b(1),pt(150,110,5),nil)@ 0)(eLoc(b(1),pt(60,105,5),
-    21)@ 11)(eLoc(b(1),pt(80,150,5),13)@ 6)(eLoc(b(1),pt(100,100,0),31)@ 23)(
-    eLoc(b(1),pt(110,130,5),8)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(1),
-    pt(100,100,0))myAlt(b(1),5)),
-  ckb :(class(b(1),Bot)atloc(b(1),pt(96,100,0))@ 36),
+  lkb :(clock(38)class(b(1),Bot)(timeElapsed(7.6225340000000003e+1)@ 37)(rand(
+    74)@ 37)(atloc(b(1),pt(104,100,-1))@ 37)(pending(b(1),stop(b(1)))@ 38)(
+    energy(b(1),2.5e+1)@ 37)(caution(b(1),2.0e+1)@ 0)(targetVel(b(1),5.0)@ 0)(
+    vel(b(1),2.15406592285e-1)@ 37)(targets(b(1),pt(150,110,5); pt(110,130,5);
+    pt(80,150,5); pt(60,105,5),nil)@ 0)(visitTimes(b(1),pt(60,105,5),20)@ 20)(
+    visitTimes(b(1),pt(80,150,5),11)@ 11)(visitTimes(b(1),pt(110,130,5),6)@ 6)(
+    visitTimes(b(1),pt(150,110,5),nil)@ 0)(eLoc(b(1),pt(60,105,5),21)@ 11)(
+    eLoc(b(1),pt(80,150,5),13)@ 6)(eLoc(b(1),pt(100,100,0),27)@ 20)(eLoc(b(1),
+    pt(110,130,5),8)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(1),pt(100,100,
+    0))myAlt(b(1),5)),
+  ckb :(class(b(1),Bot)atloc(b(1),pt(104,100,-1))@ 37),
   evs :(tick @ 0)]
 [b(2): Bot |
-  lkb :(clock(37)class(b(2),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
-    108)@ 36)(atloc(b(2),pt(4,16,0))@ 36)(pending(b(2),stop(b(2)))@ 37)(energy(
-    b(2),1.5e+1)@ 36)(caution(b(2),2.0e+1)@ 0)(targetVel(b(2),5.0)@ 0)(vel(b(
-    2),1.20830459736e-1)@ 36)(targets(b(2),pt(40,-10,10); pt(-40,-40,10); pt(
-    -35,-5,10); pt(10,-30,10),nil)@ 0)(visitTimes(b(2),pt(10,-30,10),nil)@ 0)(
-    visitTimes(b(2),pt(40,-10,10),23)@ 23)(visitTimes(b(2),pt(-35,-5,10),nil)@
-    0)(visitTimes(b(2),pt(-40,-40,10),nil)@ 0)(eLoc(b(2),pt(10,10,0),31)@ 23)(
-    eLoc(b(2),pt(40,-10,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(2),
-    pt(10,10,0))myAlt(b(2),10)),
-  ckb :(class(b(2),Bot)atloc(b(2),pt(4,16,0))@ 36),
+  lkb :(clock(38)class(b(2),Bot)(timeElapsed(7.6225340000000003e+1)@ 37)(rand(
+    111)@ 37)(atloc(b(2),pt(12,10,-1))@ 37)(pending(b(2),stop(b(2)))@ 38)(
+    energy(b(2),2.0)@ 37)(caution(b(2),2.0e+1)@ 0)(targetVel(b(2),5.0)@ 0)(vel(
+    b(2),1.87882942281e-1)@ 37)(targets(b(2),pt(40,-10,10); pt(-40,-40,10); pt(
+    -35,-5,10); pt(10,-30,10),nil)@ 0)(visitTimes(b(2),pt(10,-30,10),14)@ 14)(
+    visitTimes(b(2),pt(40,-10,10),7)@ 7)(visitTimes(b(2),pt(-35,-5,10),28)@
+    28)(visitTimes(b(2),pt(-40,-40,10),23)@ 23)(eLoc(b(2),pt(10,10,0),37)@ 28)(
+    eLoc(b(2),pt(10,-30,10),15)@ 7)(eLoc(b(2),pt(40,-10,10),9)@ 2)(eLoc(b(2),
+    pt(-35,-5,10),30)@ 23)(eLoc(b(2),pt(-40,-40,10),24)@ 14)(wind(1.0,0.0,0.0,
+    536870912)@ 0)myHome(b(2),pt(10,10,0))myAlt(b(2),10)),
+  ckb :(class(b(2),Bot)atloc(b(2),pt(12,10,-1))@ 37),
   evs :(tick @ 0)]
 [b(3): Bot |
-  lkb :(clock(37)class(b(3),Bot)(timeElapsed(5.1656531999999999e+1)@ 36)(rand(
-    144)@ 36)(atloc(b(3),pt(108,108,2))@ 36)(pending(b(3),stop(b(3)))@ 37)(
-    energy(b(3),1.0)@ 36)(caution(b(3),2.0e+1)@ 0)(targetVel(b(3),5.0)@ 0)(vel(
-    b(3),4.8301138702899998e-1)@ 36)(targets(b(3),pt(140,90,10); pt(60,60,10);
-    pt(65,95,10); pt(110,70,10),nil)@ 0)(visitTimes(b(3),pt(60,60,10),26)@ 26)(
-    visitTimes(b(3),pt(65,95,10),nil)@ 0)(visitTimes(b(3),pt(110,70,10),19)@
-    19)(visitTimes(b(3),pt(140,90,10),7)@ 7)(eLoc(b(3),pt(60,60,10),29)@ 19)(
-    eLoc(b(3),pt(110,70,10),14)@ 7)(eLoc(b(3),pt(110,110,0),40)@ 26)(eLoc(b(3),
-    pt(140,90,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(3),pt(110,110,
-    0))myAlt(b(3),10)),
-  ckb :(class(b(3),Bot)atloc(b(3),pt(108,108,2))@ 36),
+  lkb :(clock(38)class(b(3),Bot)(timeElapsed(7.6225340000000003e+1)@ 37)(rand(
+    148)@ 37)(atloc(b(3),pt(111,110,0))@ 37)(pending(b(3),stop(b(3)))@ 38)(
+    energy(b(3),0.0)@ 37)(caution(b(3),2.0e+1)@ 0)(targetVel(b(3),5.0)@ 0)(vel(
+    b(3),1.4866068747300001e-1)@ 37)(targets(b(3),pt(140,90,10); pt(60,60,10);
+    pt(65,95,10); pt(110,70,10),nil)@ 0)(visitTimes(b(3),pt(60,60,10),24)@ 24)(
+    visitTimes(b(3),pt(65,95,10),nil)@ 0)(visitTimes(b(3),pt(110,70,10),16)@
+    16)(visitTimes(b(3),pt(140,90,10),7)@ 7)(eLoc(b(3),pt(60,60,10),27)@ 16)(
+    eLoc(b(3),pt(65,95,10),31)@ 24)(eLoc(b(3),pt(110,70,10),14)@ 7)(eLoc(b(3),
+    pt(110,110,0),39)@ 29)(eLoc(b(3),pt(140,90,10),9)@ 2)(wind(1.0,0.0,0.0,
+    536870912)@ 0)myHome(b(3),pt(110,110,0))myAlt(b(3),10)),
+  ckb :(class(b(3),Bot)atloc(b(3),pt(111,110,0))@ 37),
   evs :(tick @ 0)])})
 
 CONCURRENT:
 
-asysNoWind20 (again strange energy)
+asysNoWind20 (Strange... all should have suceeded.)
 
-averages ===> [ 1.0, -1.3333333333333333, 0.0, 3.3333333333333335, 12.0]
+elapsed ===> 1713569
+average_1 ===> 0.23529411764705882
+average_0 ===> 2.823529411764706
+averages ===> [ 2.823529411764706, 0.23529411764705882, 0.0, 4.0, 14.470588235294118]
+count ===> 17
 
-asysNoWind30 (energy seems better)
+eq numTiles = 3 .
 
-averages ===> [ 0.6666666666666666, 5.333333333333333, 0.0, 3.6666666666666665, 9.666666666666666]
+asysNoWind20 (Negative values for energy!)
+My impression is that there is a concurrency locking problem.
+SITL is running faster than we are sending commands...
 
-asysNoWind40
+(tval SCENARIO{allStopConf(
+[eI
+  | clock(27)class(b(0),Bot)class(b(1),Bot)class(b(2),Bot)class(b(3),
+    Bot)class(b(4),Bot)class(b(5),Bot)(timeElapsed(1.33908524e+2)@ 27)(
+    timeElapsed(1.3450370000000001e+2)@ 27)(timeElapsed(1.35439989e+2)@ 27)(
+    timeElapsed(1.3619567799999999e+2)@ 27)(timeElapsed(1.3693353500000001e+2)@
+    27)(timeElapsed(1.37645231e+2)@ 27)(rand(0)@ 0)(atloc(b(0),pt(3,0,-1))@
+    27)(atloc(b(1),pt(86,101,0))@ 27)(atloc(b(2),pt(197,200,0))@ 27)(atloc(b(
+    3),pt(8,15,0))@ 27)(atloc(b(4),pt(102,100,0))@ 27)(atloc(b(5),pt(194,188,
+    0))@ 27)(energy(b(0),1.0e+1)@ 27)(energy(b(1),0.0)@ 27)(energy(b(2),0.0)@
+    27)(energy(b(3),3.0)@ 27)(energy(b(4),-5.0)@ 27)(energy(b(5),-4.0)@ 27)(
+    vel(b(0),3.1622776601700001e-2)@ 27)(vel(b(1),0.0)@ 27)(vel(b(2),
+    4.1231056256200001e-2)@ 27)(vel(b(3),8.5440037453200002e-2)@ 27)(vel(b(4),
+    1.4317821063300001e-1)@ 27)(vel(b(5),1.96977156036e-1)@ 27)(wind(1.0,0.0,
+    0.0,536870912)@ 0)myHome(b(0),pt(0,0,0))myHome(b(1),pt(100,100,0))myHome(b(
+    2),pt(200,200,0))myHome(b(3),pt(10,10,0))myHome(b(4),pt(110,110,0))myHome(
+    b(5),pt(210,210,0))]
+[b(0): Bot |
+  lkb :(clock(27)class(b(0),Bot)(timeElapsed(1.3032268999999999e+2)@ 26)(rand(
+    26)@ 26)(atloc(b(0),pt(3,0,-1))@ 26)(pending(b(0),stop(b(0)))@ 27)(energy(
+    b(0),1.0e+1)@ 26)(caution(b(0),2.0e+1)@ 0)(targetVel(b(0),5.0)@ 0)(vel(b(
+    0),1.41421356237e-2)@ 26)(targets(b(0),pt(50,10,5); pt(10,30,5); pt(-20,50,
+    5); pt(-40,5,5),nil)@ 0)(visitTimes(b(0),pt(10,30,5),6)@ 6)(visitTimes(b(
+    0),pt(50,10,5),nil)@ 0)(visitTimes(b(0),pt(-20,50,5),10)@ 10)(visitTimes(b(
+    0),pt(-40,5,5),16)@ 16)(eLoc(b(0),pt(0,0,0),23)@ 16)(eLoc(b(0),pt(10,30,5),
+    8)@ 2)(eLoc(b(0),pt(-20,50,5),13)@ 6)(eLoc(b(0),pt(-40,5,5),20)@ 10)(wind(
+    1.0,0.0,0.0,536870912)@ 0)myHome(b(0),pt(0,0,0))myAlt(b(0),5)),
+  ckb :(class(b(0),Bot)atloc(b(0),pt(3,0,-1))@ 26),
+  evs :(tick @ 0)]
+[b(1): Bot |
+  lkb :(clock(27)class(b(1),Bot)(timeElapsed(1.3032268999999999e+2)@ 26)(rand(
+    52)@ 26)(atloc(b(1),pt(86,101,0))@ 26)(pending(b(1),stop(b(1)))@ 27)(
+    energy(b(1),0.0)@ 26)(caution(b(1),2.0e+1)@ 0)(targetVel(b(1),5.0)@ 0)(vel(
+    b(1),1.0e-2)@ 26)(targets(b(1),pt(150,110,5); pt(110,130,5); pt(80,150,5);
+    pt(60,105,5),nil)@ 0)(visitTimes(b(1),pt(60,105,5),nil)@ 0)(visitTimes(b(
+    1),pt(80,150,5),11)@ 11)(visitTimes(b(1),pt(110,130,5),6)@ 6)(visitTimes(b(
+    1),pt(150,110,5),nil)@ 0)(eLoc(b(1),pt(60,105,5),21)@ 11)(eLoc(b(1),pt(80,
+    150,5),13)@ 6)(eLoc(b(1),pt(100,100,0),27)@ 20)(eLoc(b(1),pt(110,130,5),8)@
+    2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(1),pt(100,100,0))myAlt(b(1),5)),
+  ckb :(class(b(1),Bot)atloc(b(1),pt(86,101,0))@ 26),
+  evs :(tick @ 0)]
+[b(2): Bot |
+  lkb :(clock(27)class(b(2),Bot)(timeElapsed(1.3032268999999999e+2)@ 26)(rand(
+    78)@ 26)(atloc(b(2),pt(197,200,0))@ 26)(pending(b(2),stop(b(2)))@ 27)(
+    energy(b(2),0.0)@ 26)(caution(b(2),2.0e+1)@ 0)(targetVel(b(2),5.0)@ 0)(vel(
+    b(2),6.3245553203400001e-2)@ 26)(targets(b(2),pt(250,210,5); pt(210,230,5);
+    pt(180,250,5); pt(160,205,5),nil)@ 0)(visitTimes(b(2),pt(160,205,5),nil)@
+    0)(visitTimes(b(2),pt(180,250,5),13)@ 13)(visitTimes(b(2),pt(210,230,5),6)@
+    6)(visitTimes(b(2),pt(250,210,5),nil)@ 0)(eLoc(b(2),pt(160,205,5),24)@ 13)(
+    eLoc(b(2),pt(180,250,5),14)@ 6)(eLoc(b(2),pt(200,200,0),27)@ 20)(eLoc(b(2),
+    pt(210,230,5),8)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(2),pt(200,200,
+    0))myAlt(b(2),5)),
+  ckb :(class(b(2),Bot)atloc(b(2),pt(197,200,0))@ 26),
+  evs :(tick @ 0)]
+[b(3): Bot |
+  lkb :(clock(27)class(b(3),Bot)(timeElapsed(1.3032268999999999e+2)@ 26)(rand(
+    104)@ 26)(atloc(b(3),pt(8,15,0))@ 26)(pending(b(3),stop(b(3)))@ 27)(energy(
+    b(3),3.0)@ 26)(caution(b(3),2.0e+1)@ 0)(targetVel(b(3),5.0)@ 0)(vel(b(3),
+    1.07703296143e-1)@ 26)(targets(b(3),pt(40,-10,10); pt(-40,-40,10); pt(-35,
+    -5,10); pt(10,-30,10),nil)@ 0)(visitTimes(b(3),pt(10,-30,10),16)@ 16)(
+    visitTimes(b(3),pt(40,-10,10),7)@ 7)(visitTimes(b(3),pt(-35,-5,10),nil)@
+    0)(visitTimes(b(3),pt(-40,-40,10),nil)@ 0)(eLoc(b(3),pt(10,10,0),24)@ 16)(
+    eLoc(b(3),pt(10,-30,10),14)@ 7)(eLoc(b(3),pt(40,-10,10),9)@ 2)(wind(1.0,
+    0.0,0.0,536870912)@ 0)myHome(b(3),pt(10,10,0))myAlt(b(3),10)),
+  ckb :(class(b(3),Bot)atloc(b(3),pt(8,15,0))@ 26),
+  evs :(tick @ 0)]
+[b(4): Bot |
+  lkb :(clock(27)class(b(4),Bot)(timeElapsed(1.3032268999999999e+2)@ 26)(rand(
+    130)@ 26)(atloc(b(4),pt(102,100,3))@ 26)(pending(b(4),stop(b(4)))@ 27)(
+    energy(b(4),-3.0)@ 26)(caution(b(4),2.0e+1)@ 0)(targetVel(b(4),5.0)@ 0)(
+    vel(b(4),5.2810983706000003e-1)@ 26)(targets(b(4),pt(140,90,10); pt(60,60,
+    10); pt(65,95,10); pt(110,70,10),nil)@ 0)(visitTimes(b(4),pt(60,60,10),18)@
+    18)(visitTimes(b(4),pt(65,95,10),nil)@ 0)(visitTimes(b(4),pt(110,70,10),
+    13)@ 13)(visitTimes(b(4),pt(140,90,10),7)@ 7)(eLoc(b(4),pt(60,60,10),22)@
+    13)(eLoc(b(4),pt(110,70,10),14)@ 7)(eLoc(b(4),pt(110,110,0),32)@ 18)(eLoc(
+    b(4),pt(140,90,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@ 0)myHome(b(4),pt(
+    110,110,0))myAlt(b(4),10)),
+  ckb :(class(b(4),Bot)atloc(b(4),pt(102,100,3))@ 26),
+  evs :(tick @ 0)]
+[b(5): Bot |
+  lkb :(clock(27)class(b(5),Bot)(timeElapsed(1.3032268999999999e+2)@ 26)(rand(
+    156)@ 26)(atloc(b(5),pt(194,188,3))@ 26)(pending(b(5),stop(b(5)))@ 27)(
+    energy(b(5),-3.0)@ 26)(caution(b(5),2.0e+1)@ 0)(targetVel(b(5),5.0)@ 0)(
+    vel(b(5),5.2668776329099998e-1)@ 26)(targets(b(5),pt(240,190,10); pt(160,
+    160,10); pt(165,195,10); pt(210,170,10),nil)@ 0)(visitTimes(b(5),pt(160,
+    160,10),19)@ 19)(visitTimes(b(5),pt(165,195,10),nil)@ 0)(visitTimes(b(5),
+    pt(210,170,10),14)@ 14)(visitTimes(b(5),pt(240,190,10),7)@ 7)(eLoc(b(5),pt(
+    160,160,10),24)@ 14)(eLoc(b(5),pt(210,170,10),15)@ 7)(eLoc(b(5),pt(210,210,
+    0),32)@ 19)(eLoc(b(5),pt(240,190,10),9)@ 2)(wind(1.0,0.0,0.0,536870912)@
+    0)myHome(b(5),pt(210,210,0))myAlt(b(5),10)),
+  ckb :(class(b(5),Bot)atloc(b(5),pt(194,188,3))@ 26),
+  evs :(tick @ 0)])})
 
-Wed Mar 29 09:58:31 UTC 2017
-averages ===> [ 0.6666666666666666, 14.0, 0.0, 3.3333333333333335, 6.666666666666667]
-Wed Mar 29 10:05:54 UTC 2017
-
+asysLowWind20
 
 )
