@@ -1,0 +1,2350 @@
+Ball now rolling
+cloner for plambda got startOK plambda0 from system
+it is for us
+cloner for plambda got startOK plambda1 from system
+it is for us
+cloner for plambda got startOK maude0 from system
+cloner for maude got startOK maude0 from system
+it is for us
+cloner for plambda got startOK maude1 from system
+cloner for maude got startOK maude1 from system
+it is for us
+		     \||||||||||||||||||/
+		   --- Welcome to Maude ---
+		     /||||||||||||||||||\
+	   Maude 2.7.1 built: Jun 27 2016 16:35:16
+	    Copyright 1997-2016 SRI International
+		   Sat Apr  8 22:54:24 2017
+		     \||||||||||||||||||/
+		   --- Welcome to Maude ---
+		     /||||||||||||||||||\
+	   Maude 2.7.1 built: Jun 27 2016 16:35:16
+	    Copyright 1997-2016 SRI International
+		   Sat Apr  8 22:54:24 2017
+
+
+
+
+initializing plambda0
+initializing plambda1
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+Connect tcp:127.0.0.1:5760 source_system=255
+no script /tmp/drone_0/mavinit.scr
+Log Directory: /tmp/drone_0/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_0/logs/2017-04-08/flight24/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5760
+
+
+Init APMbind port 5762 for 2
+:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: Serial port 2 on TCP port 5762
+131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5763 for 3
+Serial port 3 on TCP port 5763
+Connect tcp:127.0.0.1:5800 source_system=255
+no script /tmp/drone_4/mavinit.scr
+Log Directory: /tmp/drone_4/logs/2017-04-08/flight23
+Telemetry log: /tmp/drone_4/logs/2017-04-08/flight23/flight.tlog
+Waiting for heartbeat from tcp:127.0.0.1:5800
+MAV>
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Freebind port 5802 for 2
+ RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: ValidSerial port 2 on TCP port 5802
+ating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5803 for 3
+Serial port 3 on TCP port 5803
+APM: Calibrating barometer
+APM: Calibrating barometer
+>>> Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+******
+
+Ready to FLY
+
+Ready to FLY fence breach
+fence breach
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_0/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_4/logs/2017-04-08/flight23/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+APM: EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+Connect tcp:127.0.0.1:5770 source_system=255
+no script /tmp/drone_1/mavinit.scr
+Log Directory: /tmp/drone_1/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_1/logs/2017-04-08/flight24/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5770
+
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+---bind port 5772 for 2
+--Serial port 2 on TCP port 5772
+bind port 5773 for 3
+-----------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5773
+Connect tcp:127.0.0.1:5810 source_system=255
+no script /tmp/drone_5/mavinit.scr
+Log Directory: /tmp/drone_5/logs/2017-04-08/flight23
+Telemetry log: /tmp/drone_5/logs/2017-04-08/flight23/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5810
+
+
+Init APM:Copbind port 5812 for 2
+ter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+lSerial port 2 on TCP port 5812
+oad_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5813 for 3
+Serial port 3 on TCP port 5813
+APM: Calibrating barometer
+>>> Calibrating barometer
+APM: Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*****
+
+Ready to FLY fence breach
+
+
+Ready to FLY fence breach
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_1/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_5/logs/2017-04-08/flight23/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+Connect tcp:127.0.0.1:5780 source_system=255
+no script /tmp/drone_2/mavinit.scr
+Log Directory: /tmp/drone_2/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_2/logs/2017-04-08/flight24/flight.tlog
+Waiting for heartbeat from tcp:127.0.0.1:5780
+MAV>
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+bind port 5782 for 2
+
+Serial port 2 on TCP port 5782
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5783 for 3
+Serial port 3 on TCP port 5783
+Connect tcp:127.0.0.1:5820 source_system=255
+no script /tmp/drone_6/mavinit.scr
+Log Directory: /tmp/drone_6/logs/2017-04-08/flight23
+Telemetry log: /tmp/drone_6/logs/2017-04-08/flight23/flight.tlog
+Waiting for heartbeat from tcp:127.0.0.1:5820
+MAV>
+
+Init APM:Copter V3.6-devbind port 5822 for 2
+ Serial port 2 on TCP port 5822
+(9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5823 for 3
+Serial port 3 on TCP port 5823
+APM: Calibrating barometer
+>>> Calibrating barometer
+APM: Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*****
+
+Ready to FLY fence breach
+
+
+Ready to FLY fence breach
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_2/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_6/logs/2017-04-08/flight23/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+APM: GPS 0: detected as u-blox at 115200 baud
+>>> GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+Connect tcp:127.0.0.1:5790 source_system=255
+no script /tmp/drone_3/mavinit.scr
+Log Directory: /tmp/drone_3/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_3/logs/2017-04-08/flight24/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5790
+
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change:bind port 5792 for 2
+Serial port 2 on TCP port 5792
+bind port 5793 for 3
+ erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5793
+bind port 5832 for 2
+Serial port 2 on TCP port 5832
+Connect tcp:127.0.0.1:5830 source_system=255
+no script /tmp/drone_7/mavinit.scr
+Log Directory: /tmp/drone_7/logs/2017-04-08/flight23
+Telemetry log: /tmp/drone_7/logs/2017-04-08/flight23/flight.tlog
+Waiting for heartbeat from tcp:127.0.0.1:5830
+MAV>
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAMbind port 5833 for 3
+: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structureSerial port 3 on TCP port 5833
+s
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+APM: Calibrating barometer
+>>> Calibrating barometer
+APM: Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*****
+
+Ready to FLY fence breach
+
+
+Ready to FLY fence breach
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_3/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+cloner for plambda got initedOK plambda0 from plambda0
+cloner for maude got initedOK plambda0 from plambda0
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_7/logs/2017-04-08/flight23/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+cloner for plambda got initedOK plambda1 from plambda1
+cloner for maude got initedOK plambda1 from plambda1
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+The g2d actor is (auto) initialized. Executing doConcurrentStats Now.
+
+calling doRun with maude0
+calling doRun with maude1
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+>>> Arming motors
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+ARMED
+GUIDED> Mode GUIDED
+ARMED
+GUIDED> Mode GUIDED
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+ARMED
+GUIDED> Mode GUIDED
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+ARMED
+GUIDED> Mode GUIDED
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+OK
+OK
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 in-flight yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+ARMED
+GUIDED> Mode GUIDED
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+height 10
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+height 10
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+height 10
+height 10
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 70 percent
+Flight battery 70 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 70 percent
+Flight battery 70 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 40 percent
+OK
+Flight battery 40 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+OK
+height 0
+OK
+height 0
+OK
+APM: Disarming motors
+>>> Disarming motors
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+DISARMED
+height 0
+OK
+OK
+OK
+APM: Disarming motors
+>>> Disarming motors
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+DISARMED
+height 0
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+APM: Disarming motors
+DISARMED
+>>> Disarming motors
+APM: Disarming motors
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+>>> Disarming motors
+DISARMED
+OK
+OK
+OK
+OK
+OK
+OK
+value = [D@7760d78b
+runResult from maude0 : [D@7760d78b
+OK
+calling doRun with maude0
+OK
+OK
+Flight battery 0 percent
+Flight battery warning
+OK
+OK
+OK
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+OK
+OK
+OK
+value = [D@3f6c8e74
+runResult from maude1 : [D@3f6c8e74
+calling doRun with maude1
+OK
+Connect tcp:127.0.0.1:5760 source_system=255
+no script /tmp/drone_0/mavinit.scr
+Log Directory: /tmp/drone_0/logs/2017-04-08/flight25
+Telemetry log: /tmp/drone_0/logs/2017-04-08/flight25/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5760
+
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FWbind port 5762 for 2
+Serial port 2 on TCP port 5762
+ Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5763 for 3
+Serial port 3 on TCP port 5763
+APM: Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+**position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+*
+
+Ready to FLY Connect tcp:127.0.0.1:5800 source_system=255
+no script /tmp/drone_4/mavinit.scr
+Log Directory: /tmp/drone_4/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_4/logs/2017-04-08/flight24/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5800
+
+
+Init bind port 5802 for 2
+ASerial port 2 on TCP port 5802
+PM:Copter V3.6-dev (9e5bind port 5803 for 3
+d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5803
+fence breach
+APM: Calibrating barometer
+>>> Calibrating barometer
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_0/logs/2017-04-08/flight25/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Flight battery 0 percent
+Flight battery warning
+APM: Barometer calibration complete
+Init Gyro*>>> Barometer calibration complete
+**
+
+Ready to FLY fence breach
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_4/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+bind port 5772 for 2
+Serial port 2 on TCP port 5772
+bind port 5773 for 3
+Connect tcp:127.0.0.1:5770 source_system=255
+no script /tmp/drone_1/mavinit.scr
+Log Directory: /tmp/drone_1/logs/2017-04-08/flight25
+Telemetry log: /tmp/drone_1/logs/2017-04-08/flight25/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5770
+
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5773
+APM: Calibrating barometer
+>>> Calibrating barometer
+APM: GPS 0: detected as u-blox at 115200 baud
+>>> GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: Barometer calibration complete
+>>> Barometer calibration complete
+Init Gyro**position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+*Connect tcp:127.0.0.1:5810 source_system=255
+no script /tmp/drone_5/mavinit.scr
+Log Directory: /tmp/drone_5/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_5/logs/2017-04-08/flight24/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5810
+
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+lbind port 5812 for 2
+oSerial port 2 on TCP port 5812
+ad_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5813 for 3
+
+
+Ready to FLY Serial port 3 on TCP port 5813
+fence breach
+APM: Calibrating barometer
+>>> Calibrating barometer
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_1/logs/2017-04-08/flight25/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Flight battery 10 percent
+Flight battery warning
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+***
+
+Ready to FLY fence breach
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_5/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+Connect tcp:127.0.0.1:5780 source_system=255
+no script /tmp/drone_2/mavinit.scr
+Log Directory: /tmp/drone_2/logs/2017-04-08/flight25
+Telemetry log: /tmp/drone_2/logs/2017-04-08/flight25/flight.tlog
+Waiting for heartbeat from tcp:127.0.0.1:5780
+MAV>
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 bind port 5782 for 2
+Serial port 2 on TCP port 5782
+validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+bind port 5783 for 3
+Serial port 3 on TCP port 5783
+APM: Calibrating barometer
+>>> Calibrating barometer
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Execute: /home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter --home=-7.16168685319,-34.8167090812,36,250 --model=quad -I 7 --defaults /home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm -w
+SITL-7> Started model quad at -7.16168685319,-34.8167090812,36,250 at speed 1.0
+SITL-7.stderr> bind port 5830 for 0
+SITL-7> Starting sketch 'ArduCopter'
+SITL-7.stderr> Serial port 0 on TCP port 5830
+SITL-7> Starting SITL input
+SITL-7> Using Irlock at port : 9075
+SITL-7> Waiting for connection ....
+Smoothing reset at 0.001
+Remaining: 0.250000 litres
+Pump: 0.000000 l/s
+Spinner: 0.000000 rev/s
+Loaded defaults from /home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm
+Loaded defaults from /home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm
+Hit ground at 0.474811 m/s
+Hit ground at 0.007253 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit grouAPM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: Barometer calibration complete
+Init Gyro*>>> Barometer calibration complete
+*position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+*Connect tcp:127.0.0.1:5820 source_system=255
+no script /tmp/drone_6/mavinit.scr
+Log Directory: /tmp/drone_6/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_6/logs/2017-04-08/flight24/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5820
+
+
+Init Abind port 5822 for 2
+PSerial port 2 on TCP port 5822
+Mbind port 5823 for 3
+:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5823
+
+
+Ready to FLY fence breach
+APM: Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_2/logs/2017-04-08/flight25/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Flight battery 20 percent
+Flight battery warning
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: Barometer calibration complete
+Init Gyro*>>> Barometer calibration complete
+**
+
+Ready to FLY fence breach
+position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_6/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+Connect tcp:127.0.0.1:5790 source_system=255
+no script /tmp/drone_3/mavinit.scr
+Log Directory: /tmp/drone_3/logs/2017-04-08/flight25
+Telemetry log: /tmp/drone_3/logs/2017-04-08/flight25/flight.tlog
+MAV> Waiting for heartbeat from tcp:127.0.0.1:5790
+
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------bind port 5792 for 2
+-Serial port 2 on TCP port 5792
+-bind port 5793 for 3
+----------------------
+
+
+Firmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5793
+APM: Calibrating barometer
+>>> Calibrating barometer
+APM: GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> GPS 0: detected as u-blox at 115200 baud
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+**position_demand=0.000000 jaw_gap=30.000000 load=0.000000
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+*Connect tcp:127.0.0.1:5830 source_system=255
+no script /tmp/drone_7/mavinit.scr
+Log Directory: /tmp/drone_7/logs/2017-04-08/flight24
+Telemetry log: /tmp/drone_7/logs/2017-04-08/flight24/flight.tlog
+Waiting for heartbeat from tcp:127.0.0.1:5830
+MAV>
+
+Init APM:Copter V3.6-dev (9e5d6ab1)
+
+Free RAM: 131072
+FW Ver: 120
+----------------------------------------
+
+bind port 5832 for 2
+
+Serial port 2 on TCP port 5832
+Fbind port 5833 for 3
+irmware change: erasing EEPROM...
+done.
+load_all took 0us
+0 0 0 validate_structures:166: Validating structures
+DataFlash_File: buffer size=16384
+online system 1
+STABILIZE> Mode STABILIZE
+Serial port 3 on TCP port 5833
+
+
+Ready to FLY fence breach
+APM: Calibrating barometer
+>>> Calibrating barometer
+Got MAVLink msg: COMMAND_ACK {command : 520, result : 0}
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_3/logs/2017-04-08/flight25/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+OK
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+APM: GPS 0: detected as u-blox at 115200 baud
+>>> GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: Barometer calibration complete
+Init Gyro>>> Barometer calibration complete
+*Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+**Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+
+
+Ready to FLY fence breach
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+Received 832 parameters
+Saved 832 parameters to /tmp/drone_7/logs/2017-04-08/flight24/mav.parm
+APM: EKF2 IMU0 initial yaw alignment complete
+APM: EKF2 IMU1 initial yaw alignment complete
+Setting SIM_SPEEDUP to 3
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> EKF2 IMU0 initial yaw alignment complete
+>>> EKF2 IMU1 initial yaw alignment complete
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+ARMED
+GUIDED> Mode GUIDED
+APM: GPS 0: detected as u-blox at 115200 baud
+>>> GPS 0: detected as u-blox at 115200 baud
+APM: EKF2 IMU1 tilt alignment complete
+APM: EKF2 IMU0 tilt alignment complete
+>>> EKF2 IMU1 tilt alignment complete
+>>> EKF2 IMU0 tilt alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 Origin set to GPS
+APM: EKF2 IMU0 Origin set to GPS
+>>> EKF2 IMU1 Origin set to GPS
+>>> EKF2 IMU0 Origin set to GPS
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+OK
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+ARMED
+GUIDED> Mode GUIDED
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+height 10
+APM: EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+APM: EKF2 IMU1 is using GPS
+APM: EKF2 IMU0 is using GPS
+>>> EKF2 IMU1 is using GPS
+>>> EKF2 IMU0 is using GPS
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+APM: Arming motors
+Got MAVLink msg: COMMAND_ACK {command : 400, result : 0}
+>>> Arming motors
+ARMED
+GUIDED> Mode GUIDED
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 0}
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+height 10
+APM: EKF2 IMU0 in-flight yaw alignment complete
+>>> EKF2 IMU0 in-flight yaw alignment complete
+APM: EKF2 IMU1 in-flight yaw alignment complete
+>>> EKF2 IMU1 in-flight yaw alignment complete
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+Got MAVLink msg: COMMAND_ACK {command : 22, result : 4}
+OK
+OK
+OK
+OK
+height 10
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+height 10
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 80 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 70 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 70 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 70 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 70 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 40 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 40 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Flight battery 30 percent
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+LAND> Mode LAND
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+APM: Disarming motors
+>>> Disarming motors
+APM: Disarming motors
+>>> Disarming motors
+OK
+DISARMED
+DISARMED
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+OK
+OK
+OK
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+OK
+OK
+height 0
+OK
+OK
+Flight battery 0 percent
+Flight battery warning
+OK
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+LAND> Mode LAND
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+OK
+OK
+height 0
+height 0
+OK
+OK
+APM: Disarming motors
+DISARMED
+>>> Disarming motors
+Flight battery 0 percent
+Flight battery warning
+OK
+Got MAVLink msg: COMMAND_ACK {command : 178, result : 4}
+Got MAVLink msg: COMMAND_ACK {command : 11, result : 0}
+OK
+OK
+OK
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+OK
+OK
+height 0
+OK
+OK
+APM: Disarming motors
+>>> Disarming motors
+DISARMED
+OK
+OK
+OK
+OK
+value = [D@460cc5c7
+runResult from maude0 : [D@460cc5c7
+Patrol:
+elapsed ===> 195114
+average_1 ===> -1.0
+average_0 ===> 2.0
+averages ===> [ 2.0, -1.0, 0.0, 3.6666666666666665, 14.0]
+count ===> 3
+accumulator ===> [D@69d9c602
+average_3 ===> 3.6666666666666665
+average_2 ===> 0.0
+rounds ===> 3
+average_4 ===> 14.0
+
+OK
+Flight battery 0 percent
+Flight battery warning
+OK
+OK
+OK
+OK
+OK
+runResult from maude1 : [D@19300abe
+Patrol:
+elapsed ===> 199125
+average_1 ===> -1.0
+average_0 ===> 2.0
+averages ===> [ 2.0, -1.0, 0.0, 3.6666666666666665, 14.0]
+count ===> 3
+accumulator ===> [D@69d9c602
+average_3 ===> 3.6666666666666665
+average_2 ===> 0.0
+rounds ===> 3
+average_4 ===> 14.0
+
+Flight battery 10 percent
+Flight battery warning
+Flight battery 0 percent
+Flight battery warning
+Flight battery 0 percent
+Flight battery warning
+Flight battery 0 percent
+Flight battery warning
+Flight battery 0 percent
+Flight battery warning
+Execute: /home/vagrant/Repositories/ardupilot/build/sitl/bin/arducopter --home=-7.162675,-34.817705,36,250 --model=quad -I 7 --defaults /home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm -w
+SITL-7> Started model quad at -7.162675,-34.817705,36,250 at speed 1.0
+SITL-7.stderr> bind port 5830 for 0
+SITL-7> Starting sketch 'ArduCopter'
+SITL-7.stderr> Serial port 0 on TCP port 5830
+SITL-7> Starting SITL input
+SITL-7> Using Irlock at port : 9075
+SITL-7> Waiting for connection ....
+Smoothing reset at 0.001
+Remaining: 0.250000 litres
+Pump: 0.000000 l/s
+Spinner: 0.000000 rev/s
+Loaded defaults from /home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm
+Loaded defaults from /home/vagrant/Repositories/ardupilot/Tools/autotest/default_params/copter.parm
+Hit ground at 0.475815 m/s
+Hit ground at 0.007235 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/sFlight battery warning
+Flight battery warning
+Flight battery warning
+Flight battery warning
+Flight battery warning
+Flight battery warning
+Flight battery warning
+Flight battery warning
+
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.008164 m/s
+Hit ground at 0.00
