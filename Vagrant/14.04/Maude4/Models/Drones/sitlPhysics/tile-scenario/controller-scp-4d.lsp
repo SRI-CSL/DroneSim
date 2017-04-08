@@ -41,7 +41,7 @@
    "\n"
    "loop init ."
    "\n"
-   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysNoWind40 false)\n (augAgentEsetConcurrentStats Patrol 400))"
+   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysNoWind20 false)\n (augAgentEsetConcurrentStats Patrol 400))"
    "\n"
    )
   )
@@ -53,8 +53,8 @@
 
 
 
-(define generic_alpha "0.5")
-(define generic_beta "0.5")
+(define generic_alpha "0.25")
+(define generic_beta "0.25")
 (define generic_num  "5")
 
 ;;; NO MORE EDITING FROM THIS POINT
