@@ -25,9 +25,8 @@
     ;;
     ;;
 	;; the default is x = 0 and y = 0
+    (invoke drone "setLogging" logP logFileName)
     (invoke drone "initialize" delta_x delta_y)
-    (define logging logP)
-    (define logFile logFileName)
     drone))
 
 (import "plambda.actors.actorlib")
@@ -78,5 +77,9 @@
 
 (import "plambda.util.Util")
 
-(define writeLog (name)
+(define _writeLog (name)
   (apply plambda.util.Util.string2File (concat (invoke name "getName") " " (apply getTimeElapsed) " " name " \n\n") logFile (boolean true)))
+
+(define writeLog (drone)
+  (let ((msg (concat (invoke drone "getName") " " (apply getTimeElapsed) " " drone " \n\n")))
+    (invoke drone "logMessage" msg)))

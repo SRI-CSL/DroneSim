@@ -66,6 +66,8 @@ class SitlDrone(object):
         self.name = name
         self.ino = instance_no
         self.debug = debug
+        self.logging = None
+        self.logfile = None
         self.speedup = int(speedup) if speedup is not None else None
         self.binary = binary
         self.params = params
@@ -95,7 +97,14 @@ class SitlDrone(object):
         self.trace("getName")
         return self.name
 
+    def setLogging(self, logging, logfile):
+        self.logging = logging
+        self.logfile = logfile
 
+    def logMessage(self, message):
+        if self.logging:
+            with open(self.logfile, "a") as log:
+                log.write(message)
 
     def setOrigin(self, x, y):
         """ Sets the home location of the drone to be (delta x, delta y) from the current self.home location.
