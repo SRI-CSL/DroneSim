@@ -10,7 +10,7 @@ eq act(id,kb) = actBasic(id,kb) .
 eq nextLoc(id,kb) = nextLocSCP(id,kb) .
 
 op numTiles : -> Nat .
-eq numTiles = 3 . *** Each tile has 2 drones
+eq numTiles = 2 . *** Each tile has 2 drones
 
 ops asysNoWind30 asysNoWind20 asysNoWind40 asysNoWind50 : -> ASystem .
 eq asysNoWind20 = asysNoWind(numTiles,20.0) .
