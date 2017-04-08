@@ -28,6 +28,8 @@
    )
   )
 
+;;(augAgentEsetConcurrentStats Patrol 400  n * 100000)
+
 (define maude_init_maude
   (concat
    "\n"
@@ -43,7 +45,7 @@
    "\n"
    "loop init ."
    "\n"
-   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysNoWind20 false)\n (augAgentEsetConcurrentStats Patrol 400))"
+   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysNoWind20 false)\n (augAgentEsetConcurrentStats Patrol 400 {1}))"
    "\n"
    )
   )
@@ -262,7 +264,7 @@
 ;;make the maude load files.
 (for instanceno maude_population
      (let  ((loadfile (concat 'load' instanceno '.maude'))
-	    (contents (invoke maude_init_maude 'format' instanceno)))
+	    (contents (invoke maude_init_maude 'format' instanceno  (* instanceno (int 100000)))))
        (apply plambda.util.Util.string2File  contents loadfile (boolean False))))
 
 

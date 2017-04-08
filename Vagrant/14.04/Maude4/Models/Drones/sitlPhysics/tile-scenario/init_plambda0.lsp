@@ -3,7 +3,7 @@
 (import 'sys')
 (invoke sys.stderr 'write' 'initializing plambda0\n')
 (load '../../../../Lib/sitl_drone.lsp')
-(define visuals (boolean true))
+(define visuals (boolean false))
 (define b0 (apply mkdrone 'b0' (* (int 4) (int 0)) (int 0) (int 0) visuals (boolean false) 'log0.txt' ))
 (define b1 (apply mkdrone 'b1' (+ (* (int 4) (int 0)) (int 1)) (int 100) (int 100) visuals (boolean false) 'log1.txt' ))
 (define b2 (apply mkdrone 'b2' (+ (* (int 4) (int 0)) (int 2)) (int 10) (int 10) visuals (boolean false) 'log1.txt' ))

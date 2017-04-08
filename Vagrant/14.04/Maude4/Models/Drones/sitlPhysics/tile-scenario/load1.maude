@@ -7,4 +7,4 @@ load ../../../../Lib/meta-cp-e
 loop init .
 (seq
  (initAgentEset maude1 g2d g2d plambda1 ANALYSIS asysNoWind20 false)
- (augAgentEsetConcurrentStats Patrol 400))
+ (augAgentEsetConcurrentStats Patrol 400 100000))
