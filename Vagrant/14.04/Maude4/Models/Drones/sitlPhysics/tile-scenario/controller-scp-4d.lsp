@@ -9,13 +9,15 @@
    "\n"
    "(load '../../../../Lib/sitl_drone.lsp')"
    "\n"
-   "(define b0 (apply mkdrone 'b0' (* (int 4) (int {1})) (int 0) (int 0) (boolean false) (boolean false) 'log0.txt' ))"
+   "(define visuals (boolean false))"
    "\n"
-   "(define b1 (apply mkdrone 'b1' (+ (* (int 4) (int {1})) (int 1)) (int 100) (int 100) (boolean false) (boolean false) 'log1.txt' ))"
+   "(define b0 (apply mkdrone 'b0' (* (int 4) (int {1})) (int 0) (int 0) visuals (boolean false) 'log0.txt' ))"
    "\n"
-   "(define b2 (apply mkdrone 'b2' (+ (* (int 4) (int {1})) (int 2)) (int 10) (int 10) (boolean false) (boolean false) 'log1.txt' ))"
+   "(define b1 (apply mkdrone 'b1' (+ (* (int 4) (int {1})) (int 1)) (int 100) (int 100) visuals (boolean false) 'log1.txt' ))"
    "\n"
-   "(define b3 (apply mkdrone 'b3' (+ (* (int 4) (int {1})) (int 3)) (int 110) (int 110) (boolean false) (boolean false) 'log1.txt' ))"
+   "(define b2 (apply mkdrone 'b2' (+ (* (int 4) (int {1})) (int 2)) (int 10) (int 10) visuals (boolean false) 'log1.txt' ))"
+   "\n"
+   "(define b3 (apply mkdrone 'b3' (+ (* (int 4) (int {1})) (int 3)) (int 110) (int 110) visuals (boolean false) 'log1.txt' ))"
    "\n"
    "(apply setStartTime)"
    "\n"
@@ -53,8 +55,8 @@
 
 
 
-(define generic_alpha "0.25")
-(define generic_beta "0.25")
+(define generic_alpha "0.5")
+(define generic_beta "0.5")
 (define generic_num  "5")
 
 ;;; NO MORE EDITING FROM THIS POINT
