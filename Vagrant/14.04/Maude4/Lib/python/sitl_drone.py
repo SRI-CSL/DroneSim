@@ -66,7 +66,7 @@ class SitlDrone(object):
         self.name = name
         self.ino = instance_no
         self.debug = debug
-        self.logging = None
+        self.logging = False
         self.logfile = None
         self.speedup = int(speedup) if speedup is not None else None
         self.binary = binary
@@ -102,7 +102,7 @@ class SitlDrone(object):
         self.logfile = logfile
 
     def logMessage(self, message):
-        if self.logging:
+        if self.logging and self.logfile is not None:
             with open(self.logfile, "a") as log:
                 log.write(message)
 

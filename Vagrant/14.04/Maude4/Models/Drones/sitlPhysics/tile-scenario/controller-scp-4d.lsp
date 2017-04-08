@@ -11,7 +11,7 @@
    "\n"
    "(define visuals (boolean false))"
    "\n"
-   "(define drone_logging (boolean true))"
+   "(define drone_logging (boolean false))"
    "\n"
    "(define b0 (apply mkdrone 'b0' (* (int 4) (int {1})) (int 0) (int 0) visuals drone_logging 'log_4_b0_in_{0}.txt' ))"
    "\n"
