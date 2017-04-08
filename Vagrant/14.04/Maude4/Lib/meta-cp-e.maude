@@ -28,7 +28,7 @@ vars t t' t0 idT idterm sxT syT szT vT xT yT zT dxT dyT dzT
       timeT timeT1 mteT nztT nztT1 actsT actsT1 ekbT ekbT' delayT durT
       aconfT aconfT0 aconfT1 aconfT2 aconfT' confT sconfT edgeXT
       idLocsT  maxCT chargeUT costMvT 
-      bT nT1 idsT dtT : Term .
+      bT nT1 idsT dtT randixT : Term .
 var tl idLocTL actTL : TermList .
 vars res? res?? res1? res1?? res0? 
      res0?? res2?? res3?? res4?? res5?? res6?? res7??
@@ -192,14 +192,14 @@ crl[initAgentEset]:
 ***********************************************************************
 
 ****************************************************************
-op augAgentEsetStats : ESet Qid Qid Qid  -> ESet .
-eq augAgentEsetStats(es,amodname, statsname,randinc) =
+op augAgentEsetStats : ESet Qid Qid Qid Term -> ESet .
+eq augAgentEsetStats(es,amodname, statsname,randinc,randixT) =
        addEntry(  addEntry(   addEntry(  
         addEntry(es, 
                 'tval, 'initConf,
                    getVal(es,'tval,'agentConf, tm(amodname,'none.ASystem))),
                 'qval, 'statsName, ql(statsname)),
-                'tval, 'randIx, tm(amodname, '0.Zero)),
+                'tval, 'randIx, tm(amodname, randixT)),
                 'tval, 'randInc, tm(amodname, qid2NatT(randinc))) .
 
 eq isReq('augAgentEsetStats) = true .
@@ -230,7 +230,7 @@ crl[augAgentEsetStats]:
  if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
  /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
  /\ ql(mname) := getVal(es,'qval, 'maudeName, ql('g2d)) 
- /\ es' := augAgentEsetStats(es, amodname, statsname, randinc)
+ /\ es' := augAgentEsetStats(es, amodname, statsname, randinc, '0.Zero)
  /\ str := mkInitStatsExp([amodname],mname,g2dvname, statsname, statsOp,toks)
  /\ toks' := str2toks(str) .
 
@@ -255,11 +255,12 @@ crl[augAgentEsetConcurrentStats]:
        wait4s !
        wait4(statsname,nil, req('graphreq,ql(g2dvname),nil)), 
        reqQ,
-       augAgentEsetStats(es, amodname, statsname, randinc),
+       augAgentEsetStats(es, amodname, statsname, randinc,randixT),
        log), 
       outQ ]
   if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL)) 
-     /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+  /\ ql(g2dvname) := getVal(es,'qval, 'g2dVName, ql('g2d)) 
+  /\ randixT := (if toks == nil then '0.Zero else  qid2NatT(head(toks)) fi)     
 .
 
 
@@ -1133,24 +1134,26 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
                else aconfT fi)
 ***** 17jan18 reset agentConf and running list
 /\ running := getIdsQL(amodname,aconfT)
-/\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
-                    'qval, 'running, ql(running))
-***** reset agentConf and simStatus ql(init)
-**** /\ es' := addEntry( addEntry(es,'tval,'agentConf,tm(amodname,aconfT0)),
-****                    'qval, 'simStatus, ql('init))
+/\ ql(status) := getVal(es,'qval, 'simStatus, ql('unknown))
+/\ es' := addEntry( addEntry( addEntry(es,
+               'tval,'agentConf,tm(amodname,aconfT0)),
+               'qval, 'running, ql(running)),
+               'qval, 'simStatus, ql('inprogress))
 /\ pyname := getPyName(es)
 /\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))          
 /\ ql(nq) := getVal(es,'qval,'simSteps,ql('1000))          
+/\ reqQ1 := req('doSimRound, ql(pyname nq),
+                    req('runOd,ql(g2dvname sname),
+                     reqQ'))
 /\ reqQ0 := (if q == 'true
              then req('doMaudeSimRound, ql(nq),
                       req('runOd,ql(g2dvname sname),
                           reqQ'))
-             else req('resetSitl, ql(pyname), 
-                   req('doSimRound, ql(pyname nq),
-                    req('runOd,ql(g2dvname sname),
-                     reqQ')))
-            fi)  .
-
+             else (if status == 'init
+                   then reqQ1
+                   else req('resetSitl, ql(pyname), reqQ1)
+                   fi) fi)
+         .
 
  eq isReq('runOd) = true .
  eq enabled(wait4s,req('runOd,ql(g2dvname sname toks),reqQ)) = 
