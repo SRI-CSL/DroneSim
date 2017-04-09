@@ -1233,6 +1233,122 @@ eq mkRunReplySingleExp(sname, 'br[bT, t]) =
 	            (("%sname" :~ sqquote(sname)),
                ("%obs" :~ downTerm(t,"")))  ) .
 
+
+
+
+***********************************************************************
+***** begin top level stats round  GRACEFULLY
+***********************************************************************
+***********************************************************************
+***** (doRunGracefully Patrol g2d)
+**** doRun--set agentConf, rewrite til done, update randix, send result
+***********************************************************************
+
+ eq isReq('doRunGracefully) = true .
+ eq enabled(wait4s,req('doRun,ql(sname g2dvname toks),reqQ)) =
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[doRunGracefully]:
+   [nil,
+    st(processing(req('doRunGracefully, ql(sname g2dvname toks),reqQ')),
+       wait4s,reqQ,es,log),
+    outQ]
+     =>
+   [nil,
+    st(ready, wait4s,(reqQ reqQ0), es',log),
+    outQ  ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) :=
+        getVal(es,'tval, 'initConf, tm(amodname,'`{_`}['none.Conf]))
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ res?? := metaReduce([amodname], 'upDateRand[aconfT,nT])
+/\ aconfT0 := (if res?? :: ResultPair
+               then getTerm(res??)
+               else aconfT fi)
+***** 17jan18 reset agentConf and running list
+/\ running := getIdsQL(amodname,aconfT)
+/\ ql(status) := getVal(es,'qval, 'simStatus, ql('unknown))
+/\ es' := addEntry( addEntry( addEntry(es,
+               'tval,'agentConf,tm(amodname,aconfT0)),
+               'qval, 'running, ql(running)),
+               'qval, 'simStatus, ql('inprogress))
+/\ pyname := getPyName(es)
+/\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))
+/\ ql(nq) := getVal(es,'qval,'simSteps,ql('1000))
+/\ reqQ1 := req('doSimRound, ql(pyname nq),
+                    req('runOdGracefully,ql(g2dvname sname),
+                     reqQ'))
+/\ reqQ0 := (if q == 'true
+             then req('doMaudeSimRound, ql(nq),
+                      req('runOdGracefully,ql(g2dvname sname),
+                          reqQ'))
+             else (if status == 'init
+                   then reqQ1
+                   else req('resetSitl, ql(pyname), reqQ1)
+                   fi) fi)
+         .
+
+ eq isReq('runOdGracefully) = true .
+ eq enabled(wait4s,req('runOdGracefully,ql(g2dvname sname toks),reqQ)) =
+    not(waiting4(wait4s,g2dvname)) .
+
+crl[runOdGracefully]:
+   [nil,
+    st(processing(req('runOdGracefully, ql(g2dvname sname toks),reqQ')),
+       wait4s,reqQ,es,log),
+    outQ]
+     =>
+   [nil,
+    st(ready,
+      (wait4s !
+       wait4(g2dvname,sname,
+             req('logreq,ql('runOdGracefully g2dvname sname),reqQ'))),
+       reqQ ,
+       es',
+       log),
+        outQ  g2dvname '\n mname '\n toks' maudePrompt ]
+if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
+/\ tm(amodname, aconfT) :=
+        getVal(es,'tval, 'agentConf, tm(amodname,'`{_`}['none.Conf]))
+/\ res?? := metaReduce([amodname], 'getObs[aconfT])
+/\ bT := (if (res?? :: ResultPair)
+               then getTerm(res??)
+               else 'false.Bool fi)
+/\ tm(amodname, nT) := getVal(es,'tval, 'randIx, tm(amodname,'0.Zero))
+/\ tm(amodname, xT) := getVal(es,'tval, 'randInc, tm(amodname,'0.Zero))
+/\ res1?? := metaReduce([amodname], '_+_[nT,xT])
+/\ nT1 := (if res1?? :: ResultPair
+           then getTerm(res1??) else nT fi)
+/\ es' := addEntry(es,'tval,'randIx,tm(amodname,nT1))
+/\ ql(mname) := getVal(es,'qval,'maudeName,ql('maude))
+/\ ql(q) := getVal(es,'qval,'MaudePhysics,ql('true))
+/\ str := (if q == 'true
+          then mkRunReplySingleExp(sname, bT)
+          else mkRunReplyGracefullyExp(sname,mname, bT)
+          fi)
+/\ toks' := str2toks(str) .
+
+
+op runReplyGracefullyTemplate : -> String .
+eq runReplyGracefullyTemplate =
+     "(apply runConcurrentGracefullyResult %sname %mname (apply makeDouble  %obs))" .
+
+op runReplyGracefullyNTemplate : -> String .
+eq runReplyGracefullyNTemplate =
+     "(apply runConcurrentGracefullyResult %sname %mname (array double %obs))"   .
+
+op mkRunReplyGracefullyExp : Qid Qid Term -> String .
+**** true -- multi obs fill array template, false single obs
+eq mkRunReplyGracefullyExp(sname,mname, 'br[bT, t]) =
+  fillTemplate((if bT == 'true.Bool
+                then runReplyGracefullyNTemplate
+                else runReplyGracefullyTemplate fi),
+              (("%sname" :~ sqquote(sname)),
+  						 ("%mname" :~ sqquote(mname)),
+               ("%obs" :~ downTerm(t,"")))  ) .
+
+
+
 ********************************************************************************
 ***** reseting SITL
 ********************************************************************************
