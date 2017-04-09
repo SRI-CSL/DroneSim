@@ -1245,7 +1245,7 @@ eq mkRunReplySingleExp(sname, 'br[bT, t]) =
 ***********************************************************************
 
  eq isReq('doRunGracefully) = true .
- eq enabled(wait4s,req('doRun,ql(sname g2dvname toks),reqQ)) =
+ eq enabled(wait4s,req('doRunGracefully,ql(sname g2dvname toks),reqQ)) =
     not(waiting4(wait4s,g2dvname)) .
 
 crl[doRunGracefully]:
@@ -1331,11 +1331,11 @@ if ql(amodname) := getVal(es,'qval, 'agentModName, ql('BOOL))
 
 op runReplyGracefullyTemplate : -> String .
 eq runReplyGracefullyTemplate =
-     "(apply runConcurrentGracefullyResult %sname %mname (apply makeDouble  %obs))" .
+     "(apply runConcurrentResultGracefully %sname %mname (apply makeDouble  %obs))" .
 
 op runReplyGracefullyNTemplate : -> String .
 eq runReplyGracefullyNTemplate =
-     "(apply runConcurrentGracefullyResult %sname %mname (array double %obs))"   .
+     "(apply runConcurrentResultGracefully %sname %mname (array double %obs))"   .
 
 op mkRunReplyGracefullyExp : Qid Qid Term -> String .
 **** true -- multi obs fill array template, false single obs
