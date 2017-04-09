@@ -105,7 +105,7 @@ drones:
    '\n'
    '(invoke java.lang.System.err "println" "The g2d actor is (auto) initialized. Executing doConcurrentStats Now.")'
    '\n'
-   '(apply doConcurrentStatsGracefully "Patrol" maudes drone_count)'
+   '(apply doConcurrentStatsGracefully "Patrol" maudes)'
    '\n'
    )
   )

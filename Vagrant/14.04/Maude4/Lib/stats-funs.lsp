@@ -83,16 +83,16 @@
   (concat "plambda" (invoke maude "substring" (invoke "maude" "length"))))
 
 
-(define doConcurrentStatsGracefully (handle maudes drone_count)
+(define doConcurrentStatsGracefully (handle maudes)
   (let ((statsObject (fetch handle)))
     (if (isobject statsObject)
 	(for maude maudes
-	     (apply doConcurrentStatsGracefullyAux handle maude  drone_count statsObject (boolean false)))
+	     (apply doConcurrentStatsGracefullyAux handle maude statsObject (boolean false)))
       )
     )
   )
 
-(define doConcurrentStatsGracefullyAux (handle maude drone_count statsObject isDone)
+(define doConcurrentStatsGracefullyAux (handle maude statsObject isDone)
   (if isDone
       ;; at this point we can shutdown all the drones in the plambda that is twinned with the
       ;; maude.
@@ -107,14 +107,16 @@
 	     )
 	)
     (seq
-     (invoke java.lang.System.err "println" (concat "calling doRun with " maude))
+     (invoke java.lang.System.err "println" (concat "calling doConcurrentRunGracefully with " maude))
      (apply doConcurrentRunGracefully handle maude)
      )) )
 
-;;;iam2clt: we send a "doRunGracefully" which calls back with a "runConcurrentResultGracefully"?
-;;; also need to pass the drone_count ...
 (define doConcurrentRunGracefully (handle maude)
-  (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRun")
+  ;;iam: flicking on the graceful version here breaks things.
+  (if (boolean false)
+      (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRunGracefully")
+    (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRun")
+    )
   )
 
 
@@ -125,7 +127,7 @@
 	(seq
 	 ;; (invoke statsObject "recordRunResult" (apply makeDouble val))
 	 (invoke statsObject "recordRunResult" val)
-	 (invoke java.lang.System.err "println" (concat "runResult from " maude " : " val ))
+	 (invoke java.lang.System.err "println" (concat "runConcurrentResultGracefully from " maude " : " val ))
 	 (sinvoke "g2d.util.ActorMsg"  "send" maude "g2d" "OK")
 	 (apply doConcurrentStatGracefullysAux handle maude drone_count statsObject (invoke statsObject "done"))
 	 )) ))
