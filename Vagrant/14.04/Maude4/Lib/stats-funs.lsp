@@ -100,8 +100,10 @@
 	(invoke java.lang.System.err "println" (concat "isDone is true shutting down the drones in " plambda))
 	(invoke java.lang.System.err "println" statsObject)
 	(for droneid drone_count
-	     (invoke java.lang.System.err "println" (concat "Shutting down drone: " (concat "b" droneid)))
-	     (sinvoke "g2d.util.ActorMsg"  "send" plambda maude (concat "(invoke " (concat "b" droneid) " \"shutdown\")"))
+	     (let ((drone (concat "b" droneid)))
+	       (invoke java.lang.System.err "println" (concat "Shutting down drone: " drone))
+	       (sinvoke "g2d.util.ActorMsg"  "send" plambda maude (concat "(invoke " drone " \"shutdown\")"))
+	       )
 	     )
 	)
     (seq
