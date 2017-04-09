@@ -101,13 +101,11 @@ drones:
    '\n'
    '(define maudes (array java.lang.String {0}))'
    '\n'
-   '(define plambdas (array java.lang.String {4}))'
-   '\n'
-   '(define drones (array java.lang.String {5}))'
+   '(define drone_count (int {4}))'
    '\n'
    '(invoke java.lang.System.err "println" "The g2d actor is (auto) initialized. Executing doConcurrentStats Now.")'
    '\n'
-   '(apply doConcurrentStatsGracefully "Patrol" maudes plambdas drones)'
+   '(apply doConcurrentStatsGracefully "Patrol" maudes drone_count)'
    '\n'
    )
   )
@@ -154,9 +152,8 @@ drones:
 			   generic_alpha
 			   generic_beta
 			   generic_num
-			   (apply make_string_list 'plambda' plambda_population)
-               (apply make_string_list 'b' drone_count)
-               )))
+			   drone_count
+			   )))
     (apply plambda.util.Util.string2File  contents lspfile (boolean False))
     )
   )
