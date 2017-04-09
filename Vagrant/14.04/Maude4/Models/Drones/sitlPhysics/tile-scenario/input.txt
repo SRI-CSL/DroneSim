@@ -38,3 +38,6 @@
 (g2dexe graphics2d (supdate "g2d.util.ActorMsg" "VERBOSE" (boolean false)))
 (g2dexe graphics2d (supdate "g2d.Main" "DEBUG" (boolean false)))
 
+
+**** send to g2d
+(user (sinvoke "g2d.console.Console" "launch" "softagents"))

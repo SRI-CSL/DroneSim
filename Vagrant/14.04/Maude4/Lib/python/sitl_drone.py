@@ -176,7 +176,7 @@ class SitlDrone(object):
 
         sitl_args = self.sitl_args()
 
-        if self.debug:
+        if self.debug or True:
             sys.stderr.write('Spawning sitl: {0}\n'.format(sitl_args))
 
         self.sitl = sandbox.SandBox('sitl', sitl_args, True)
@@ -191,7 +191,7 @@ class SitlDrone(object):
 
         mpargs = self.mavproxy_args()
 
-        if self.debug:
+        if self.debug or True:
             sys.stderr.write('Spawning mavproxy: {0}\n'.format(mpargs))
         self.mavproxy = sandbox.SandBox('mavproxy', mpargs, True)
         self.mavproxy.start()

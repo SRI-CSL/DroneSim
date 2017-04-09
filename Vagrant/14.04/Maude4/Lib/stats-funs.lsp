@@ -27,7 +27,7 @@
       (sinvoke "g2d.util.ActorMsg"  "send" "maude" "g2d" "OK")
       (apply doStatsAux handle statsObject (invoke statsObject "done"))
       )) ))
-	
+
 
 (define doStats (handle)
   (let ((statsObject (fetch handle)))
@@ -48,7 +48,7 @@
 (define doConcurrentStats (handle maudes)
   (let ((statsObject (fetch handle)))
     (if (isobject statsObject)
-	(for maude maudes 
+	(for maude maudes
 	     (apply doConcurrentStatsAux handle maude statsObject (boolean false)))
       )
     )
@@ -61,6 +61,30 @@
      (invoke java.lang.System.err "println" (concat "calling doRun with " maude))
      (apply doConcurrentRun handle maude)
      )) )
+
+(define doConcurrentStatsGracefully (handle maudes plambdas drones)
+  (let ((statsObject (fetch handle)))
+    (if (isobject statsObject)
+	(for maude maudes
+	     (apply doConcurrentStatsGracefullyAux handle maude maudes plambdas drones statsObject (boolean false)))
+      )
+    )
+  )
+
+(define doConcurrentStatsGracefullyAux (handle maude maudes plambdas drones statsObject isDone)
+  (if isDone
+      (seq
+       (invoke java.lang.System.err "println" statsObject)
+       ;; at this point we can shutdown al the drones in the plambda that is twinned with the
+       ;; maude.
+
+
+       )
+    (seq
+     (invoke java.lang.System.err "println" (concat "calling doRun with " maude))
+     (apply doConcurrentRun handle maude)
+     )) )
+
 
 (define doConcurrentRun (handle maude)
   (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRun")

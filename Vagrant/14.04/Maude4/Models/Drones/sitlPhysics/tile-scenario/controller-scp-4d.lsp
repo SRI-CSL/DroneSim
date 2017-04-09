@@ -1,3 +1,28 @@
+;; thu number of maudes and plambdas
+(define clone_count (int 3))
+
+;;this is now used so BE CAREFUL!!!
+(define drone_count (int 4))
+
+
+
+(define generic_alpha "0.5")
+(define generic_beta "0.5")
+(define generic_num  "5")
+
+
+/*
+
+drones:
+
+0.  need to be more uniform about the construction of b0 through b<drone_count> so tinkering is verbotem
+
+1. the instance numbers need to be clearly disjoint, and comprehensible
+
+
+*/
+
+
 (define plambda_init_lsp
   (concat
    "\n"
@@ -11,15 +36,15 @@
    "\n"
    "(define visuals (boolean false))"
    "\n"
-   "(define drone_logging (boolean false))"
+   "(define drone_logging (boolean true))"
    "\n"
-   "(define b0 (apply mkdrone 'b0' (* (int 4) (int {1})) (int 0) (int 0) visuals drone_logging 'log_4_b0_in_{0}.txt' ))"
+   "(define b0 (apply mkdrone 'b0' (* (int 4) (int {1})) (int 0) (int 0) visuals drone_logging 'log_4_drones_in_{0}.txt' ))"
    "\n"
-   "(define b1 (apply mkdrone 'b1' (+ (* (int 4) (int {1})) (int 1)) (int 100) (int 100) visuals drone_logging 'log_4_b1_in_{0}.txt' ))"
+   "(define b1 (apply mkdrone 'b1' (+ (* (int 4) (int {1})) (int 1)) (int 100) (int 100) visuals drone_logging 'log_4_drones_in_{0}.txt' ))"
    "\n"
-   "(define b2 (apply mkdrone 'b2' (+ (* (int 4) (int {1})) (int 2)) (int 10) (int 10) visuals drone_logging 'log_4_b2_in_{0}.txt' ))"
+   "(define b2 (apply mkdrone 'b2' (+ (* (int 4) (int {1})) (int 2)) (int 10) (int 10) visuals drone_logging 'log_4_drones_in_{0}.txt' ))"
    "\n"
-   "(define b3 (apply mkdrone 'b3' (+ (* (int 4) (int {1})) (int 3)) (int 110) (int 110) visuals drone_logging 'log_4_b3_in_{0}.txt' ))"
+   "(define b3 (apply mkdrone 'b3' (+ (* (int 4) (int {1})) (int 3)) (int 110) (int 110) visuals drone_logging 'log_4_drones_in_{0}.txt' ))"
    "\n"
    "(apply setStartTime)"
    "\n"
@@ -47,21 +72,12 @@
    "\n"
    "loop init ."
    "\n"
-   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysNoWind20 false)\n (augAgentEsetConcurrentStats Patrol 400 {1}))"
+   "(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysLowWind30 false)\n (augAgentEsetConcurrentStats Patrol 400 {1}))"
    "\n"
    )
   )
 
-(define clone_count (int 2))
-
-;;ian thinks this is not used:
-(define num_drones (int 4))
-
-
-
-(define generic_alpha "0.5")
-(define generic_beta "0.5")
-(define generic_num  "5")
+;;asysNoWind20
 
 ;;; NO MORE EDITING FROM THIS POINT
 
@@ -85,9 +101,13 @@
    '\n'
    '(define maudes (array java.lang.String {0}))'
    '\n'
-   '(invoke java.lang.System.err "println" "The g2d actor is (auto) initialized. Executing doConcurrentStats Now.\n")'
+   '(define plambdas (array java.lang.String {4}))'
    '\n'
-   '(apply doConcurrentStats "Patrol" maudes)'
+   '(define drones (array java.lang.String {5}))'
+   '\n'
+   '(invoke java.lang.System.err "println" "The g2d actor is (auto) initialized. Executing doConcurrentStats Now.")'
+   '\n'
+   '(apply doConcurrentStatsGracefully "Patrol" maudes plambdas drones)'
    '\n'
    )
   )
@@ -110,11 +130,13 @@
 
 
 (import 'plambda.util.StringBuffer')
-;;;makes a string of the names of count maudes: ' "maude0" "maude1" "maude2" ... "maude<count - 1>" '
-(define make_maudes_string (count)
+
+;;;makes a string of the names of count prefixes, such as 'maude': ' "maude0" "maude1" "maude2" ... "maude<count - 1>" '
+(define make_string_list (prefix count)
   (let ((sb (apply plambda.util.StringBuffer.StringBuffer)))
     (for index count
-	 (invoke sb 'append' '"maude')
+	 (invoke sb 'append' '"')
+	 (invoke sb 'append' prefix)
 	 (invoke sb 'append' index)
 	 (invoke sb 'append' '" ')
 	 )
@@ -128,10 +150,13 @@
   (let  ((lspfile 'g2dinit.lsp')
 	 (contents (invoke g2d_init_lsp
 			   'format'
-			   (apply make_maudes_string maude_population)
+			   (apply make_string_list 'maude' maude_population)
 			   generic_alpha
 			   generic_beta
-			   generic_num)))
+			   generic_num
+			   (apply make_string_list 'plambda' plambda_population)
+               (apply make_string_list 'b' drone_count)
+               )))
     (apply plambda.util.Util.string2File  contents lspfile (boolean False))
     )
   )
