@@ -112,11 +112,7 @@
      )) )
 
 (define doConcurrentRunGracefully (handle maude)
-  ;;iam: flicking on the graceful version here breaks things.
-  (if (boolean false)
-      (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRunGracefully")
-    (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRun")
-    )
+  (sinvoke "g2d.util.ActorMsg"  "send" maude handle "doRunGracefully")
   )
 
 
@@ -129,6 +125,6 @@
 	 (invoke statsObject "recordRunResult" val)
 	 (invoke java.lang.System.err "println" (concat "runConcurrentResultGracefully from " maude " : " val ))
 	 (sinvoke "g2d.util.ActorMsg"  "send" maude "g2d" "OK")
-	 (apply doConcurrentStatGracefullysAux handle maude drone_count statsObject (invoke statsObject "done"))
+	 (apply doConcurrentStatsGracefullyAux handle maude statsObject (invoke statsObject "done"))
 	 )) ))
 
