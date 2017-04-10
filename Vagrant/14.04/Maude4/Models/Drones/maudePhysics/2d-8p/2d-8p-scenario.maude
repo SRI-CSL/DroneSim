@@ -137,8 +137,8 @@ ops locs1 locs2 allTargets : -> LocList .
 eq locs1 = mkLoc(50.0,10.0,5.0) ; mkLoc(10.0,30.0,5.0)
            ; mkLoc(-20.0,50.0,5.0) ; mkLoc(-40.0,5.0,5.0) .
 
-eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(-40.0,-40.0,10.0)
-           ; mkLoc(-35.0,-5.0,10.0) ; mkLoc(10.0,-30.0,10.0) .
+eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(10.0,-30.0,10.0) 
+           ; mkLoc(-40.0,-40.0,10.0) ; mkLoc(-35.0,-5.0,10.0)  .
 
 eq allTargets = locs1 ; locs2 .
 
