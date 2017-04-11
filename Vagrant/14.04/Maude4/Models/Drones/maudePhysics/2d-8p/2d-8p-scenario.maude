@@ -85,7 +85,7 @@ Assume .5 for taking off
 
 
 op reducedFactor : -> FiniteFloat .
-eq reducedFactor = 1.0 .
+eq reducedFactor = 0.8 .
 
 *** Using values inferred from SITL experiments
 *** The value for hovering is not well supported.
@@ -142,17 +142,20 @@ eq locs2 = mkLoc(40.0,-10.0,10.0) ; mkLoc(10.0,-30.0,10.0)
 
 eq allTargets = locs1 ; locs2 .
 
-ops noWind lowWind highWind : -> Nat .
+ops noWind lowWind highWind veryHighWind vvHighWind : -> Nat .
 eq noWind = 0 .
 eq lowWind = round(float(rand.25) / 2.0) .
 eq highWind = round(float(rand.25)) .
+eq veryHighWind = round(float(2 * rand.25)) .
+eq vvHighWind = round(2.5 * float(rand.25)) .
 
 --- eq windThresh = 2 * rand.25 .
 --- eq windThresh = round(float(rand.25) / 2.0) .
 --- eq windThresh = 0 .
 
 
-ops confNoWind confLowWind confHighWind : FiniteFloat -> Conf .
+ops confNoWind confLowWind confHighWind confVeryHighWind confVVHighWind : FiniteFloat -> Conf .
+ops confHighWind : FiniteFloat FiniteFloat -> Conf .
 ****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
 ****          (n,sx, sy, sz, v,  e,    c,   a,locs)
 eq confNoWind(caution) 
@@ -170,14 +173,22 @@ eq confHighWind(caution)
    mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
    mkE(0,0.0,0.0,0.0,5.0,highWind,100.0) . 
 
+eq confVeryHighWind(caution) 
+ = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
+   mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
+   mkE(0,0.0,0.0,0.0,5.0,veryHighWind,100.0) . 
 
-ops asysNoWind asysLowWind asysHighWind : FiniteFloat -> ASystem .
+eq confVVHighWind(caution) 
+ = mkBB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1)
+   mkBB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2)
+   mkE(0,0.0,0.0,0.0,5.0,vvHighWind,100.0) . 
+
+ops asysNoWind asysLowWind asysHighWind asysVeryHighWind asysVVHighWind : FiniteFloat -> ASystem .
 eq asysNoWind(caution) = { confNoWind(caution) } .
 eq asysLowWind(caution) = { confLowWind(caution) } .
 eq asysHighWind(caution) = { confHighWind(caution) } .
-
---- op asys : Nat -> ASystem .
---- eq asys(n) = { conf1 bound(n) } .
+eq asysVeryHighWind(caution) = { confVeryHighWind(caution) } .
+eq asysVVHighWind(caution) = { confVVHighWind(caution) } .
 
 eq stopSimulation = 5.0 .
 

@@ -21,6 +21,17 @@ eq asysHighWind20 = asysHighWind(20.0) .
 eq asysHighWind40 = asysHighWind(40.0) .
 eq asysHighWind50 = asysHighWind(50.0) .
 
+ops asysVeryHighWind30 asysVeryHighWind20 asysVeryHighWind40 asysVeryHighWind50 : -> ASystem .
+eq asysVeryHighWind30 = asysVeryHighWind(30.0) .
+eq asysVeryHighWind20 = asysVeryHighWind(20.0) .
+eq asysVeryHighWind40 = asysVeryHighWind(40.0) .
+eq asysVeryHighWind50 = asysVeryHighWind(50.0) .
+
+ops asysVVHighWind30 asysVVHighWind20 asysVVHighWind40 asysVVHighWind50 : -> ASystem .
+eq asysVVHighWind20 = asysVVHighWind(20.0) .
+eq asysVVHighWind30 = asysVVHighWind(30.0) .
+eq asysVVHighWind40 = asysVVHighWind(40.0) .
+eq asysVVHighWind50 = asysVVHighWind(50.0) .
 
 
 endm
@@ -124,6 +135,28 @@ asysHighWind50
 
 [ 2.0, 32.11764705882353, 0.0, 0.0, 4.647058823529412]
 
+Using reduced factor = 0.8
+
+asysHighWind20
+elapsed ===> 8780
+average_1 ===> 20.44705882352941
+average_0 ===> 2.0
+averages ===> [ 2.0, 20.44705882352941, 0.0, 0.0, 8.0]
+
+asysHighWind30
+elapsed ===> 8009
+average_1 ===> 25.235294117647058
+average_0 ===> 2.0
+averages ===> [ 2.0, 25.235294117647058, 0.0, 0.0, 7.588235294117647]
+count ===> 17
+
+asysHighWind40
+elapsed ===> 8219
+average_1 ===> 28.352941176470587
+average_0 ===> 2.0
+averages ===> [ 2.0, 28.352941176470587, 0.0, 0.0, 7.0]
+
+asysVeryHighWind20
 
 
 )

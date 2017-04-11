@@ -332,4 +332,75 @@ OK
 ==================================================
 Corrected points...
 
+asysLowWind20
+elapsed ===> 178752
+average_1 ===> 0.0
+average_0 ===> 1.6666666666666667
+averages ===> [ 1.6666666666666667, 0.0, 0.0, 2.0, 8.0]
+count ===> 3
+
+asysLowWind30
+elapsed ===> 175214
+average_1 ===> 11.666666666666666
+average_0 ===> 2.0
+averages ===> [ 2.0, 11.666666666666666, 0.0, 2.0, 8.0]
+
+asysLowWind40
+elapsed ===> 157506
+average_1 ===> 16.0
+average_0 ===> 2.0
+averages ===> [ 2.0, 16.0, 0.0, 2.0, 8.0]
+count ===> 3
+
+asysHighWind20
+elapsed ===> 188799
+average_1 ===> 1.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 1.0, 0.0, 1.6666666666666667, 8.0]
+count ===> 3
+
+asysHighWind30
+elapsed ===> 170645
+average_1 ===> 11.333333333333334
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 11.333333333333334, 0.0, 2.0, 8.0]
+count ===> 3
+
+asysHighWind40
+elapsed ===> 192856
+average_1 ===> 12.0
+average_0 ===> 1.3333333333333333
+averages ===> [ 1.3333333333333333, 12.0, 0.0, 1.6666666666666667, 8.0]
+count ===> 3
+
+asysVeryHighWind20
+lapsed ===> 181726
+average_1 ===> 0.0
+average_0 ===> 1.0
+averages ===> [ 1.0, 0.0, 0.0, 1.0, 7.0]
+count ===> 3
+
+asysVeryHighWind30
+elapsed ===> 180607
+average_1 ===> 2.6666666666666665
+average_0 ===> 1.0
+averages ===> [ 1.0, 2.6666666666666665, 0.0, 1.3333333333333333, 6.333333333333333]
+count ===> 3
+
+asysVeryHighWind40
+elapsed ===> 157538
+average_1 ===> 4.666666666666667
+average_0 ===> 0.6666666666666666
+averages ===> [ 0.6666666666666666, 4.666666666666667, 0.0, 1.3333333333333333, 5.333333333333333]
+count ===> 3
+
+asysVVHighWind20
+elapsed ===> 1440219
+average_1 ===> 0.0
+average_0 ===> 0.0
+averages ===> [ 0.0, 0.0, 0.0, 0.0, 3.0588235294117645]
+
+asysVVHighWind30
+
+
 )
