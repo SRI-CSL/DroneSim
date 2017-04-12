@@ -1,0 +1,24 @@
+load load-scp
+**** load sitl
+
+load model-checker
+load ~/Repositories/imaude/ilib/load-lib
+load ../../../../Lib/meta-cp-e
+loop init .
+
+(seq
+ (pyexe plambda (load "../../../../Lib/sitl_drone.lsp"))
+ (pyexe plambda (define b0 (apply mkdrone "b0" (int 0) (int 0) (int 0) (boolean false) (boolean false) "log3.txt" )))
+ (pyexe plambda (define b1 (apply mkdrone "b1" (int 1) (int 100) (int 100) (boolean false) (boolean false) "log-hor.txt" )))
+ (pyexe plambda (define b2 (apply mkdrone "b2" (int 2) (int 200) (int 200) (boolean false) (boolean false) "log-hor.txt" )))
+ (pyexe plambda (define b3 (apply mkdrone "b3" (int 3) (int 300) (int 300) (boolean false) (boolean false) "log-hor.txt" )))
+ (pyexe plambda (define b4 (apply mkdrone "b4" (int 4) (int 10) (int 10) (boolean false) (boolean false) "log-hor.txt" )))
+ (pyexe plambda (define b5 (apply mkdrone "b5" (int 5) (int 110) (int 110) (boolean false) (boolean false) "log-hor.txt" ))) 
+  (pyexe plambda (define b6 (apply mkdrone "b6" (int 6) (int 210) (int 210) (boolean false) (boolean false) "log-hor.txt" ))) 
+ (pyexe plambda (define b7 (apply mkdrone "b7" (int 7) (int 310) (int 310) (boolean false) (boolean false) "log-hor.txt" ))) 
+ (pyexe plambda (apply setStartTime))
+ ****           maude local remote plambda module conf maudephyscs?
+**** (initAgentEset maude g2d g2d plambda SITL asysHor false)
+ (initAgentEset maude g2d g2d plambda SCENARIO asysLowWind20 false)
+)
+
