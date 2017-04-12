@@ -6,5 +6,5 @@ load /home/vagrant/Repositories/imaude/ilib/load-lib
 load ../../../../Lib/meta-cp-e
 loop init .
 (seq
- (initAgentEset maude0 g2d g2d plambda0 ANALYSIS asysLowWind30 false)
- (augAgentEsetConcurrentStats Patrol 400 0))
+ (initAgentEset maude0 g2d g2d plambda0 ANALYSIS asysLowWind20 false)
+ (augAgentEsetConcurrentStats Patrol 400))
