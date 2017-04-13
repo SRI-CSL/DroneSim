@@ -159,4 +159,31 @@ averages ===> [ 2.0, 28.352941176470587, 0.0, 0.0, 7.0]
 asysVeryHighWind20
 
 
+==========================
+very high confidence:
+0.05 0.05 
+asysHighWind40
+value = [D@f94195a
+runResult: [D@f94195a
+Patrol:
+elapsed ===> 462429
+average_1 ===> 29.044037940379404
+average_0 ===> 2.0
+averages ===> [ 2.0, 29.044037940379404, 0.0, 0.0, 6.96070460704607]
+count ===> 738
+accumulator ===> [D@204103ac
+average_3 ===> 0.0
+average_2 ===> 0.0
+rounds ===> 738
+average_4 ===> 6.96070460704607
+
+
+asysHighWind20
+Patrol:
+elapsed ===> 503138
+average_1 ===> 20.22249322493225
+average_0 ===> 1.978319783197832
+averages ===> [ 1.978319783197832, 20.22249322493225, 0.0, 0.0027100271002710027, 7.990514905149052]
+count ===> 738
+
 )
