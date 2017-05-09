@@ -245,8 +245,8 @@ endm
 
 ***(
 
-
-
+set print attribute on .
+rew [5] asysNoWind(20.0) .
 
 
 )

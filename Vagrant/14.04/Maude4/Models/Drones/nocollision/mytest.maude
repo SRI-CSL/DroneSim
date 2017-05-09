@@ -1,0 +1,69 @@
+mod TEST is
+ inc SCENARIO-BASIC .
+ --- inc ANALYSIS .
+ 
+var act : Action .
+var kb : KB .
+
+op ekb0 : -> KB .
+ops acts : -> ActSet . 
+ops lkb0 lkb1 ekb1  : -> KB .
+op iconf : -> Conf .
+
+eq iconf = getConf(asysNoWind(20.0)) .
+
+
+ops getLKB0 getLKB1 : Conf -> KB .
+op getEKB : Conf -> KB .
+eq getLKB0([b(0) : Bot | lkb : kb, attrs:AttributeSet] conf:Conf) = kb .
+eq getLKB1([b(1) : Bot | lkb : kb, attrs:AttributeSet] conf:Conf) = kb .
+eq getEKB([eI | kb] conf:Conf) = kb .
+
+ 
+eq lkb0 = getLKB0(iconf) .
+eq lkb1 = getLKB1(iconf) .
+eq ekb1 = getEKB(iconf) .
+                 
+eq acts = myActsA(Bot,b(0),nil,lkb0) .
+
+ops ev0 ev1 : -> Event .       
+op evs0 : -> EventSet .           
+ops lkb01 lkb02 lkb03 lkb04 lkb11 lkb12 lkb13 lkb14 : -> KB .
+ops actKB01 actKB02 actKB11 actKB12 : -> ActionKB . 
+
+eq lkb01 = getSensors(b(0),ekb1) .
+eq lkb02 = proSensors(b(0),lkb0,lkb01) .
+
+eq lkb11 = getSensors(b(1),ekb1) .
+eq lkb12 = proSensors(b(1),lkb1,lkb11) .
+
+eq actKB01 = act(b(0),lkb02) .
+eq actKB11 = act(b(1),lkb12) .
+
+eq lkb03 = getKB(actKB01) .
+eq lkb13 = getKB(actKB11) .
+
+eq actKB02 = doControl(getAct(actKB01),lkb03) .
+eq actKB12 = doControl(getAct(actKB11),lkb13) .
+
+op getKB : ActionKB -> KB .
+eq getKB({act,kb}) = kb .
+
+op getAct : ActionKB -> Action .
+eq getAct({act,kb}) = act .
+
+
+op pact : -> Action .
+eq pact = getPending(b(0),lkb02) .
+
+op loc : -> Loc .
+eq loc = getLoc(b(0),lkb02) .
+
+
+endm
+***(
+eq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ s t) kb) 
+ = myActsA$(cl,id,locsdiff((locs0 ; locs1), locs),kb) .
+
+red locsdiff(pt(50, 10, 5) ; pt(10, 30, 5) ; pt(-20, 50, 5) ; pt(-40, 5, 5), nil) . 
+)
