@@ -327,26 +327,27 @@ op equiv : Loc Loc -> Bool .
 op myActsA : Class Id LocList KB -> ActSet .
 op myActsA$ : Class Id LocList KB -> ActSet .
 
-eq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ s t) kb) 
+eq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ t) kb) 
  = myActsA$(cl,id,locsdiff((locs0 ; locs1), locs),kb) .
 
-ceq myActsA$(cl,id,loc0 ; locs, (atloc(id,loc) @ t1)
-                        (targetVel(id,v) @ t2) kb) = 
+ceq myActsA$(cl,id,loc0 ; locs, 
+         (atloc(id,loc) @ t1) (myAlt(id,alt))
+         (targetVel(id,v) @ t2) kb) = 
   (goToW(id,pt(x1,y1,z1),v)) 
-  (goToW(id,pt(round(ffxnu1 * v) + x0,round(ffynu1 * v) + x0,z1),v))
-  (goToW(id,pt(round(ffxnu2 * v) + x0,round(ffynu2 * v) + x0,z1),v))
+  (goToW(id,pt(round(ffxnu1 * v) + x0,round(ffynu1 * v) + y0,z1),v))
+  (goToW(id,pt(round(ffxnu2 * v) + x0,round(ffynu2 * v) + y0,z1),v))
   (goToW(id,pt(x1,y1,z1 + 5),v))
-  (goToW(id,pt(x1,y1,z1 - 5),v)) 
-  myActsA$(cl,id,locs,(atloc(id,loc) @ t1)(vel(id,v) @ t2) kb)
+  (if z1 - 5 < alt then none else (goToW(id,pt(x1,y1,z1 - 5),v)) fi)   
+  myActsA$(cl,id,locs,(atloc(id,loc) @ t1)(targetVel(id,v) @ t2) kb)
  if pt(x2,y2,z2) := loc0
  /\ pt(x0,y0,z0) := loc 
  /\ dir(ffx1,ffy1,ffz1) := getNormVec(loc,pt(x2,y2,z0))
  *** Using the property of cos(alpha + beta) and sin(alpha + beta)
  *** sin(30) = 0.5 and cos(30) = 0.87
  /\ ffxnu1 := ffx1 * 0.87 - ffy1 * 0.5 *** + 30 degrees
- /\ ffynu1 := ffx1 * 0.5 + ffy1 * 0.87 *** + 30 degrees
+ /\ ffynu1 := ffy1 * 0.87 + ffx1 * 0.5 *** + 30 degrees
  /\ ffxnu2 := ffx1 * 0.87 + ffy1 * 0.5 *** - 30 degrees
- /\ ffynu2 := ffx1 * 0.5 - ffy1 * 0.87 *** - 30 degrees
+ /\ ffynu2 := ffy1 * 0.87 - ffx1 * 0.5 *** - 30 degrees
  /\ pt(x1,y1,z1) := pt(round(ffx1 * v) + x0,
                        round(ffy1 * v) + y0,
                        round(ffz1 * v) + z0) .
@@ -410,7 +411,19 @@ eq locsdiff(locs1, nil)  = locs1 .
    /\ dt1 := (ff / v) + dt0
    /\ t1 := s t0
    /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
-                  (lastVisit(id,loc,dt1) @ t1)
+                  (energy(id,e0) @ t1),incCountVisit(id,loc,t1,kb)) .
+
+  ceq doAct(id,kb,goToW(id,loc,v)) = kb1
+   if t0 := getTime(kb)
+   /\ l0 := getLoc(id,kb)
+   /\ e0 := getEnergy(id,kb) - cost2loc(l0,loc,v) 
+   /\ ff := distanceFF(l0,loc)
+   /\ timeElapsed(dt0) @ t2 := getTimeElapsed(kb)
+   --- Once we are able to link the model's timestamp with SITL's 
+   --- This is a very rough estimate of arrival time
+   /\ dt1 := (ff / v) + dt0
+   /\ t1 := s t0
+   /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
                   (energy(id,e0) @ t1),incCountVisit(id,loc,t1,kb)) .
 
 
@@ -501,6 +514,23 @@ eq rest(times) = nil [owise] .
    /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
                   (energy(id,e0) @ t1),
 									incVisitTimes(id,loc,t1,kb) ).
+
+  ceq doActT(id,kb,goToW(id,loc,v)) = kb1
+   if t0 := getTime(kb)
+   /\ l0 := getLoc(id,kb)
+   /\ ff := distanceDir(l0,loc)
+   /\ timeElapsed(dt0) @ t2 := getTimeElapsed(kb)
+   --- Once we are able to link the model's timestamp with SITL's 
+   --- This is a very rough estimate of arrival time
+   /\ dt1 := (ff / v) + dt0
+   /\ e0 := getEnergy(id,kb) - cost2locT(l0,loc,v,(ff / v)) 
+****   /\ t1 := s t0
+   /\ t1 := round(dt1)
+   /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
+                  (energy(id,e0) @ t1),
+                  incVisitTimes(id,loc,t1,kb) ).
+
+
 
   op time2Loc : Loc Loc FiniteFloat -> FiniteFloat .
 	eq time2Loc(l0,loc,v) = distanceDir(l0,loc) / v .

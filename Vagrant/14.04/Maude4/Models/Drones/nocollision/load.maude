@@ -9,4 +9,5 @@ load scp
 load tasks-wind
 load actions
 load scenario
+load scenario-scp
 **** load analysis-stats

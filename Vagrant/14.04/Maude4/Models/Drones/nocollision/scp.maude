@@ -107,7 +107,7 @@ fmod VAL-ENERGY is
   var cl : Class .
   vars kb kb' : KB .
   vars id st : Id .
-  vars cx cy cz e : FiniteFloat .
+  vars cx cy cz e v : FiniteFloat .
   vars loc locb : Loc .
   vars t0 t t1 x1 y1 z1 x0 y0 z0 : Nat .
   var act : Action .
@@ -124,6 +124,9 @@ fmod VAL-ENERGY is
   op val-energy : Id KB Action  -> BVal .
   eq val-energy(id,(myHome(id,locb)) kb,goTo(id,loc1)) = 
    if locb == loc1 then top else  val-energy(id,doAct(id,kb,goTo(id,loc1))) fi .
+
+  eq val-energy(id,(myHome(id,locb)) kb,goToW(id,loc1,v)) = 
+   if locb == loc1 then top else val-energy(id,doAct(id,kb,goToW(id,loc1,v))) fi .
 
   eq val-energy(id,kb,act) = bot [owise] .  **** shouldn't happen
 
@@ -201,8 +204,8 @@ fmod VAL-VISITS is
   op cost : Id KB Action -> FiniteFloat .
   op val-visits : Id KB Action  -> FF .
 
-  ceq benefit(id,kb,goTo(id,loc)) = st2 - st1
-   if kb1 := doActT(id,kb,goTo(id,loc))
+  ceq benefit(id,kb,goToW(id,loc,v)) = st2 - st1
+   if kb1 := doActT(id,kb,goToW(id,loc,v))
    /\ st1 := valueCS(id,kb)
    /\ st2 := valueCS(id,kb1) .
 
@@ -210,12 +213,11 @@ fmod VAL-VISITS is
    = valueCS(id,(clock(t)) kb) + 1.0 .
   eq valueCS(id,(clock(t)) 
       (atloc(id,loc0) @ t0) (visitTimes(id,loc,nil) @ t1) kb) = 
-    valueCS(id,(clock(t)) kb) + exp(- float(distance(loc0,loc))) .
+    valueCS(id,(clock(t)) kb) + exp(- 0.1 * distanceFF(loc0,loc)) .
   eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have 
 
-  ceq cost(id,kb,goTo(id,loc)) = cost2locT(loc0,loc,v,time2Loc(loc0,loc,v)) 
-   if v := getVel(id,kb) 
-   /\ loc0 := getLoc(id,kb) .
+  ceq cost(id,kb,goToW(id,loc,v)) = cost2locT(loc0,loc,v,time2Loc(loc0,loc,v)) 
+   if loc0 := getLoc(id,kb) .
 
   eq val-visits(id,kb,act) 
    = {benefit(id,kb,act),cost(id,kb,act)} .
@@ -229,11 +231,12 @@ fmod VAL-NO-COLLISION is
   inc MODEL-KNOWLEDGE .
 
   var id : Id .
-  vars ffx ffx1 ffy ffy1 ffz ffz1 safety delta v 
-       maxT minT ffx0 ffy0 ffz0 dx dx' dy dy' dz dz' : FiniteFloat .
+  vars ffx ffx0 ffx1 ffx2 ffx3 ffy ffy0 ffy1 ffy2 ffy3 ffz ffz0 
+       ff ffz1 safety delta v dxc dyc dxl dyl cross
+       maxT minT  dx dx' dy dy' dz dz' a b c d : FiniteFloat .
   vars loc0 loc1 loc2 : Loc .
   vars t0 t1 : Time .
-  vars x0 y0 z0 x1 y1 z1 x2 y2 z2 : Nat .
+  vars x0 y0 z0 x1 y1 z1 x2 y2 z2 : Int .
   var kb : KB .
   var act : Action .
 
@@ -248,14 +251,59 @@ fmod VAL-NO-COLLISION is
   *** The safety parameter may be dependent on the velocity. 
   *** this would lead to more precise evaluation.
   op tooClose : Id Loc Loc KB Action -> Bool .
-  eq tooClose(id,pt(x1,y1,z1),pt(x2,y2,z2),
-      safetyStat(id,safety) kb, goToW(id,pt(x0,y0,z0),v) ) 
-   = (float(abs(x1 - x0)) < safety) or 
-     (float(abs(x2 - x0)) < safety) or 
-     (float(abs(y1 - y0)) < safety) or
-     (float(abs(y2 - y0)) < safety) or
-     (float(abs(z1 - z0)) < safety) or
-     (float(abs(z2 - z0)) < safety) .
+  ceq tooClose(id,pt(x1,y1,z1),pt(x2,y2,z2),
+      safetyStat(id,safety) kb, goToW(id,pt(x0,y0,z0),v))
+    = (if d >= safety then false 
+      else 
+        betweenPoints(ffx3,ffy3,pt(x1,y1,z1),pt(x2,y2,z2))
+        or 
+        distanceFF(pt(x1,y1,0),pt(round(ffx3),round(ffy3),0)) < safety 
+        or 
+        distanceFF(pt(x2,y2,0),pt(round(ffx3),round(ffy3),0)) < safety
+      fi)
+   if ffx0 := float(x0)
+   /\ ffx1 := float(x1)
+   /\ ffx2 := float(x2)
+   /\ ffy0 := float(y0)
+   /\ ffy1 := float(y1)
+   /\ ffy2 := float(y2)
+   /\ a := if (ffx2 - ffx1) == 0.0 then 1.0 
+                     else  (ffy2 - ffy1) / (ffx2 - ffx1) fi 
+   /\ b := if (ffx2 - ffx1) == 0.0 then 0.0  
+                         else - 1.0 fi
+   /\ c := if (ffx2 - ffx1) == 0.0 then - ffx1  
+             else (- (a * ffx1)) + ffy1 fi 
+   /\ ff := a ^ 2.0 + b ^ 2.0
+   --- /\ d := abs((ffy2 - ffy1) * ffx0 - (ffx2 - ffx1) * ffx0 + ffx2 * ffy1 - ffy2 * ffy1) / sqrt((ffy2 - ffy1) ^ 2.0 + (ffx2 - ffx1) ^ 2.0)
+   /\ d := abs(a * ffx0 + b * ffy0 + c) / sqrt(ff) 
+   /\ ffx3 := (b * (b * ffx0 - a * ffy0) - a * c) / ff 
+   /\ ffy3 := (a * (- b * ffx0 + a * ffy0) - b * c) / ff 
+   [print ffx3 " " ffy3 " " d].
+
+*** http://stackoverflow.com/questions/11907947/how-to-check-if-a-point-lies-on-a-line-between-2-other-points/11912171
+  op betweenPoints : FiniteFloat FiniteFloat Loc Loc -> Bool .
+  ceq betweenPoints(ffx0,ffy0,pt(x1,y1,z1),pt(x2,y2,z2)) = 
+     (if not (cross == 0.0) then false 
+     else 
+      (if abs(dxl) > abs(dyl) then 
+        (if dxl > 0.0 then ffx1 <= ffx0 and ffx0 <= ffx2 
+                    else ffx2 <= ffx0 and ffx0 <= ffx1
+         fi)
+      else
+        (if dyl > 0.0 then ffy1 <= ffy0 and ffy0 <= ffy2 
+                    else ffy2 <= ffy0 and ffy0 <= ffy1
+         fi)
+      fi)
+     fi) 
+   if ffx1 := float(x1) 
+   /\ ffx2 := float(x2) 
+   /\ ffy1 := float(y1) 
+   /\ ffy2 := float(y2)
+   /\ dxc := ffx0 - ffx1
+   /\ dyc := ffy0 - ffy1
+   /\ dxl := ffx2 - ffx1
+   /\ dyl := ffy2 - ffy1
+   /\ cross := dxc * dyl - dyc * dxl  .
 
   op colliding : Id Loc Loc FiniteFloat FiniteFloat FiniteFloat KB Action -> Bool .
   ceq colliding(id,loc0,loc1,ffx1,ffy1,ffz1,

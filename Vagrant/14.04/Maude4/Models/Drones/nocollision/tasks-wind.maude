@@ -207,8 +207,8 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
  /\ locs := (if isGoTo(pact) then getLoc(pact) else nil fi)
  /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
  --- /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
- /\ goTo(id,loc2) := 
-    (if acts == none then goTo(id,home) else pickOne(acts) fi) .
+ /\ goToW(id,loc2,v) := 
+    (if acts == none then goToW(id,home,v) else pickOne(acts) fi) .
 
 
 **** abstracting random numbers to [0,1]
