@@ -240,6 +240,8 @@ fmod VAL-NO-COLLISION is
   var kb : KB .
   var act : Action .
   var tval : TriVal .
+  var locs : LocList .
+  var dir : Dir .
 
   op val-no-collision : Id KB Action -> TriVal .
   op val-no-collision$ : Id KB Action TriVal -> TriVal .
@@ -247,11 +249,11 @@ fmod VAL-NO-COLLISION is
   eq val-no-collision(id,kb,act) = val-no-collision$(id,kb,act,top) .
 
   eq val-no-collision$(id,(atloc(id,loc0) @ t0) 
-                 (statObj(id,loc1,loc2) @ t1)
+                 (statObj(id,loc1,loc2,locs,dir) @ t1)
                  (safetyStat(id,safety,prevention)) kb,
                   act, tval) = 
-   (if tooClose(id,loc1,loc2,safety,act) then bot 
-   else (if tooClose(id,loc1,loc2,prevention,act) then 
+   (if inBox(id,loc1,loc2,safety,act) then bot 
+   else (if inBox(id,loc1,loc2,prevention,act) then 
          val-no-collision$(id,(atloc(id,loc0) @ t0) 
                  (safetyStat(id,safety,prevention)) kb,
                   act, mid)
@@ -268,60 +270,9 @@ fmod VAL-NO-COLLISION is
 
   *** The safety parameter may be dependent on the velocity. 
   *** this would lead to more precise evaluation.
-  op tooClose : Id Loc Loc FiniteFloat Action -> Bool .
-  ceq tooClose(id,pt(x1,y1,z1),pt(x2,y2,z2),
-      safety, goToW(id,pt(x0,y0,z0),v))
-    = (if d >= safety then false 
-      else 
-        betweenPoints(ffx3,ffy3,pt(x1,y1,z1),pt(x2,y2,z2))
-        or 
-        distanceFF(pt(x1,y1,0),pt(round(ffx3),round(ffy3),0)) < safety 
-        or 
-        distanceFF(pt(x2,y2,0),pt(round(ffx3),round(ffy3),0)) < safety
-      fi)
-   if ffx0 := float(x0)
-   /\ ffx1 := float(x1)
-   /\ ffx2 := float(x2)
-   /\ ffy0 := float(y0)
-   /\ ffy1 := float(y1)
-   /\ ffy2 := float(y2)
-   /\ a := if (ffx2 - ffx1) == 0.0 then 1.0 
-                     else  (ffy2 - ffy1) / (ffx2 - ffx1) fi 
-   /\ b := if (ffx2 - ffx1) == 0.0 then 0.0  
-                         else - 1.0 fi
-   /\ c := if (ffx2 - ffx1) == 0.0 then - ffx1  
-             else (- (a * ffx1)) + ffy1 fi 
-   /\ ff := a ^ 2.0 + b ^ 2.0
-   --- /\ d := abs((ffy2 - ffy1) * ffx0 - (ffx2 - ffx1) * ffx0 + ffx2 * ffy1 - ffy2 * ffy1) / sqrt((ffy2 - ffy1) ^ 2.0 + (ffx2 - ffx1) ^ 2.0)
-   /\ d := abs(a * ffx0 + b * ffy0 + c) / sqrt(ff) 
-   /\ ffx3 := (b * (b * ffx0 - a * ffy0) - a * c) / ff 
-   /\ ffy3 := (a * (- b * ffx0 + a * ffy0) - b * c) / ff 
-   [print ffx3 " " ffy3 " " d].
-
-*** http://stackoverflow.com/questions/11907947/how-to-check-if-a-point-lies-on-a-line-between-2-other-points/11912171
-  op betweenPoints : FiniteFloat FiniteFloat Loc Loc -> Bool .
-  ceq betweenPoints(ffx0,ffy0,pt(x1,y1,z1),pt(x2,y2,z2)) = 
-     (if not (cross == 0.0) then false 
-     else 
-      (if abs(dxl) > abs(dyl) then 
-        (if dxl > 0.0 then ffx1 <= ffx0 and ffx0 <= ffx2 
-                    else ffx2 <= ffx0 and ffx0 <= ffx1
-         fi)
-      else
-        (if dyl > 0.0 then ffy1 <= ffy0 and ffy0 <= ffy2 
-                    else ffy2 <= ffy0 and ffy0 <= ffy1
-         fi)
-      fi)
-     fi) 
-   if ffx1 := float(x1) 
-   /\ ffx2 := float(x2) 
-   /\ ffy1 := float(y1) 
-   /\ ffy2 := float(y2)
-   /\ dxc := ffx0 - ffx1
-   /\ dyc := ffy0 - ffy1
-   /\ dxl := ffx2 - ffx1
-   /\ dyl := ffy2 - ffy1
-   /\ cross := dxc * dyl - dyc * dxl  .
+  op inBox : Id Loc Loc FiniteFloat Action -> Bool .
+  eq inBox(id,loc1,loc2,safety, goToW(id,loc0,v))
+    = inBox(id,loc1,loc2,safety,loc0) .
 
   op colliding : Id Loc Loc FiniteFloat FiniteFloat FiniteFloat KB Action -> Bool .
   ceq colliding(id,loc0,loc1,ffx1,ffy1,ffz1,

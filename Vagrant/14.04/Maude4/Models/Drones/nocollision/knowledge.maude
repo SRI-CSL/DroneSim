@@ -9,16 +9,18 @@ fmod MODEL-KNOWLEDGE is
   vars id id0 id1 : Id .
 	var cl : Class .
   vars l l0 l1 l2 l3 l4 loc locTL locTR loc0 : Loc .
-  vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 :  KB .
+  vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 statObjs kb2 :  KB .
   var dir dir0 dir1 : Dir .
-  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn ffxnu1 ffxnu2 ffynu1 ffynu2 
-  safety xsafety prevention : FiniteFloat .
+  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn ffxnu1 ffxnu2 ffynu1 ffynu2 ff2 a b c d dxc dyc dxl dyl cross
+  safety xsafety prevention 
+  ffx2 ffy2 ffz2 ffx3 ffy3 ffz3 : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
   var act act0 act1 pact : Action .
   var acts : ActSet .
   vars n n0 n1 r j : Nat .
 	var times : TimesList .
   var mInv : [Float] .
+  vars b1 b2 : Bool .
 
   op b : Nat -> Id .
   op st : Nat -> Id .
@@ -106,7 +108,7 @@ op equiv : Loc Loc -> Bool .
 
   op isObstacle : Id KItem -> Bool .
   eq isObstacle(id,movObj(id,loc,ffx,ffy,ffz) @ t) = true .
-  eq isObstacle(id,statObj(id,locTL,locTR) @ t) = true .
+  eq isObstacle(id,statObj(id,locTL,locTR,locs,dir) @ t) = true .
   eq isObstacle(id,it:KItem) = false [owise] .
 
   *** Knowledge fact specifying that some drone 
@@ -122,15 +124,15 @@ op equiv : Loc Loc -> Bool .
   op movObj : Id Loc FiniteFloat FiniteFloat FiniteFloat -> Info .
   eq hasId(id,movObj(id,loc,ffx,ffy,ffz) @ t) = true .
 
+  *** Static object on ground represented as a rectangle on position locTL, locTR
+  op statObj : Id Loc Loc LocList Dir -> Info .
+  eq hasId(id,statObj(id,locTL,locTR,locs,dir) @ t) = true .  
+
   *** parameters: safety -- min distance to moving object
   ***             delta -- max time to collision  
   op safetyMv : Id FiniteFloat FiniteFloat -> PKItem .
   *** parameter: safety -- min distance to statical object
   op safetyStat : Id FiniteFloat FiniteFloat -> PKItem .
-
-  *** Static object on ground represented as a rectangle on position locTL, locTR
-  op statObj : Id Loc Loc -> Info .
-  eq hasId(id,statObj(id,locTL,locTR) @ t) = true .  
 
   op pending : Id Action -> Info .
   eq hasId(id,pending(id,act) @ t) = true .
@@ -226,6 +228,60 @@ op equiv : Loc Loc -> Bool .
   op mv : Id Dir FiniteFloat -> Action .
   op charge : Id -> Action .
   
+op inBox : Id Loc Loc FiniteFloat Loc -> Bool .
+ceq inBox(id,pt(x1,y1,z1),pt(x2,y2,z2),safety,pt(x0,y0,z0))
+    = (if d >= safety then false 
+      else 
+        betweenPoints(ffx3,ffy3,pt(x1,y1,z1),pt(x2,y2,z2))
+        or 
+        distanceFF(pt(x1,y1,0),pt(round(ffx3),round(ffy3),0)) < safety 
+        or 
+        distanceFF(pt(x2,y2,0),pt(round(ffx3),round(ffy3),0)) < safety
+      fi)
+   if ffx0 := float(x0)
+   /\ ffx1 := float(x1)
+   /\ ffx2 := float(x2)
+   /\ ffy0 := float(y0)
+   /\ ffy1 := float(y1)
+   /\ ffy2 := float(y2)
+   /\ a := if (ffx2 - ffx1) == 0.0 then 1.0 
+                     else  (ffy2 - ffy1) / (ffx2 - ffx1) fi 
+   /\ b := if (ffx2 - ffx1) == 0.0 then 0.0  
+                         else - 1.0 fi
+   /\ c := if (ffx2 - ffx1) == 0.0 then - ffx1  
+             else (- (a * ffx1)) + ffy1 fi 
+   /\ ff := a ^ 2.0 + b ^ 2.0
+   --- /\ d := abs((ffy2 - ffy1) * ffx0 - (ffx2 - ffx1) * ffx0 + ffx2 * ffy1 - ffy2 * ffy1) / sqrt((ffy2 - ffy1) ^ 2.0 + (ffx2 - ffx1) ^ 2.0)
+   /\ d := abs(a * ffx0 + b * ffy0 + c) / sqrt(ff) 
+   /\ ffx3 := (b * (b * ffx0 - a * ffy0) - a * c) / ff 
+   /\ ffy3 := (a * (- b * ffx0 + a * ffy0) - b * c) / ff 
+   [print ffx3 " " ffy3 " " d] .
+
+*** http://stackoverflow.com/questions/11907947/how-to-check-if-a-point-lies-on-a-line-between-2-other-points/11912171
+  op betweenPoints : FiniteFloat FiniteFloat Loc Loc -> Bool .
+  ceq betweenPoints(ffx0,ffy0,pt(x1,y1,z1),pt(x2,y2,z2)) = 
+     (if not (cross == 0.0) then false 
+     else 
+      (if abs(dxl) > abs(dyl) then 
+        (if dxl > 0.0 then ffx1 <= ffx0 and ffx0 <= ffx2 
+                    else ffx2 <= ffx0 and ffx0 <= ffx1
+         fi)
+      else
+        (if dyl > 0.0 then ffy1 <= ffy0 and ffy0 <= ffy2 
+                    else ffy2 <= ffy0 and ffy0 <= ffy1
+         fi)
+      fi)
+     fi) 
+   if ffx1 := float(x1) 
+   /\ ffx2 := float(x2) 
+   /\ ffy1 := float(y1) 
+   /\ ffy2 := float(y2)
+   /\ dxc := ffx0 - ffx1
+   /\ dyc := ffy0 - ffy1
+   /\ dxl := ffx2 - ffx1
+   /\ dyl := ffy2 - ffy1
+   /\ cross := dxc * dyl - dyc * dxl  .
+
   op distanceFF : Loc Loc -> FiniteFloat .
   eq distanceFF(pt(x0,y0,z0),pt(x1,y1,z1)) = 
     float((abs(x0 - x1))) * gridStepX + float(abs(y0 - y1)) * gridStepY + float(abs(z0 - z1)) * gridStepZ .
@@ -328,49 +384,119 @@ op equiv : Loc Loc -> Bool .
 *** Compute (x0 + cos(theta - 30) * |V|, y0 + cos(theta - 30) * |V|)
 
 op myActsA : Class Id LocList KB -> ActSet .
-op myActsA$ : Class Id LocList KB -> ActSet .
+op myActsSafe : Class Id LocList KB -> ActSet .
+op myActsCautious : Id KB KB -> ActSet .
+op mkGoToW : Id LocList FiniteFloat -> ActSet .
 
-eq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ t) kb) 
- = myActsA$(cl,id,locsdiff((locs0 ; locs1), locs),kb) .
+ceq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ t) kb) =
+  (if statObjs == none then 
+       myActsSafe(cl,id,locsdiff((locs0 ; locs1), locs),kb)
+       else 
+       myActsCautious(id,kb,statObjs)            
+  fi) 
+if statObjs := inPrevention(id,kb,none) .
 
-ceq myActsA$(cl,id,loc0 ; locs, 
-         (atloc(id,loc) @ t1) (myAlt(id,alt))
-         (targetVel(id,v) @ t2) kb) = 
-  (goToW(id,pt(x1,y1,z1),v)) 
-  (goToW(id,pt(round(ffxnu1 * v) + x0,round(ffynu1 * v) + y0,z1),v))
-  (goToW(id,pt(round(ffxnu2 * v) + x0,round(ffynu2 * v) + y0,z1),v))
-  (goToW(id,pt(x1,y1,z1 + 5),v))
-  (if z1 - 5 < alt then none else (goToW(id,pt(x1,y1,z1 - 5),v)) fi)   
-  myActsA$(cl,id,locs,(atloc(id,loc) @ t1)(targetVel(id,v) @ t2) kb)
- if pt(x2,y2,z2) := loc0
- /\ pt(x0,y0,z0) := loc 
- /\ dir(ffx1,ffy1,ffz1) := getNormVec(loc,pt(x2,y2,z0))
- *** Using the property of cos(alpha + beta) and sin(alpha + beta)
- *** sin(30) = 0.5 and cos(30) = 0.87
- /\ ffxnu1 := ffx1 * 0.87 - ffy1 * 0.5 *** + 30 degrees
- /\ ffynu1 := ffy1 * 0.87 + ffx1 * 0.5 *** + 30 degrees
- /\ ffxnu2 := ffx1 * 0.87 + ffy1 * 0.5 *** - 30 degrees
- /\ ffynu2 := ffy1 * 0.87 - ffx1 * 0.5 *** - 30 degrees
- /\ pt(x1,y1,z1) := pt(round(ffx1 * v) + x0,
-                       round(ffy1 * v) + y0,
-                       round(ffz1 * v) + z0) .
-eq myActsA$(cl,id,nil,kb) = none .
+ceq myActsCautious(id,kb (targetVel(id,v) @ t0) 
+        (safetyStat(id,safety,prevention)),statObjs) 
+ = mkGoToW(id,locs3,v)
+ if locs := getAllSafePoints(id,kb)
+ /\ pt(x0,y0,z0) := getLoc(id,kb)
+ /\ locs1 := getClosest(2,pt(x0,y0,z0),locs)
+ /\ locs2 := getExitPoints(id,pt(x0,y0,z0),v,statObjs)
+ /\ l2 := pt(x0,y0,z0 + round(vlift))
+ /\ locs3 := notInAnySafetyBox(id,kb,safety,l2 ; locs1 ; locs2) .
 
-op getSafePoints : KItem FiniteFloat -> LocList .
-ceq getSafePoints(statObj(id,pt(x1,y1,z1),pt(x2,y2,z2)) @ t, safety) = l1 ; l2 ; l3 ; l4 
+ op getExitPoints : Id Loc FiniteFloat KB -> LocList .
+ ceq getExitPoints(id,pt(x0,y0,z0),v,
+            (statObj(id,locTL,locTR,locs,dir(ffx1,ffy1,ffz1)) @ t) kb) =
+     l3 ; getExitPoints(id,pt(x0,y0,z0),v,kb)
+  if l1 := pt(x0 + round(ffx1 * v),y0 + round(ffy1 * v),z0 + round(ffz1 * v))
+  /\ l2 := pt(x0 - round(ffx1 * v),y0 - round(ffy1 * v),z0 - round(ffz1 * v))
+  /\ ff1 := distanceFF(locTL,l1)
+  /\ ff2 := distanceFF(locTL,l2)
+  /\ l3 := if ff1 > ff2 then l1 else l2 fi .
+
+ op notInAnySafetyBox : Id KB FiniteFloat LocList -> LocList .
+ ceq notInAnySafetyBox(id,
+    (statObj(id,locTL,locTR,locs1,dir) @ t) kb,safety,l0 ; locs) = 
+    notInAnySafetyBox(id,
+     (statObj(id,locTL,locTR,locs1,dir) @ t) kb,safety,locs)
+  if inBox(id,locTL,locTR,safety,l0) .
+
+ eq notInAnySafetyBox(id,kb,safety,l0 ; locs) = 
+   l0 ; notInAnySafetyBox(id,kb,safety,locs) [owise] .
+    
+ eq notInAnySafetyBox(id,kb,safety,nil) = nil .  
+  
+ ceq myActsSafe(cl,id,loc0 ; locs, kb) = 
+      (goToW(id,pt(x1,y1,z1),v)) myActsSafe(cl,id,locs,kb)
+  if (myAlt(id,alt)) (atloc(id,loc) @ t1) (targetVel(id,v) @ t2) kb1 := kb
+  /\ pt(x2,y2,z2) := loc0
+  /\ pt(x0,y0,z0) := loc 
+  /\ dir(ffx1,ffy1,ffz1) := getNormVec(loc,pt(x2,y2,alt))
+  /\ pt(x1,y1,z1) := pt(round(ffx1 * v) + x0,
+                        round(ffy1 * v) + y0,
+                        round(ffz1 * v) + z0) . 
+
+eq myActsSafe(cl,id,nil,kb) = none .
+
+op inPrevention : Id KB KB -> KB .
+ceq inPrevention(id,kb (atloc(id,l0) @ t0) 
+                (statObj(id,l1,l2,locs,dir) @ t)
+                (safetyStat(id,safety,prevention)),kb1) = 
+    inPrevention(id,kb (atloc(id,l0) @ t0) 
+                (safetyStat(id,safety,prevention)),kb2 kb1) 
+ if kb2 := if inBox(id,l1,l2,prevention,l0) then 
+           (statObj(id,l1,l2,locs,dir) @ t) else none fi .
+
+eq inPrevention(id,kb,kb1) = kb1 [owise] .
+
+
+
+op getClosest : Nat Loc LocList -> LocList .
+op getClosest$ : Loc LocList -> LocList .
+op getClosest$$ : Loc FiniteFloat Loc LocList LocList -> LocList .
+
+eq getClosest(0,l0,locs) = nil .
+eq getClosest(n,l0,nil) = nil .
+ceq getClosest(s n,l0,locs) = l1 ; getClosest(n,l0,locs1)
+ if l1 ; locs1 := getClosest$(l0,locs) .
+eq getClosest$(l0,l1 ; locs) = getClosest$$(l0,distanceFF(l0,l1),l1,locs,nil) .
+eq getClosest$$(l0,ff,l1,l2 ; locs,locs1) 
+  = if distanceFF(l0,l2) < ff then 
+     getClosest$$(l0,distanceFF(l0,l2),l2,locs,l1 ; locs1)
+    else 
+      getClosest$$(l0,ff,l1,locs,l2 ; locs1) 
+    fi .
+eq getClosest$$(l0,ff,l1,nil,locs1) = l1 ; locs1 .
+
+op getAllSafePoints : Id KB -> LocList .
+eq getAllSafePoints(id,(statObj(id,l1,l2,locs1,dir) @ t) kb) =
+  locs1 ; getAllSafePoints(id,kb) .
+eq getAllSafePoints(id,kb) = nil [owise] .
+
+op getSafePoints : Loc Loc FiniteFloat -> LocList .
+ceq getSafePoints(pt(x1,y1,z1),pt(x2,y2,z2), safety) = l1 ; l2 ; l3 ; l4 
  if xsafety := safety + 1.0
  /\ dir(ffx0,ffy0,ffz0) := getNormVec(pt(x1,y1,z1),pt(x2,y2,z2))
  /\ pt(x3,y3,z3) := pt(x2 + round(ffx0 * xsafety),y2 + round(ffy0 * xsafety),z2)
  /\ pt(x4,y4,z4) := pt(x1 - round(ffx0 * xsafety),y1 - round(ffy0 * xsafety), 
    z2)
  /\ mInv := - float(x2 - x1) / float(y2 - y1) 
- /\ pt(x5,y5,z5) := if mInv :: FiniteFloat then pt(round(mInv) * y3, 0, z2) 
-                                         else pt(x3,0,z2) fi 
+ /\ pt(x5,y5,z5) := if (y2 == y1) then pt(x3,0,z2) 
+                    else (if (x2 == x1) then pt(0,y3,z2)
+                         else pt(round(mInv) * y3 + x3, 0, z2) 
+                         fi) fi  
  /\ dir(ffx1,ffy1,ffz1) := getNormVec(pt(x3,y3,z3),pt(x5,y5,z5))
  /\ l1 := pt(x3 + round(ffx1 * xsafety),y3 + round(ffy1 * xsafety),z2) 
  /\ l2 := pt(x3 - round(ffx1 * xsafety),y3 - round(ffy1 * xsafety),z2)
- /\ l3 := l1 + pt(x4,y4,z4) - pt(x3,y3,z3) 
- /\ l4 := l2 + pt(x4,y4,z4) - pt(x3,y3,z3) .
+ /\ pt(x6,y6,z6) := if (y2 == y1) then pt(x4,0,z2) 
+                    else (if (x2 == x1) then pt(0,y4,z2)
+                         else pt(round(mInv) * y4 + x4, 0, z2) 
+                         fi) fi  
+ /\ dir(ffx2,ffy2,ffz2) := getNormVec(pt(x4,y4,z4),pt(x6,y6,z6))
+ /\ l3 := pt(x4 + round(ffx2 * xsafety),y4 + round(ffy2 * xsafety),z2) 
+ /\ l4 := pt(x4 - round(ffx2 * xsafety),y4 - round(ffy2 * xsafety),z2) .
 
 op _+_ : Loc Loc -> Loc [assoc comm] .
 op _-_ : Loc Loc -> Loc [assoc comm] .
@@ -583,3 +709,29 @@ eq rest(times) = nil [owise] .
       clock(t) kb)  .
             
 endfm
+
+
+***(
+ceq myActsA$(cl,id,loc0 ; locs, 
+         (atloc(id,loc) @ t1) (myAlt(id,alt))
+         (targetVel(id,v) @ t2) kb) = 
+  (goToW(id,pt(x1,y1,z1),v)) 
+  (goToW(id,pt(round(ffxnu1 * v) + x0,round(ffynu1 * v) + y0,z1),v))
+  (goToW(id,pt(round(ffxnu2 * v) + x0,round(ffynu2 * v) + y0,z1),v))
+  (goToW(id,pt(x1,y1,z1 + 5),v))
+  (if z1 - 5 < alt then none else (goToW(id,pt(x1,y1,z1 - 5),v)) fi)   
+  myActsA$(cl,id,locs,(atloc(id,loc) @ t1)(targetVel(id,v) @ t2) kb)
+ if not inPrevention(id,kb)
+ /\ pt(x2,y2,z2) := loc0
+ /\ pt(x0,y0,z0) := loc 
+ /\ dir(ffx1,ffy1,ffz1) := getNormVec(loc,pt(x2,y2,z0))
+ *** Using the property of cos(alpha + beta) and sin(alpha + beta)
+ *** sin(30) = 0.5 and cos(30) = 0.87
+ /\ ffxnu1 := ffx1 * 0.87 - ffy1 * 0.5 *** + 30 degrees
+ /\ ffynu1 := ffy1 * 0.87 + ffx1 * 0.5 *** + 30 degrees
+ /\ ffxnu2 := ffx1 * 0.87 + ffy1 * 0.5 *** - 30 degrees
+ /\ ffynu2 := ffy1 * 0.87 - ffx1 * 0.5 *** - 30 degrees
+ /\ pt(x1,y1,z1) := pt(round(ffx1 * v) + x0,
+                       round(ffy1 * v) + y0,
+                       round(ffz1 * v) + z0) .
+ )

@@ -124,7 +124,7 @@ eq confNoWind(caution)
  = mkB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1,10.0,20.0,10.0,2.0)
    mkB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2,10.0,20.0,10.0,2.0)
    mkE(0,0.0,0.0,0.0,5.0,noWind,100.0,
-       statObj(b(0),pt(30,0,5),pt(30,15,5)) @ 0) . 
+       statObj(b(0),pt(30,0,5),pt(30,15,5),getSafePoints(pt(30,0,5),pt(30,15,5),10.0),dir(1.0,0.0,0.0)) @ 0) . 
 
 ops asysNoWind asysLowWind asysHighWind asysVeryHighWind asysVVHighWind : FiniteFloat -> ASystem .
 eq asysNoWind(caution) = { confNoWind(caution) } .
