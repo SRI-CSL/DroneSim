@@ -13,31 +13,31 @@ ops lkb0 lkb1 ekb1  : -> KB .
 op iconf : -> Conf .
 
 eq iconf = [eI
-  | clock(6) class(b(0), Bot) class(b(1), Bot) (timeElapsed(6.0) @ 6) (rand(24) @ 6) (atloc(b(
-    0), pt(22, 11, 5)) @ 6) (atloc(b(1), pt(24, -3, 10)) @ 6) (energy(b(0), 9.2784000000000034e+1) @
-    6) (energy(b(1), 9.2720000000000027e+1) @ 6) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (statObj(b(
-    0), pt(30, 0, 5), pt(30, 15, 5)) @ 0) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0))
-    myHome(b(1), pt(10, 10, 0))]
+  | clock(5) class(b(0), Bot) class(b(1), Bot) (timeElapsed(5.0) @ 5) (rand(20) @ 5) (atloc(
+    b(0), pt(16, 6, 5)) @ 5) (atloc(b(1), pt(18, -4, 10)) @ 5) (energy(b(0), 9.3976000000000028e+1)
+    @ 5) (energy(b(1), 9.391200000000002e+1) @ 5) (vel(b(0), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (
+    statObj(b(0), pt(30, 0, 5), pt(30, 15, 5)) @ 0) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0,
+    0, 0)) myHome(b(1), pt(10, 10, 0))]
 [b(0) : Bot |
-  lkb : (clock(6) class(b(0), Bot) (timeElapsed(5.0) @ 5) (rand(25) @ 5) (atloc(b(0), pt(17, 11, 5)) @
-    5) (pending(b(0), goToW(b(0), pt(22, 10, 5), 5.0)) @ 6) (energy(b(0), 9.3976000000000028e+1) @ 5)
-    (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (statObj(b(0), pt(30,
-    0, 5), pt(30, 15, 5)) @ 0) (targets(b(0), pt(50, 10, 5), nil) @ 0) (visitTimes(b(0), pt(50, 10,
-    5), nil) @ 0) (eLoc(b(0), pt(4, 3, 5), 2) @ 1) (eLoc(b(0), pt(8, 7, 5), 3) @ 2) (eLoc(b(0), pt(12,
-    11, 5), 4) @ 3) (eLoc(b(0), pt(17, 10, 5), 5) @ 4) (eLoc(b(0), pt(22, 10, 5), 6) @ 5) (wind(1.0,
-    0.0, 0.0, 0) @ 0) safetyStat(b(0), 1.0e+1) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5) safetyMv(b(0),
-    1.0e+1, 2.0)),
-  ckb : (class(b(0), Bot) atloc(b(0), pt(17, 11, 5)) @ 5),
-  evs : (tick @ 0)]
+  lkb : (clock(5) class(b(0), Bot) (timeElapsed(5.0) @ 5) (rand(25) @ 5) (atloc(b(0), pt(16, 6, 5))
+    @ 5) (pending(b(0), goToW(b(0), pt(20, 9, 5), 5.0)) @ 6) (energy(b(0), 9.3976000000000028e+1) @
+    5) (caution(b(0), 2.0e+1) @ 0) (targetVel(b(0), 5.0) @ 0) (vel(b(0), 5.0) @ 0) (statObj(b(0),
+    pt(30, 0, 5), pt(30, 15, 5)) @ 0) (targets(b(0), pt(50, 10, 5), nil) @ 0) (visitTimes(b(0), pt(
+    50, 10, 5), nil) @ 0) (eLoc(b(0), pt(4, 3, 5), 2) @ 1) (eLoc(b(0), pt(8, 6, 5), 3) @ 2) (eLoc(
+    b(0), pt(12, 9, 5), 4) @ 3) (eLoc(b(0), pt(16, 6, 5), 5) @ 4) (eLoc(b(0), pt(20, 9, 5), 6) @ 5)
+    (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(0), pt(0, 0, 0)) myAlt(b(0), 5) safetyMv(b(0), 1.0e+1,
+    2.0) safetyStat(b(0), 1.0e+1, 2.0e+1)),
+  ckb : (class(b(0), Bot) atloc(b(0), pt(16, 6, 5)) @ 5),
+  evs : ((tick @ 1) goToW(b(0), 4.0, 3.0, 0.0, 0.0, 0.0, 0.0, 2.0) @ 0)]
 [b(1) : Bot |
-  lkb : (clock(6) class(b(1), Bot) (timeElapsed(5.0) @ 5) (rand(30) @ 5) (atloc(b(1), pt(20, 0, 10)) @
-    5) (pending(b(1), goToW(b(1), pt(24, -3, 10), 5.0)) @ 6) (energy(b(1), 9.391200000000002e+1) @ 5)
-    (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1), 5.0) @ 0) (targets(b(1), pt(40,
-    -10, 10), nil) @ 0) (visitTimes(b(1), pt(40, -10, 10), nil) @ 0) (eLoc(b(1), pt(12, 5, 10), 3) @
-    2) (eLoc(b(1), pt(16, 3, 10), 4) @ 3) (eLoc(b(1), pt(20, 0, 10), 5) @ 4) (eLoc(b(1), pt(24, -3,
-    10), 6) @ 5) (wind(1.0, 0.0, 0.0, 0) @ 0) safetyStat(b(1), 1.0e+1) myHome(b(1), pt(10, 10, 0))
-    myAlt(b(1), 10) safetyMv(b(1), 1.0e+1, 2.0)),
-  ckb : (class(b(1), Bot) atloc(b(1), pt(20, 0, 10)) @ 5),
+  lkb : (clock(5) class(b(1), Bot) (timeElapsed(4.0) @ 4) (rand(24) @ 4) (atloc(b(1), pt(15, 1,
+    10)) @ 4) (pending(b(1), goToW(b(1), pt(18, -4, 10), 5.0)) @ 5) (energy(b(1),
+    9.5104000000000013e+1) @ 4) (caution(b(1), 2.0e+1) @ 0) (targetVel(b(1), 5.0) @ 0) (vel(b(1),
+    5.0) @ 0) (targets(b(1), pt(40, -10, 10), nil) @ 0) (visitTimes(b(1), pt(40, -10, 10), nil) @
+    0) (eLoc(b(1), pt(12, 5, 10), 3) @ 2) (eLoc(b(1), pt(15, 1, 10), 4) @ 3) (eLoc(b(1), pt(18, -4,
+    10), 5) @ 4) (wind(1.0, 0.0, 0.0, 0) @ 0) myHome(b(1), pt(10, 10, 0)) myAlt(b(1), 10) safetyMv(
+    b(1), 1.0e+1, 2.0) safetyStat(b(1), 1.0e+1, 2.0e+1)),
+  ckb : (class(b(1), Bot) atloc(b(1), pt(15, 1, 10)) @ 4),
   evs : (tick @ 0)] .
 
 
@@ -65,7 +65,7 @@ eq lkb02 = proSensors(b(0),lkb0,lkb01) .
 eq lkb11 = getSensors(b(1),ekb1) .
 eq lkb12 = proSensors(b(1),lkb1,lkb11) .
 
-ops acts0 acts1 : -> ActSet .                 
+ops acts0 acts1 acts01 acts11 : -> ActSet .                 
 eq acts0 =  myActsA(Bot,b(0),nil,lkb02) .
 eq acts1 =  myActsA(Bot,b(0),nil,lkb12) .
 
@@ -74,6 +74,9 @@ eq actKB11 = act(b(1),lkb12) .
 
 eq lkb03 = getKB(actKB01) .
 eq lkb13 = getKB(actKB11) .
+
+eq acts01 =  solveSCP(b(0),lkb02,acts0) .
+eq acts11 =  solveSCP(b(1),lkb12,acts1) .
 
 eq actKB02 = doControl(getAct(actKB01),lkb03) .
 eq actKB12 = doControl(getAct(actKB11),lkb13) .

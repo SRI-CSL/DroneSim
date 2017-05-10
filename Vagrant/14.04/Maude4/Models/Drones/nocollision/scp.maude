@@ -227,32 +227,50 @@ fmod VAL-VISITS is
 endfm
 
 fmod VAL-NO-COLLISION is
-  inc BVAL .
+  inc TRIVAL .
   inc MODEL-KNOWLEDGE .
 
   var id : Id .
   vars ffx ffx0 ffx1 ffx2 ffx3 ffy ffy0 ffy1 ffy2 ffy3 ffz ffz0 
-       ff ffz1 safety delta v dxc dyc dxl dyl cross
-       maxT minT  dx dx' dy dy' dz dz' a b c d : FiniteFloat .
+       ff ffz1  delta v dxc dyc dxl dyl cross safety prevention
+       maxT minT  dx dx' dy dy' dz dz' a b c d  : FiniteFloat .
   vars loc0 loc1 loc2 : Loc .
   vars t0 t1 : Time .
   vars x0 y0 z0 x1 y1 z1 x2 y2 z2 : Int .
   var kb : KB .
   var act : Action .
+  var tval : TriVal .
 
-  op val-no-collision : Id KB Action -> BVal .
-  ceq val-no-collision(id,(atloc(id,loc0) @ t0) (statObj(id,loc1,loc2) @ t1) kb, act) = bot 
-   if tooClose(id,loc1,loc2,kb,act) .
-  ceq val-no-collision(id,(atloc(id,loc0) @ t0) 
-                          (movObj(id,loc1,ffx,ffy,ffz) @ t1) kb,act) = bot 
+  op val-no-collision : Id KB Action -> TriVal .
+  op val-no-collision$ : Id KB Action TriVal -> TriVal .
+
+  eq val-no-collision(id,kb,act) = val-no-collision$(id,kb,act,top) .
+
+  eq val-no-collision$(id,(atloc(id,loc0) @ t0) 
+                 (statObj(id,loc1,loc2) @ t1)
+                 (safetyStat(id,safety,prevention)) kb,
+                  act, tval) = 
+   (if tooClose(id,loc1,loc2,safety,act) then bot 
+   else (if tooClose(id,loc1,loc2,prevention,act) then 
+         val-no-collision$(id,(atloc(id,loc0) @ t0) 
+                 (safetyStat(id,safety,prevention)) kb,
+                  act, mid)
+         else val-no-collision$(id,(atloc(id,loc0) @ t0) 
+                 (safetyStat(id,safety,prevention)) kb,
+                  act, tval) fi)
+   fi) .
+
+  ceq val-no-collision$(id,(atloc(id,loc0) @ t0) 
+      (movObj(id,loc1,ffx,ffy,ffz) @ t1) kb,act,tval) = bot 
    if colliding(id,loc0,loc1,ffx,ffy,ffz,kb,act) .
-  eq val-no-collision(id,kb,act) = top [owise] . 
+
+  eq val-no-collision$(id,kb,act,tval) = tval [owise] .
 
   *** The safety parameter may be dependent on the velocity. 
   *** this would lead to more precise evaluation.
-  op tooClose : Id Loc Loc KB Action -> Bool .
+  op tooClose : Id Loc Loc FiniteFloat Action -> Bool .
   ceq tooClose(id,pt(x1,y1,z1),pt(x2,y2,z2),
-      safetyStat(id,safety) kb, goToW(id,pt(x0,y0,z0),v))
+      safety, goToW(id,pt(x0,y0,z0),v))
     = (if d >= safety then false 
       else 
         betweenPoints(ffx3,ffy3,pt(x1,y1,z1),pt(x2,y2,z2))
@@ -358,12 +376,15 @@ fmod VAL-VISITS-ENERGY-COLLISION is
   var id : Id . 
   var kb : KB . 
   var act : Action .
-  vars b1 b2 b1' b2' : BVal .
+  vars b1 b2 : BVal .
+  vars t1 t2 : TriVal .
   vars u1 u2 : FF .
+  vars ttffval1 ttffval2 : TTFFVal .
+  vars bn1 bn2 cs1 cs2 : FiniteFloat .  
   
   *** Collision Energy Pics
   sort TTFFVal .
-  op {_,_,_} : BVal BVal FF -> TTFFVal .
+  op {_,_,_} : TriVal BVal FF -> TTFFVal .
 
   op val : Id KB -> TTFFVal .
   op val : Id KB Action -> TTFFVal .
@@ -375,11 +396,18 @@ fmod VAL-VISITS-ENERGY-COLLISION is
   op _<_ : TTFFVal TTFFVal -> Bool .
   op equivZero : TTFFVal -> Bool .
 
-  eq {b1',b1,u1} < {b2',b2,u2} = (b1' < b2') or
-                                 (b1' == b2' and b1 < b2) or
-                                 (b1' == b2' and b1 == b2 and u1 < u2) .
+  eq {top,b1,u1} < {top,b2,u2} = (b1 < b2) or
+                                 (b1 == b2 and u1 < u2) .
+  eq {bot,b1,u1} < {top,b2,u2} = true .
+  eq {bot,b1,u1} < {mid,b2,u2} = true .
+  eq {mid,b1,{bn1,cs1}} < {top,b2,{bn2,cs2}} = 
+                          (b1 < b2) or (b1 == b2 and bn2 > 0.0) .
+  eq {top,b1,{bn1,cs1}} < {mid,b2,{bn2,cs2}} = 
+                          (b1 < b2) or 
+                          (b1 == b2 and bn1 <= 0.0 and bn2 > 0.0) .
+  eq ttffval1 < ttffval2 = false [owise] .
 
-  eq equivZero({b1',b1,u1}) = (equivZero(b1')) or (equivZero(b1)) or (equivZero(u1)) .
+  eq equivZero({t1,b1,u1}) = (equivZero(t1)) or (equivZero(b1)) or (equivZero(u1)) .
 
 endfm
 

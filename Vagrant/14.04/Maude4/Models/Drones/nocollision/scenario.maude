@@ -6,7 +6,7 @@ mod SCENARIO-BASIC is
 var check : Bool .
 vars n n' t t0 m t1 thr : Nat .
 vars i j x y z x0 y0 z0 : Int .
-vars sx sy sz dx dy dz v e c dt te caution safMv safStat deltaMv : FiniteFloat .
+vars sx sy sz dx dy dz v e c dt te caution safMv safStat deltaMv prevention : FiniteFloat .
 var dir : Dir .
 vars wkb kb lkb ekb : KB .
 var aconf conf : Conf .
@@ -60,23 +60,23 @@ eq costMv(v) = (if v < 3.0 then 1.30 * reducedFactor else 1.49 * reducedFactor f
 **** ekb has current velocity vel
 
 **** lkb has target velocity 
-op mkBkb : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList FiniteFloat FiniteFloat FiniteFloat -> KB .
-eq mkBkb(n,sx,sy,sz,v,e,c,a,locs,safStat,safMv,deltaMv) = 
+op mkBkb : Nat FiniteFloat FiniteFloat  FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> KB .
+eq mkBkb(n,sx,sy,sz,v,e,c,a,locs,safStat,prevention,safMv,deltaMv) = 
     mkBekb(n,sx,sy,sz,v,e)  (targetVel(b(n),v) @ 0) 
     myAlt(b(n),a) (caution(b(n),c) @ 0)
     myHome(b(n),mkLoc(sx,sy,sz)) (targets(b(n),locs,nil) @ 0) 
     mkVisitTimes(n,locs) clock(0) 
     safetyMv(b(n),safMv,deltaMv)
-    safetyStat(b(n),safStat) .
+    safetyStat(b(n),safStat,prevention) .
 
 op mkCountVisits : Nat LocList -> KB .
 eq mkCountVisits(n,l ; locs) 
  = (countVisit(b(n),l,0) @ 0) mkCountVisits(n,locs) .
 eq mkCountVisits(n,nil) = none .
 
-op mkB : Nat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList FiniteFloat FiniteFloat FiniteFloat -> Agent .
-eq mkB(n,sx,sy,sz,v,e,c,a,locs,safStat,safMv,deltaMv) =
- [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs,safStat,safMv,deltaMv),
+op mkB : Nat FiniteFloat FiniteFloat  FiniteFloat FiniteFloat FiniteFloat FiniteFloat Int LocList FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Agent .
+eq mkB(n,sx,sy,sz,v,e,c,a,locs,safStat,prevention,safMv,deltaMv) =
+ [b(n) : Bot | lkb : mkBkb(n,sx,sy,sz,v,e,c,a,locs,safStat,prevention,safMv,deltaMv),
                ckb : none, evs : (tick @ 0)] .
 
 
@@ -121,8 +121,8 @@ ops confHighWind : FiniteFloat FiniteFloat -> Conf .
 ****           (n,sx,sy,sz,  v,  e,   c,  a,locs) 
 ****          (n,sx, sy, sz, v,  e,    c,   a,locs)
 eq confNoWind(caution) 
- = mkB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1,10.0,10.0,2.0)
-   mkB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2,10.0,10.0,2.0)
+ = mkB(0,0.0,0.0,0.0,5.0,100.0,caution,5,locs1,10.0,20.0,10.0,2.0)
+   mkB(1,10.0,10.0,0.0,5.0,100.0,caution,10,locs2,10.0,20.0,10.0,2.0)
    mkE(0,0.0,0.0,0.0,5.0,noWind,100.0,
        statObj(b(0),pt(30,0,5),pt(30,15,5)) @ 0) . 
 

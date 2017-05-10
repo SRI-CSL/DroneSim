@@ -4,18 +4,21 @@ fmod MODEL-KNOWLEDGE is
 
 
   vars t t0 t1 t2 : Time .
-  vars alt x y x1 y1 x0 y0 z0 z1 z thr x2 y2 z2 : Int .
+  vars alt x y x1 y1 x0 y0 z0 z1 z thr x2 y2 z2 
+  x3 y3 z3 x4 y4 z4 x5 y5 z5  x6 y6 z6 : Int .
   vars id id0 id1 : Id .
 	var cl : Class .
-  vars l l0 l1 l2 l3 loc locTL locTR loc0 : Loc .
+  vars l l0 l1 l2 l3 l4 loc locTL locTR loc0 : Loc .
   vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 :  KB .
   var dir dir0 dir1 : Dir .
-  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn ffxnu1 ffxnu2 ffynu1 ffynu2 : FiniteFloat .
+  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn ffxnu1 ffxnu2 ffynu1 ffynu2 
+  safety xsafety prevention : FiniteFloat .
   vars locs locs0 locs1 locs2 locs3 : LocList .
   var act act0 act1 pact : Action .
   var acts : ActSet .
   vars n n0 n1 r j : Nat .
 	var times : TimesList .
+  var mInv : [Float] .
 
   op b : Nat -> Id .
   op st : Nat -> Id .
@@ -123,7 +126,7 @@ op equiv : Loc Loc -> Bool .
   ***             delta -- max time to collision  
   op safetyMv : Id FiniteFloat FiniteFloat -> PKItem .
   *** parameter: safety -- min distance to statical object
-  op safetyStat : Id FiniteFloat -> PKItem .
+  op safetyStat : Id FiniteFloat FiniteFloat -> PKItem .
 
   *** Static object on ground represented as a rectangle on position locTL, locTR
   op statObj : Id Loc Loc -> Info .
@@ -353,12 +356,32 @@ ceq myActsA$(cl,id,loc0 ; locs,
                        round(ffz1 * v) + z0) .
 eq myActsA$(cl,id,nil,kb) = none .
 
+op getSafePoints : KItem FiniteFloat -> LocList .
+ceq getSafePoints(statObj(id,pt(x1,y1,z1),pt(x2,y2,z2)) @ t, safety) = l1 ; l2 ; l3 ; l4 
+ if xsafety := safety + 1.0
+ /\ dir(ffx0,ffy0,ffz0) := getNormVec(pt(x1,y1,z1),pt(x2,y2,z2))
+ /\ pt(x3,y3,z3) := pt(x2 + round(ffx0 * xsafety),y2 + round(ffy0 * xsafety),z2)
+ /\ pt(x4,y4,z4) := pt(x1 - round(ffx0 * xsafety),y1 - round(ffy0 * xsafety), 
+   z2)
+ /\ mInv := - float(x2 - x1) / float(y2 - y1) 
+ /\ pt(x5,y5,z5) := if mInv :: FiniteFloat then pt(round(mInv) * y3, 0, z2) 
+                                         else pt(x3,0,z2) fi 
+ /\ dir(ffx1,ffy1,ffz1) := getNormVec(pt(x3,y3,z3),pt(x5,y5,z5))
+ /\ l1 := pt(x3 + round(ffx1 * xsafety),y3 + round(ffy1 * xsafety),z2) 
+ /\ l2 := pt(x3 - round(ffx1 * xsafety),y3 - round(ffy1 * xsafety),z2)
+ /\ l3 := l1 + pt(x4,y4,z4) - pt(x3,y3,z3) 
+ /\ l4 := l2 + pt(x4,y4,z4) - pt(x3,y3,z3) .
+
+op _+_ : Loc Loc -> Loc [assoc comm] .
+op _-_ : Loc Loc -> Loc [assoc comm] .
+eq (pt(x1,y1,z1) + pt(x2,y2,z2)) = pt(x1 + x2,y1 + y2,z1 + z2) .
+eq (pt(x1,y1,z1) - pt(x2,y2,z2)) = pt(x1 - x2,y1 - y2,z1 - z2) .
+
 op locsdiff : LocList LocList -> LocList .
 eq locsdiff(locs0 ; loc ; locs1,loc ; locs) = 
      locsdiff(locs0 ; locs1, locs) .
 eq locsdiff(locs1, loc ; locs) =  locsdiff(locs1, locs) [owise] .
 eq locsdiff(locs1, nil)  = locs1 .
-
 
   op getLastVisits : Class Id KB -> KB .
   eq getLastVisits(cl,id,(lastVisit(id,loc,dt) @ t) kb)
