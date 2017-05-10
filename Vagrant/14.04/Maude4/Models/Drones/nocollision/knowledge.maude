@@ -406,6 +406,11 @@ ceq myActsCautious(id,kb (targetVel(id,v) @ t0)
  /\ l2 := pt(x0,y0,z0 + round(vlift))
  /\ locs3 := notInAnySafetyBox(id,kb,safety,l2 ; locs1 ; locs2) .
 
+ eq mkGoToW(id,loc0 ; locs,v) = 
+   goToW(id,loc0,v) mkGoToW(id,locs,v) .
+ eq mkGoToW(id,nil,v) = none .  
+
+
  op getExitPoints : Id Loc FiniteFloat KB -> LocList .
  ceq getExitPoints(id,pt(x0,y0,z0),v,
             (statObj(id,locTL,locTR,locs,dir(ffx1,ffy1,ffz1)) @ t) kb) =
@@ -415,6 +420,8 @@ ceq myActsCautious(id,kb (targetVel(id,v) @ t0)
   /\ ff1 := distanceFF(locTL,l1)
   /\ ff2 := distanceFF(locTL,l2)
   /\ l3 := if ff1 > ff2 then l1 else l2 fi .
+
+ eq getExitPoints(id,l0,v,kb) = nil [owise] .
 
  op notInAnySafetyBox : Id KB FiniteFloat LocList -> LocList .
  ceq notInAnySafetyBox(id,
