@@ -13,7 +13,7 @@ loop init .
 (g2dexe g2d (load (sinvoke "g2d.util.IO" "interpretTilde" "~/Repositories/imaude/jlib/jl-util.lsp")))
 (loadg2dlib g2d ../../../../Lib/stats-funs.lsp)
 (initAgentEset maude g2d g2d none ANALYSIS asysHighWind20 true 300) 
-(augAgentEsetStats Patrol 400 nGenericApprox .05 .05 5)
+(augAgentEsetStats Patrol 400 nGenericApprox .25 .25 5)
 )
 
 **** (initAgentEsetStats maude g2d g2d SCENARIO-VER initSys1w Patrol 400 GenericApprox .25 .25)

@@ -388,6 +388,7 @@ op myActsSafe : Class Id LocList KB -> ActSet .
 op myActsCautious : Id KB KB -> ActSet .
 op mkGoToW : Id LocList FiniteFloat -> ActSet .
 
+*** Class, locs is either empty or the last point visited, kb
 ceq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ t) kb) =
   (if statObjs == none then 
        myActsSafe(cl,id,locsdiff((locs0 ; locs1), locs),kb)
@@ -399,7 +400,7 @@ if statObjs := inPrevention(id,kb,none) .
 ceq myActsCautious(id,kb (targetVel(id,v) @ t0) 
         (safetyStat(id,safety,prevention)),statObjs) 
  = mkGoToW(id,locs3,v)
- if locs := getAllSafePoints(id,kb)
+ if locs := getCornerPoints(id,kb)
  /\ pt(x0,y0,z0) := getLoc(id,kb)
  /\ locs1 := getClosest(2,pt(x0,y0,z0),locs)
  /\ locs2 := getExitPoints(id,pt(x0,y0,z0),v,statObjs)
@@ -409,7 +410,6 @@ ceq myActsCautious(id,kb (targetVel(id,v) @ t0)
  eq mkGoToW(id,loc0 ; locs,v) = 
    goToW(id,loc0,v) mkGoToW(id,locs,v) .
  eq mkGoToW(id,nil,v) = none .  
-
 
  op getExitPoints : Id Loc FiniteFloat KB -> LocList .
  ceq getExitPoints(id,pt(x0,y0,z0),v,
@@ -458,8 +458,6 @@ ceq inPrevention(id,kb (atloc(id,l0) @ t0)
 
 eq inPrevention(id,kb,kb1) = kb1 [owise] .
 
-
-
 op getClosest : Nat Loc LocList -> LocList .
 op getClosest$ : Loc LocList -> LocList .
 op getClosest$$ : Loc FiniteFloat Loc LocList LocList -> LocList .
@@ -477,10 +475,10 @@ eq getClosest$$(l0,ff,l1,l2 ; locs,locs1)
     fi .
 eq getClosest$$(l0,ff,l1,nil,locs1) = l1 ; locs1 .
 
-op getAllSafePoints : Id KB -> LocList .
-eq getAllSafePoints(id,(statObj(id,l1,l2,locs1,dir) @ t) kb) =
-  locs1 ; getAllSafePoints(id,kb) .
-eq getAllSafePoints(id,kb) = nil [owise] .
+op getCornerPoints : Id KB -> LocList .
+eq getCornerPoints(id,(statObj(id,l1,l2,locs1,dir) @ t) kb) =
+  locs1 ; getCornerPoints(id,kb) .
+eq getCornerPoints(id,kb) = nil [owise] .
 
 op getSafePoints : Loc Loc FiniteFloat -> LocList .
 ceq getSafePoints(pt(x1,y1,z1),pt(x2,y2,z2), safety) = l1 ; l2 ; l3 ; l4 
