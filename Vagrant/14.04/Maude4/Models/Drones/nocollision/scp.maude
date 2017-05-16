@@ -356,9 +356,12 @@ fmod VAL-VISITS-ENERGY-COLLISION is
   eq {top,b1,{bn1,cs1}} < {mid,b2,{bn2,cs2}} = 
                           (b1 < b2) or 
                           (b1 == b2 and bn1 <= 0.0 and bn2 > 0.0) .
+  eq {mid,b1,u1} < {mid,b2,u2} = (b1 < b2) or 
+                                 (b1 == b2 and u1 < u2) .
+ 
   eq ttffval1 < ttffval2 = false [owise] .
 
-  eq equivZero({t1,b1,u1}) = (equivZero(t1)) or (equivZero(b1)) or (equivZero(u1)) .
+  eq equivZero({t1,b1,u1}) = (equivZero(t1)) or (equivZero(b1)) .
 
 endfm
 

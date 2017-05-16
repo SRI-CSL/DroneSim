@@ -120,6 +120,9 @@ op equiv : Loc Loc -> Bool .
   op landFarFromHome : Id Loc FiniteFloat -> Info .
   eq hasId(id,landFarFromHome(id,loc,ff) @ t) = true .
 
+  op goal : Id Loc -> Info .
+  eq hasId(id,goal(id,loc) @ t) = true .
+
   *** Moving object detected with velocity ffx, ffy, ffz at location loc
   op movObj : Id Loc FiniteFloat FiniteFloat FiniteFloat -> Info .
   eq hasId(id,movObj(id,loc,ffx,ffy,ffz) @ t) = true .
@@ -230,7 +233,7 @@ op equiv : Loc Loc -> Bool .
   
 op inBox : Id Loc Loc FiniteFloat Loc -> Bool .
 ceq inBox(id,pt(x1,y1,z1),pt(x2,y2,z2),safety,pt(x0,y0,z0))
-    = (if d >= safety then false 
+    = (if d >= safety or float(z0) > float(z1) + safety then false 
       else 
         betweenPoints(ffx3,ffy3,pt(x1,y1,z1),pt(x2,y2,z2))
         or 
@@ -281,6 +284,16 @@ ceq inBox(id,pt(x1,y1,z1),pt(x2,y2,z2),safety,pt(x0,y0,z0))
    /\ dxl := ffx2 - ffx1
    /\ dyl := ffy2 - ffy1
    /\ cross := dxc * dyl - dyc * dxl  .
+
+  *** Position Goal Object
+  op isMovingTowards : Loc Loc KItem -> Bool .
+  ceq isMovingTowards(l0,l1,(statObj(id,locTL,locTR,locs,dir) @ t)) = 
+    (distanceFF(l0,locTL) > distanceFF(l2,locTL))
+    or 
+    (distanceFF(l0,locTR) > distanceFF(l2,locTR))
+   if pt(x0,y0,z0) := l0
+   /\ dir(ffx,ffy,ffz) := getNormVec(l0,l1)
+   /\ l2 := pt(x0 + round(5.0 * ffx),y0 + round(5.0 * ffy),z0) .
 
   op distanceFF : Loc Loc -> FiniteFloat .
   eq distanceFF(pt(x0,y0,z0),pt(x1,y1,z1)) = 
@@ -371,27 +384,35 @@ ceq inBox(id,pt(x1,y1,z1),pt(x2,y2,z2),safety,pt(x0,y0,z0))
   op close : Loc Loc -> Bool .
  
 ********* helpers
-  op myActs : Class Id KB -> ActSet .
-  eq myActs(cl,id,lkb) = goTos(cl,id,lkb) .
+  op myActsGoal : Class Id KB -> ActSet .
+  eq myActsGoal(cl,id,lkb) = goTos(cl,id,lkb) .
 
   op goTos : Class Id KB -> ActSet .
-  op goTos$ : Class Id LocList -> ActSet .
-  eq goTos(cl,id,(targets(id,locs,locs1) @ t) kb) = 
-   goTos$(cl,id, locs ; locs1) .
-  eq goTos$(cl,id,loc ; locs) = goTo(id,loc) goTos$(cl,id,locs) .
-  eq goTos$(cl,id,nil) = none .
+  eq goTos(cl,id,
+     (visitTimes(id,l1,nil) @ t1)
+     (targetVel(id,v) @ t0) kb) = 
+   goToW(id,l1,v) goTos(cl,id,(targetVel(id,v) @ t0) kb) .
+  eq goTos(cl,id,kb) = none [owise] .
 
-*** Compute (x0 + cos(theta - 30) * |V|, y0 + cos(theta - 30) * |V|)
+sort ActsKB .
+op {{_,_}} : ActSet KB -> ActsKB [ctor] .
+
+op myActsSubGoals : Class Id LocList KB LocList -> ActsKB .
+ceq myActsSubGoals(cl,id,locs,kb,locs1 ; loc ; locs2) = 
+   {{myActsA(cl,id,locs,kb),kb}}
+ if (goal(id,loc) @ t) kb1 := kb .
+eq myActsSubGoals(cl,id,locs, clock(t) kb, loc ; locs2 ) = 
+  {{myActsA(cl,id,locs,addK(goal(id,loc) @ (s t), clock(t) kb)),
+     addK(goal(id,loc) @ (s t), clock(t) kb)}} [owise] .     
 
 op myActsA : Class Id LocList KB -> ActSet .
 op myActsSafe : Class Id LocList KB -> ActSet .
 op myActsCautious : Id KB KB -> ActSet .
-op mkGoToW : Id LocList FiniteFloat -> ActSet .
 
 *** Class, locs is either empty or the last point visited, kb
-ceq myActsA(cl,id,locs, (targets(id,locs0, locs1) @ t) kb) =
+ceq myActsA(cl,id,locs,(goal(id,loc) @ t) kb) =
   (if statObjs == none then 
-       myActsSafe(cl,id,locsdiff((locs0 ; locs1), locs),kb)
+       myActsSafe(cl,id,loc,kb)
        else 
        myActsCautious(id,kb,statObjs)            
   fi) 
@@ -399,29 +420,20 @@ if statObjs := inPrevention(id,kb,none) .
 
 ceq myActsCautious(id,kb (targetVel(id,v) @ t0) 
         (safetyStat(id,safety,prevention)),statObjs) 
- = mkGoToW(id,locs3,v)
- if locs := getCornerPoints(id,kb)
+ = mkGoToW(id,getLoc(id,kb),locs3,v)
+ if locs := getCornerPoints(id,statObjs)
  /\ pt(x0,y0,z0) := getLoc(id,kb)
  /\ locs1 := getClosest(2,pt(x0,y0,z0),locs)
- /\ locs2 := getExitPoints(id,pt(x0,y0,z0),v,statObjs)
  /\ l2 := pt(x0,y0,z0 + round(vlift))
- /\ locs3 := notInAnySafetyBox(id,kb,safety,l2 ; locs1 ; locs2) .
+ /\ locs3 := notInAnySafetyBox(id,kb,safety,l2 ; locs1 ) .
 
- eq mkGoToW(id,loc0 ; locs,v) = 
-   goToW(id,loc0,v) mkGoToW(id,locs,v) .
- eq mkGoToW(id,nil,v) = none .  
-
- op getExitPoints : Id Loc FiniteFloat KB -> LocList .
- ceq getExitPoints(id,pt(x0,y0,z0),v,
-            (statObj(id,locTL,locTR,locs,dir(ffx1,ffy1,ffz1)) @ t) kb) =
-     l3 ; getExitPoints(id,pt(x0,y0,z0),v,kb)
-  if l1 := pt(x0 + round(ffx1 * v),y0 + round(ffy1 * v),z0 + round(ffz1 * v))
-  /\ l2 := pt(x0 - round(ffx1 * v),y0 - round(ffy1 * v),z0 - round(ffz1 * v))
-  /\ ff1 := distanceFF(locTL,l1)
-  /\ ff2 := distanceFF(locTL,l2)
-  /\ l3 := if ff1 > ff2 then l1 else l2 fi .
-
- eq getExitPoints(id,l0,v,kb) = nil [owise] .
+op mkGoToW : Id Loc LocList FiniteFloat -> ActSet .
+ceq mkGoToW(id,l0,loc0 ; locs,v) = 
+  goToW(id,l1,v) mkGoToW(id,l0,locs,v) 
+  if pt(x0,y0,z0) := l0
+  /\ dir(ffx1,ffy1,ffz1) := getNormVec(l0,loc0) 
+  /\ l1 := pt(x0 + round(ffx1 * v),y0 + round(ffy1 * v),z0 + round(ffz1 * v) ) .
+ eq mkGoToW(id,l0,nil,v) = none .  
 
  op notInAnySafetyBox : Id KB FiniteFloat LocList -> LocList .
  ceq notInAnySafetyBox(id,
@@ -448,14 +460,15 @@ ceq myActsCautious(id,kb (targetVel(id,v) @ t0)
 eq myActsSafe(cl,id,nil,kb) = none .
 
 op inPrevention : Id KB KB -> KB .
-ceq inPrevention(id,kb (atloc(id,l0) @ t0) 
+ceq inPrevention(id,kb (goal(id,loc) @ t1) (atloc(id,l0) @ t0) 
                 (statObj(id,l1,l2,locs,dir) @ t)
                 (safetyStat(id,safety,prevention)),kb1) = 
     inPrevention(id,kb (atloc(id,l0) @ t0) 
                 (safetyStat(id,safety,prevention)),kb2 kb1) 
- if kb2 := if inBox(id,l1,l2,prevention,l0) then 
-           (statObj(id,l1,l2,locs,dir) @ t) else none fi .
-
+ if kb2 := if inBox(id,l1,l2,prevention,l0) and 
+         isMovingTowards(l0,loc,statObj(id,l1,l2,locs,dir) @ t)
+              then 
+              (statObj(id,l1,l2,locs,dir) @ t) else none fi .
 eq inPrevention(id,kb,kb1) = kb1 [owise] .
 
 op getClosest : Nat Loc LocList -> LocList .
@@ -476,8 +489,8 @@ eq getClosest$$(l0,ff,l1,l2 ; locs,locs1)
 eq getClosest$$(l0,ff,l1,nil,locs1) = l1 ; locs1 .
 
 op getCornerPoints : Id KB -> LocList .
-eq getCornerPoints(id,(statObj(id,l1,l2,locs1,dir) @ t) kb) =
-  locs1 ; getCornerPoints(id,kb) .
+eq getCornerPoints(id,(statObj(id,l1,l2,locs1,dir) @ t) kb)
+ = locs1 ; getCornerPoints(id,kb) .
 eq getCornerPoints(id,kb) = nil [owise] .
 
 op getSafePoints : Loc Loc FiniteFloat -> LocList .
@@ -629,12 +642,13 @@ eq rest(times) = nil [owise] .
 
 *** managed by update function, no need for partial order
 *** var times : TimesList .
-
   op incVisitTimes : Id Loc Time KB -> KB .
-  eq incVisitTimes(id,loc,t1,(visitTimes(id,loc,times) @ t) kb) = 
-	                (visitTimes(id,loc,(times ; t1)) @ t1) kb .
+  eq incVisitTimes(id,loc,t1,(visitTimes(id,loc,times) @ t) kb) = 	                (visitTimes(id,loc,(times ; t1)) @ t1) kb .
   eq incVisitTimes(id,loc,t1,kb) = kb [owise] .
 	
+  op checkGoal : Id Loc KB -> KB .
+  eq checkGoal(id,loc,(goal(id,loc0) @ t0) kb) = 
+   if loc == loc0 then kb else (goal(id,loc0) @ t0) kb fi .
 
   op distanceDir : Loc Loc -> FiniteFloat .
   ceq distanceDir(pt(x0,y0,z0),pt(x1,y1,z1)) = ffn

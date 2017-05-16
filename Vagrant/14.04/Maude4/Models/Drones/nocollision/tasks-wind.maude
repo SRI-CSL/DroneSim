@@ -8,11 +8,11 @@ fmod MODEL-TASKS is
 	var cl : Class .
 	vars  t t0 t1 t2 t3 t4 t5 t6 : Time .
   vars l l0 loc loc0 home locR loc1 loc2 : Loc .
-  vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 lkb4 : KB .
+  vars kb kbp lkb lkb0 lkb1 lkb2 lkb3 ekb ekb0 kb0 kb1 lkb4 kb2 : KB .
   vars evs evs' ievs devs : EventSet . 
   var dir dir1 : Dir .
   var act act0 act1  : Action .
-	vars acts acts0 pact : ActSet .
+	vars acts acts0 pact acts1 acts2 acts3 : ActSet .
 	vars e v c x y z : FiniteFloat .
   vars sx sy sz sx0 sy0 sz0 sx1 sy1 sz1 sx2 sy2 sz2 sx3 sy3 sz3 : FiniteFloat .
   vars wsp sp sp0 ffx ffy ffz ffx1 ffy1 ffz1 dt dt2 dt1 ctheta : FiniteFloat .
@@ -193,7 +193,7 @@ ceq nextLocSimple(id,kb) =
 
 
 ceq nextLocSCP(id,kb) =
-  {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
+  {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb2)} 
 
 if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0) 
    (targetVel(id,v) @ t1) (timeElapsed(dt) @ t2) kb0 := kb
@@ -201,15 +201,20 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
  /\ kb1 := (if isGoTo(pact)
             then (if (close(getLoc(pact),loc) 
 								       and not(recentVisitT(getLoc(pact),kb,dt)))
-						      then incVisitTimes(id,getLoc(pact),t,kb)
+						      then checkGoal(id,getLoc(pact),
+                            incVisitTimes(id,getLoc(pact),t,kb))
 						      else kb fi)
             else kb fi)
  /\ locs := (if isGoTo(pact) then getLoc(pact) else nil fi)
- /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
- --- /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
+ /\ locs1 := getLocs(solveSCP(id,kb1,myActsGoal(cl,id,kb1)))
+ /\ {{acts2,kb2}} := myActsSubGoals(cl,id,locs,kb1,locs1)
+ /\ acts3 := solveSCP(id,kb2,acts2) 
  /\ goToW(id,loc2,v) := 
-    (if acts == none then goToW(id,home,v) else pickOne(acts) fi) .
+    (if acts3 == none then goToW(id,home,v) else pickOne(acts3) fi) .
 
+op getLocs : ActSet -> LocList .
+eq getLocs(none) = nil .
+eq getLocs(goToW(id,loc,v) acts0) = loc ; getLocs(acts0) . 
 
 **** abstracting random numbers to [0,1]
   ops randMax rand.25 rand.5 rand.75 rand.125 : -> Nat .
