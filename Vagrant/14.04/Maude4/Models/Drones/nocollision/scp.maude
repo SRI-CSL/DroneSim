@@ -365,11 +365,33 @@ fmod VAL-VISITS-ENERGY-COLLISION is
 
 endfm
 
+fmod IN-PREVENSION is
+  inc TRIVAL .
+
+  op val : Id KB -> TriVal .
+  op val : Id KB Action -> TriVal .
+
+  eq var(id,kb) = if inSafeBox(id,kb) then bot 
+                  else (if inPrevention(id,kb,none) == none then top 
+                        else mid fi) fi .
+  eq var(id,kb,act) = var(id,doAct(id,kb,act)) .
+
+endfm
+
+fmod TOWARDS-GOAL is
+  inc BVAL .
+
+
+endfm
+
+fmod SAFE-TO-REACH is
+  inc BVAL .
+  
+endfm
 
 view  valuation2valvisit from VALUATION to VAL-VISITS-ENERGY is
   sort Grade to TFFVal .
 endv  
-
 
 view  valuation2valvisitcollision from VALUATION to VAL-VISITS-ENERGY-COLLISION is
   sort Grade to TTFFVal .

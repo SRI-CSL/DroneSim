@@ -127,8 +127,8 @@ op equiv : Loc Loc -> Bool .
   op movObj : Id Loc FiniteFloat FiniteFloat FiniteFloat -> Info .
   eq hasId(id,movObj(id,loc,ffx,ffy,ffz) @ t) = true .
 
-  *** Static object on ground represented as a rectangle on position locTL, locTR
-  op statObj : Id Loc Loc LocList Dir -> Info .
+  *** Static object on ground represented as a rectangle on position locTL, locTR, corners, safecorners, visited safecorners
+  op statObj : Id Loc Loc LocList LocList LocList -> Info .
   eq hasId(id,statObj(id,locTL,locTR,locs,dir) @ t) = true .  
 
   *** parameters: safety -- min distance to moving object
@@ -285,6 +285,34 @@ ceq inBox(id,pt(x1,y1,z1),pt(x2,y2,z2),safety,pt(x0,y0,z0))
    /\ dyl := ffy2 - ffy1
    /\ cross := dxc * dyl - dyc * dxl  .
 
+  op linesCrossing : Loc Loc Loc Loc -> Bool .
+  ceq linesCrossing(pt(x0,y0,z0),pt(x1,y1,z1),pt(x2,y2,z2),pt(x3,y3,z3)) =
+   if ffx0 := float(x0)
+   /\ ffx1 := float(x1)
+   /\ ffx2 := float(x2)
+   /\ ffx3 := float(x3)
+   /\ ffy0 := float(y0)
+   /\ ffy1 := float(y1)
+   /\ ffy2 := float(y2)
+   /\ ffy3 := float(y3)
+   /\ m1 := if (ffx1 - ffx0) == 0.0 then 1.0 
+           else  (ffy1 - ffy0) / (ffx1 - ffx0) fi
+   /\ m2 := if (ffx3 - ffx2) == 0.0 then 1.0 
+           else  (ffy3 - ffy2) / (ffx3 - ffx2) fi
+   /\ ffx4 := ((- m1) * ffx0 + m2 * ffx2 + ffy0 - ffy2) 
+              / (m2 - m1)
+   /\ ffy4 := m2 * (ffx4 - ffx2) + ffy2 
+   /\ b := if (m2 == m1) then 
+            betweenPoints(ffx0,ffy0,pt(x2,y2,z2),pt(x3,y3,z3))
+            or  
+            betweenPoints(ffx1,ffy1,pt(x2,y2,z2),pt(x3,y3,z3))
+            else 
+           ffx4 <= max(ffx1,ffx0) and ffx4 >= min(ffx1,ffx0) and 
+           ffy4 <= max(ffy1,ffy0) and ffy4 >= min(ffy1,ffy0) and 
+           ffx4 <= max(ffx3,ffx2) and ffx4 >= min(ffx3,ffx2) and 
+           ffy4 <= max(ffy3,ffy2) and ffy4 >= min(ffy3,ffy2) and 
+       fi .
+
   *** Position Goal Object
   op isMovingTowards : Loc Loc KItem -> Bool .
   ceq isMovingTowards(l0,l1,(statObj(id,locTL,locTR,locs,dir) @ t)) = 
@@ -410,30 +438,42 @@ op myActsSafe : Class Id LocList KB -> ActSet .
 op myActsCautious : Id KB KB -> ActSet .
 
 *** Class, locs is either empty or the last point visited, kb
-ceq myActsA(cl,id,locs,(goal(id,loc) @ t) kb) =
-  (if statObjs == none then 
-       myActsSafe(cl,id,loc,kb)
-       else 
-       myActsCautious(id,kb,statObjs)            
+ceq myActsA(cl,id,locs,kb) =
+  (if statObjs == none then myActsSafe(cl,id,loc,kb)
+     else myActsCautious(id,kb,statObjs)            
   fi) 
-if statObjs := inPrevention(id,kb,none) .
+if kb1 (goal(id,loc) @ t) := kb
+/\ statObjs := inPrevention(id,kb,none) .
 
 ceq myActsCautious(id,kb (targetVel(id,v) @ t0) 
         (safetyStat(id,safety,prevention)),statObjs) 
- = mkGoToW(id,getLoc(id,kb),locs3,v)
+ = mkGoToW(id,getLoc(id,kb),locs3,kb,v)
  if locs := getCornerPoints(id,statObjs)
  /\ pt(x0,y0,z0) := getLoc(id,kb)
- /\ locs1 := getClosest(2,pt(x0,y0,z0),locs)
+ --- /\ locs1 := getClosest(2,pt(x0,y0,z0),locs)
+ /\ locs1 := safePath(pt(x0,y0,z0),locs,statObjs)
  /\ l2 := pt(x0,y0,z0 + round(vlift))
  /\ locs3 := notInAnySafetyBox(id,kb,safety,l2 ; locs1 ) .
 
-op mkGoToW : Id Loc LocList FiniteFloat -> ActSet .
-ceq mkGoToW(id,l0,loc0 ; locs,v) = 
-  goToW(id,l1,v) mkGoToW(id,l0,locs,v) 
+op safePath : Loc LocList KB LocList -> LocList .
+ceq safePath(l0,l1 ; locs,obj statObjs,locs1) = 
+   safePath(l0,locs,obj statObjs,locs1) 
+ if isMovingTowards(l0,l1,obj) .
+ceq safePath(l0,l1 ; locs,obj statObjs,locs1) = 
+  safePath(l0,locs,obj statObjs,l1 ; locs1) 
+ if not isMovingTowards(l0,l1,obj) .
+eq safePath(l0,nil,obj statObjs,locs1) = locs1 .
+
+op mkGoToW : Id Loc LocList KB FiniteFloat -> ActSet .
+ceq mkGoToW(id,l0,loc0 ; locs,
+     (safetyStat(id,safety,prevention)) kb, v) = 
+  act mkGoToW(id,l0,locs,kb,v) 
   if pt(x0,y0,z0) := l0
   /\ dir(ffx1,ffy1,ffz1) := getNormVec(l0,loc0) 
-  /\ l1 := pt(x0 + round(ffx1 * v),y0 + round(ffy1 * v),z0 + round(ffz1 * v) ) .
- eq mkGoToW(id,l0,nil,v) = none .  
+  /\ l1 := pt(x0 + round(ffx1 * v),y0 + round(ffy1 * v),z0 + round(ffz1 * v) ) 
+  /\ act := if notInAnySafetyBox(id,kb,safety,l1) == nil
+            then none else goToW(id,l1,v) fi .
+ eq mkGoToW(id,l0,nil,kb,v) = none .  
 
  op notInAnySafetyBox : Id KB FiniteFloat LocList -> LocList .
  ceq notInAnySafetyBox(id,
