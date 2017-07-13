@@ -1,0 +1,492 @@
+fmod MODEL-KNOWLEDGE is
+  inc SOFT-AGENTS .
+	inc CONVERSION .
+
+
+  vars t t0 t1 t2 : Time .
+  vars alt x y x1 y1 x0 y0 z0 z1 z thr : Int .
+  vars id id0 id1 : Id .
+	var cl : Class .
+  vars l l0 l1 l2 l3 loc : Loc .
+  vars ekb ekb0 ekb1 kb  lkb kb1 lkb0 kb3 :  KB .
+  var dir dir0 dir1 : Dir .
+  vars e e0 e1 ff0 ff1 ffx ffy ffz ff ffx0 ffx1 ffy0 ffy1 ffz0 ffz1 v sx sy sz norm1 norm2 dt dt0 dt1 fdx fdy fdz ffn : FiniteFloat .
+  vars locs locs0 locs1 locs2 locs3 : LocList .
+  var act act0 act1 pact : Action .
+  var acts : ActSet .
+  vars n n0 n1 r j : Nat .
+	var times : TimesList .
+
+  op b : Nat -> Id .
+  op st : Nat -> Id .
+  op eI : -> Id .
+*** parameters
+  --- ops gridX gridY gridZ : -> Nat .
+  --- for shifting coordinates 0,0
+  ops senXLow senYLow senZLow : -> FiniteFloat . 
+  ops gridStepX gridStepY gridStepZ : -> FiniteFloat .
+  op edgeX : -> Int .
+
+  --- eq gridStepX = floor((senXHigh - senXLow) / float(gridX)) . 
+  --- eq gridStepY = floor((senYHigh - senYLow) / float(gridY)) . 
+  --- eq gridStepZ = floor((senZHigh - senZLow) / float(gridZ)) . 
+
+  op comDistance : -> Nat .
+  op periodicity : -> Nat .
+
+  op chargeUnit : -> FiniteFloat .
+  op maxCharge : -> FiniteFloat .      --- stop charging when full
+ 
+  op botDelay : -> Nat .
+  op costMv : FiniteFloat -> FiniteFloat .
+
+***** done up/dn velocities
+  op vlift : -> FiniteFloat .
+  op vland : -> FiniteFloat .
+
+*** class
+  op Bot : -> Class .
+  op Station : -> Class .
+
+*** grid-location
+  sorts GridLoc SenLoc .
+  op pt : Int Int Int -> Loc .
+
+  op mkLoc : FiniteFloat FiniteFloat FiniteFloat -> Loc .
+  eq mkLoc(ffx,ffy,ffz) = pt(rat(floor((ffx - senXLow) / gridStepX)), 
+                          rat(floor((ffy - senYLow) / gridStepY)),
+                          rat(floor((ffz - senZLow) / gridStepZ))) .
+
+op equiv : Loc Loc -> Bool .
+  eq equiv(l0,l0) = true .
+  eq equiv(l0,l1) = false [owise] .
+
+  sort LocList .
+  subsort Loc < LocList .
+  op nil : -> LocList [ctor] .
+  op _;_ : LocList LocList -> LocList [ctor assoc id: nil] .
+
+  op first : LocList ~> Loc .
+  op rest : LocList ~> LocList .
+  eq first(loc ; locs) = loc .
+  eq rest(loc ; locs) = locs .
+  op len : LocList -> Nat .
+  eq len((nil).LocList) = 0 .
+  eq len(loc ; locs) = s (len(locs)) .
+
+ op diff : Loc Loc -> Loc .
+  eq diff(pt(x0,y0,z0),pt(x1,y1,z1)) 
+   = pt((x1 - x0),(y1 - y0),(z1 - z0)) .
+
+  --- Here we are using locs as vectors. So do not use (0,0,0).
+  op angle : Loc Loc -> FiniteFloat .
+  ceq angle(pt(x0,y0,z0),pt(x1,y1,z1)) 
+   = acos(ffx0 * ffx1 + ffy0 * ffy1 + ffz0 * ffz1) 
+   if norm1 := sqrt(float(x0 ^ 2) + float(y0 ^ 2) + float(z0 ^ 2)) 
+   /\ norm2 := sqrt(float(x1 ^ 2) + float(y1 ^ 2) + float(z1 ^ 2)) 
+   /\ ffx0 := float(x0) / norm1 
+   /\ ffy0 := float(y0) / norm1 
+   /\ ffz0 := float(z0) / norm1 
+   /\ ffx1 := float(x1) / norm2 
+   /\ ffy1 := float(y1) / norm2 
+   /\ ffz1 := float(z1) / norm2 .
+     
+  op wind : FiniteFloat FiniteFloat FiniteFloat Nat -> Info .
+  op getWind : KB -> KB .
+  eq getWind((wind(ffx,ffy,ffz,thr) @ t) kb ) = (wind(ffx,ffy,ffz,thr) @ t) .
+  eq getWind(kb) = none [owise] .
+
+  *** Knowledge fact specifying that some drone 
+  *** has reached energy zero during flight
+  op crashed : Id Loc FiniteFloat -> Info .
+  eq hasId(id,crashed(id,loc,ff) @ t) = true .
+  *** Knowledge fact specifying that some drone
+  *** landed far from home
+  op landFarFromHome : Id Loc FiniteFloat -> Info .
+  eq hasId(id,landFarFromHome(id,loc,ff) @ t) = true .
+
+  op pending : Id Action -> Info .
+  eq hasId(id,pending(id,act) @ t) = true .
+
+  op getLoc : Action -> Loc .
+  eq getLoc(goTo(id,loc)) = loc .
+  eq getLoc(goToW(id,loc,dt)) = loc .
+  eq getLoc(act) = nil [owise] . *** Make sure it is always a goto
+
+  op targets : Id LocList LocList -> Info .
+  eq hasId(id,targets(id,locs,locs1) @ t) = true .
+
+  op isTarget : Loc KB -> Bool .
+  eq isTarget(loc,(targets(id,locs0 ; loc ; locs,locs1) @ t) kb) = true .
+  eq isTarget(loc,(targets(id,locs,locs0 ; loc ; locs1) @ t) kb) = true .
+  eq isTarget(loc,kb) = false [owise] .
+
+  op lastVisit : Id Loc FiniteFloat -> Info .
+  eq hasId(id,lastVisit(id,loc,dt) @ t) = true .
+
+  op getTimeVisit : Id Loc KB -> FiniteFloat .
+  eq getTimeVisit(id,loc,(lastVisit(id,loc,dt) @ t) kb) = dt .
+  eq getTimeVisit(id,loc,kb) = 0.0 [owise] .
+
+  op countVisit : Id Loc Nat -> Info .
+  eq hasId(id,countVisit(id,loc,n) @ t) = true .
+
+  op countLate : Id Nat -> Info .
+  eq hasId(id,countLate(id,n) @ t) = true .
+
+  op visited : Id LocList -> Info .
+  eq hasId(id,visited(id,locs) @ t) = true .
+
+  op myHome : Id Loc -> PKItem .
+  eq hasId(id,myHome(id,loc)) = true .
+
+  op myAlt : Id Int -> PKItem .
+  eq hasId(id,myAlt(id,alt)) = true .
+
+  op energy : Id FiniteFloat -> Info [ctor] .
+  eq hasId(id,energy(id,e) @ t) = true .
+
+  op getEnergy : Id KB -> FiniteFloat .
+  eq getEnergy(id, (energy(id,e) @ t) lkb ) = e .
+  eq getEnergy(id,lkb) = 0.0 [owise] .
+
+  op caution : Id FiniteFloat -> Info [ctor] .
+  eq hasId(id,caution(id,e) @ t) = true .
+	
+  op getCaution : Id KB -> FiniteFloat .
+  eq getCaution(id, (caution(id,e) @ t) lkb ) = e .
+  eq getCaution(id,lkb ) = 1.0 [owise] .
+
+  op timeElapsed : FiniteFloat -> Info .
+  op getTimeElapsed : KB -> KB .
+  eq getTimeElapsed((timeElapsed(dt) @ t) kb) = timeElapsed(dt) @ t .
+  eq getTimeElapsed(kb) = none [owise] .
+
+  sorts Interval Intervals .
+  subsort Interval < Intervals .
+  op <_,_> : FiniteFloat FiniteFloat -> Interval .
+  op none : -> Intervals . 
+  op __ : Intervals Intervals -> Intervals [ctor assoc comm id: none] .
+
+**** Time traffic monitoring facts
+
+*** Location, 
+*** the second argument is a singleton or empty denoting whether a location is currently not being covered or not, 
+*** the third argument is the history of uncovered intervals.
+  op notCovered : Loc Intervals Intervals -> Info . 
+
+  op rand : Nat -> Info .
+  op getRand : Id KB -> KB .
+  eq getRand(b(j),(rand(r) @ t) (clock(t1)) kb) = rand(r + t1 * (s j)) @ t1 .
+  eq getRand(id,kb) = none [owise] .
+
+  **** This is the target velocity is the absolute velocity
+  op targetVel : Id FiniteFloat -> Info .  
+  eq hasId(id,targetVel(id,ff) @ t) = true .
+
+  op getVel : Id KB -> FiniteFloat .
+  eq getVel(id, (targetVel(id,v) @ t) lkb ) = v .
+  eq getVel(id,lkb) = 0.0 [owise] .
+
+  op vel : Id FiniteFloat -> Info .  **** myVel is the absolute velocity -- i.e. speed
+  eq hasId(id,vel(id,ff) @ t) = true .
+
+  op getCurVel : Id KB -> FiniteFloat .
+  eq getCurVel(id, (vel(id,v) @ t) lkb ) = v .
+  eq getCurVel(id,lkb) = 0.0 [owise] .
+
+******** bot  actions
+  op continue : Id -> Action .
+  op takeOff : Id Int -> Action .
+  op land : Id -> Action .
+  op stop : Id -> Action .
+  op land : Id Nat -> Action .
+--- We will need to probably add velocity to the goTo action
+  op goTo : Id Loc -> Action .
+  op goToW : Id Loc FiniteFloat -> Action .
+  op goToW : Id FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat FiniteFloat -> Action .
+  *** the following two are deprecated!
+  op mv : Id Dir FiniteFloat -> Action .
+  op charge : Id -> Action .
+  
+  op distanceFF : Loc Loc -> FiniteFloat .
+  eq distanceFF(pt(x0,y0,z0),pt(x1,y1,z1)) = 
+    float((abs(x0 - x1))) * gridStepX + float(abs(y0 - y1)) * gridStepY + float(abs(z0 - z1)) * gridStepZ .
+
+  eq distance(pt(x0,y0,z0),pt(x1,y1,z1)) = 
+    abs(x0 - x1) + abs(y0 - y1) + abs(z0 - z1) .
+
+  op getNormVec : Loc Loc -> Dir .
+  ceq getNormVec(pt(x0,y0,z0),pt(x1,y1,z1)) = dir(fdx / ffn, fdy / ffn, fdz / ffn)
+   if fdx := float(x1 - x0) / gridStepX
+   /\ fdy := float(y1 - y0) / gridStepY
+   /\ fdz := float(z1 - z0) / gridStepZ
+   /\ ffn := sqrt(fdx ^ 2.0 + fdy ^ 2.0 + fdz ^ 2.0) .
+
+  --- location occupied if there is a bot at the location
+   op occupied : Loc KB -> Bool .
+  eq occupied(l0,(atloc(id,l0) @ t) class(id,Bot) ekb) = true .
+  eq occupied(l0, ekb) = false [owise] .
+
+  --- in contact if distance is less than or equal to comDistance
+  eq inContact(id0,id1,ekb) 
+   = distance(getLoc(id0,ekb),getLoc(id1,ekb)) <= comDistance .
+
+  sort Dir . 
+  ops E W N S : -> Dir .  **** east (right) west (left) north south
+  --- dir(x,y,z) where -1 <= x,y,z <= 1.0
+  op dir : FiniteFloat FiniteFloat FiniteFloat -> Dir .
+  eq E = dir(1.0,0.0,0.0) .
+  eq W = dir(-1.0,0.0,0.0) .
+  eq N = dir(0.0,1.0,0.0) . 
+  eq S = dir(0.0,-1.0,0.0) . 
+
+  op reverseDir : Dir -> Dir .
+  eq reverseDir(dir) = if dir == E then W 
+                       else (if dir == W then E 
+                         else (if dir == N then S 
+                               else (if dir == S then N else dir fi)
+                               fi)
+                         fi)
+                       fi .
+**** model of expected result of move actions
+  op round : FiniteFloat -> Int .
+  ceq round(sx) =
+    (if (sx >= 0.0)
+      then (if r:Rat < 1/2 then floor(rat(sx)) else ceiling(rat(sx)) fi)
+      else (if r:Rat < 1/2 then ceiling(rat(sx)) else floor(rat(sx)) fi)
+    fi)
+    if r:Rat := rat(sx) - floor(rat(sx)) .
+
+  op doMv : Loc Dir FiniteFloat -> Loc .
+  eq doMv(pt(x0,y0,z0),dir(ffx0,ffy0,ffz0),v) 
+   = pt(x0 + round(ffx0 * v / gridStepX),
+        y0 + round(ffy0 * v / gridStepY),
+        z0 + round(ffz0 * v / gridStepZ)) .
+
+  eq doMv(l0,dir,v) = l0 [owise] .
+
+
+*** partial order
+  eq atloc(id,l0) @ t0 << atloc(id,l1) @ t1 = t0 < t1 .
+  eq (clock(t0)) << (clock(t1)) = t0 < t1 .
+  eq (energy(id,e0) @ t0) << (energy(id,e1) @ t1) =  t0 < t1 .
+  eq (caution(id,e0) @ t0) << (caution(id,e1) @ t1) =  t0 < t1 .
+  eq vel(id,ff0) @ t0 << vel(id,ff1) @ t1 = t0 < t1 .
+  eq targetVel(id,ff0) @ t0 << targetVel(id,ff1) @ t1 = t0 < t1 .
+  eq rand(r1:Nat) @ t0 << rand(r2:Nat) @ t1 = t0 < t1 .
+  eq targets(id,locs0,locs1) @ t0 << targets(id,locs2,locs3) @ t1 = t0 < t1 .
+  --- eq visited(id,locs0) @ t0 << visited(id,locs1) @ t1 = t0 < t1 .
+  eq lastVisit(id,l0,dt0) @ t0 << lastVisit(id,l0,dt1) @ t1 = t0 < t1 .
+  eq pending(id, act0) @ t0 << pending(id, act1) @ t1 = t0 < t1 .
+  eq timeElapsed(dt0) @ t0 << timeElapsed(dt1) @ t1 = t0 < t1 .
+  eq landFarFromHome(id,l0,ff0) @ t0 << landFarFromHome(id,l1,ff) @ t1 = t0 < t1 . *** it does not matter which one we keep.
+  eq notCovered(l0,int0:Intervals,ints0:Intervals) @ t0 << notCovered(l0,int0:Intervals,ints1:Intervals) @ t1 = t0 < t1 .
+
+  op incCountVisit : Id Loc Time KB -> KB .
+  eq incCountVisit(id,loc,t1,(countVisit(id,loc,n) @ t) kb) = (countVisit(id,loc,s n) @ t1) kb .
+  eq incCountVisit(id,loc,t1,kb) = kb [owise] .
+
+  op incLateVisit : FiniteFloat FiniteFloat Time KB -> KB .
+  eq incLateVisit(dt0,dt1,t1,(countLate(id,n) @ t) kb) = 
+   if dt1 - dt0 > float(periodicity) then (countLate(id,s n) @ t1) kb
+   else (countLate(id,n) @ t) kb fi .
+  eq incLateVisit(dt0,dt1,t1,kb) = kb [owise] .
+
+  op close : Loc Loc -> Bool .
+ 
+********* helpers
+  op myActs : Class Id KB -> ActSet .
+  eq myActs(cl,id,lkb) = goTos(cl,id,lkb) .
+
+  op goTos : Class Id KB -> ActSet .
+  op goTos$ : Class Id LocList -> ActSet .
+  eq goTos(cl,id,(targets(id,locs,locs1) @ t) kb) = 
+   goTos$(cl,id, locs ; locs1) .
+  eq goTos$(cl,id,loc ; locs) = goTo(id,loc) goTos$(cl,id,locs) .
+  eq goTos$(cl,id,nil) = none .
+
+
+***** 16dec25  avoiding repeated visits to current loc
+op myActsA : Class Id LocList KB -> ActSet .
+eq myActsA(cl,id,locs,(targets(id,locs0,locs1) @ t) kb) = 
+      goTos$(cl,id, locsdiff(locs0 ; locs1, locs)) .
+
+op locsdiff : LocList LocList -> LocList .
+eq locsdiff(locs0 ; loc ; locs1,loc ; locs) = 
+     locsdiff(locs0 ; locs1, locs) .
+eq locsdiff(locs1, loc ; locs) =  locsdiff(locs1, locs) [owise] .
+eq locsdiff(locs1, nil)  = locs1 .
+
+
+  op getLastVisits : Class Id KB -> KB .
+  eq getLastVisits(cl,id,(lastVisit(id,loc,dt) @ t) kb)
+   = (lastVisit(id,loc,dt) @ t) getLastVisits(cl,id,kb) .
+  eq getLastVisits(cl,id, kb) = none [owise] .
+
+**** at the same grid as a station and not fully charged 
+  op canCharge : Class Id KB -> Bool .
+  ceq canCharge(Bot,id,lkb) = true
+  if (atloc(id,l0) @ t0) class(id,Bot)
+     (atloc(id1,l0) @ t1) class(id1,Station)
+     (energy(id,e) @ t2) lkb0 := lkb
+  /\ e < maxCharge .
+
+  eq canCharge(Bot,id,lkb) = false [owise] .
+
+  op myMvs : Class Id KB -> ActSet .
+
+	ceq myMvs(Bot,id, lkb) =
+    ((if occupied(l0,lkb) then none else mv(id,E,v) fi)
+     (if occupied(l1,lkb) then none else mv(id,W,v) fi)		
+     (if occupied(l2,lkb) then none else mv(id,S,v) fi)				
+     (if occupied(l3,lkb) then none else mv(id,N,v) fi)	)
+   if l := getLoc(id,lkb)
+   /\ v := getVel(id,lkb)
+	 /\ l0 := doMv(l,E,v)
+	 /\ l1 := doMv(l,W,v)
+	 /\ l2 := doMv(l,S,v)
+	 /\ l3 := doMv(l,N,v) .
+
+	eq myMvs(cl,id,lkb) = none [owise] .
+
+	op doAct : Id KB Action -> KB .
+	
+  ceq doAct(id,kb,charge(id)) = kb1
+   if e0 := getEnergy(id,kb) + chargeUnit
+   /\ e := min(e0, maxCharge)
+   /\ t := getTime(kb)
+   /\ kb1 := addK(kb, clock(s t) (energy(id,e) @ s t)) .
+
+  ceq doAct(id,kb,goTo(id,loc)) = kb1
+   if t0 := getTime(kb)
+   /\ l0 := getLoc(id,kb)
+   /\ v := getVel(id,kb)
+   /\ e0 := getEnergy(id,kb) - cost2loc(l0,loc,v) 
+   /\ ff := distanceFF(l0,loc)
+   /\ timeElapsed(dt0) @ t2 := getTimeElapsed(kb)
+   --- Once we are able to link the model's timestamp with SITL's 
+   --- This is a very rough estimate of arrival time
+   /\ dt1 := (ff / v) + dt0
+   /\ t1 := s t0
+   /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
+                  (lastVisit(id,loc,dt1) @ t1)
+                  (energy(id,e0) @ t1),incCountVisit(id,loc,t1,kb)) .
+
+
+  op cost2loc : Loc Loc FiniteFloat -> FiniteFloat .
+  eq cost2loc(l0,l1,v) = (distanceFF(l0,l1) / v) * costMv(v) .
+
+  op getLKB : Id Conf -> KB .
+  eq getLKB(id:Id,[id:Id : cl:Class | lkb : kb:KB, attrs:AttributeSet] pc:Conf) = kb:KB .
+	
+
+  op getPending : Id KB -> ActSet . **** 0 or 1
+  eq getPending(id, kb (pending(id,pact) @ t)) = pact .
+  eq getPending(id, kb) = none [owise] .
+  
+  op pickOne : ActSet -> Action .
+  eq pickOne(act acts) = act .
+  
+  op isGoTo : Action Loc -> Bool .
+  eq isGoTo(goToW(id,loc,v), loc) = true .
+  eq isGoTo(goTo(id,loc), loc) = true .
+  eq isGoTo(act,loc) = false [owise] .
+  
+  op isStop : Action -> Bool .
+  eq isStop(stop(id)) = true .
+  eq isStop(act) = false [owise] .
+
+*********16dec06 clt new stuff
+***** using NAT-LIST causes ambiguity -- Maude thinks (n - m) could be
+***** the list (n -m)   which is silly becuase -m is not a Nat, but ....
+
+sort TimesList .
+subsort Nat < TimesList .
+op nil : -> TimesList .
+op _;_ : TimesList TimesList -> TimesList [ctor assoc id: nil] .
+
+op len : TimesList -> Nat .
+eq len((nil).TimesList) = 0 .
+eq len( n ; times) = s (len(times)) .
+
+op first : TimesList ~> Nat .
+eq first( n ; times) = n .
+op rest : TimesList -> TimesList .
+eq rest( n ; times) = times .
+eq rest(times) = nil [owise] .
+
+**** track visitTimes, the rest can be computed
+  op visitTimes : Id Loc TimesList -> Info .  --- list initially nil
+  eq hasId(id,visitTimes(id,loc,times) @ t) = true .
+
+*** managed by update function, no need for partial order
+*** var times : TimesList .
+
+  op incVisitTimes : Id Loc Time KB -> KB .
+  eq incVisitTimes(id,loc,t1,(visitTimes(id,loc,times) @ t) kb) = 
+	                (visitTimes(id,loc,(times ; t1)) @ t1) kb .
+  eq incVisitTimes(id,loc,t1,kb) = kb [owise] .
+	
+
+  op distanceDir : Loc Loc -> FiniteFloat .
+  ceq distanceDir(pt(x0,y0,z0),pt(x1,y1,z1)) = ffn
+   if fdx := float(x1 - x0) / gridStepX
+   /\ fdy := float(y1 - y0) / gridStepY
+   /\ fdz := float(z1 - z0) / gridStepZ
+   /\ ffn := sqrt(fdx ^ 2.0 + fdy ^ 2.0 + fdz ^ 2.0) .
+  
+****** using visit times
+
+	op doActT : Id KB Action -> KB .
+	
+  ceq doActT(id,kb,charge(id)) = kb1
+   if e0 := getEnergy(id,kb) + chargeUnit
+   /\ e := min(e0, maxCharge)
+   /\ t := getTime(kb)
+   /\ kb1 := addK(kb, clock(s t) (energy(id,e) @ s t)) .
+
+  ceq doActT(id,kb,goTo(id,loc)) = kb1
+   if t0 := getTime(kb)
+   /\ l0 := getLoc(id,kb)
+   /\ v := getVel(id,kb)
+   /\ ff := distanceDir(l0,loc)
+   /\ timeElapsed(dt0) @ t2 := getTimeElapsed(kb)
+   --- Once we are able to link the model's timestamp with SITL's 
+   --- This is a very rough estimate of arrival time
+   /\ dt1 := (ff / v) + dt0
+   /\ e0 := getEnergy(id,kb) - cost2locT(l0,loc,v,(ff / v)) 
+****   /\ t1 := s t0
+	 /\ t1 := round(dt1)
+   /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
+                  (energy(id,e0) @ t1),
+									incVisitTimes(id,loc,t1,kb) ).
+
+  op time2Loc : Loc Loc FiniteFloat -> FiniteFloat .
+	eq time2Loc(l0,loc,v) = distanceDir(l0,loc) / v .
+
+  op cost2locT : Loc Loc FiniteFloat FiniteFloat -> FiniteFloat .
+  eq cost2locT(l0,l1,v,dt) = costMv(v) * dt .
+
+**** The drone should remember the expected time to visit a location
+ op eLoc : Id Loc TimesList -> Info .
+ eq hasId(id,eLoc(id,loc,times) @ t) = true .
+
+ op updateELoc : Id Loc Time KB -> KB .
+ eq updateELoc(id,loc,t1,(eLoc(id,loc,times) @ t) kb) = 
+	              (eLoc(id,loc, (times ; t1)) @ t1) kb .
+ eq updateELoc(id,loc,t1,kb) = kb [owise] .
+
+**** eLoc item added upon first attempt to visit rather than initial state
+ op updateELocKB : Id Loc FiniteFloat KB -> KB .
+ eq updateELocKB(id,loc,v, (eLoc(id,loc,times) @ t0) clock(t) kb) =
+     ((eLoc(id,loc,
+        times ; round(float(t) + time2Loc(getLoc(id,kb),loc,v)) ) @ t)
+      clock(t) kb)  .  
+
+ eq updateELocKB(id,loc,v, clock(t) kb) =
+      ((eLoc(id,loc, 
+             round(float(t) + time2Loc(getLoc(id,kb),loc,v))) @ t) 
+      clock(t) kb)  .
+            
+endfm
