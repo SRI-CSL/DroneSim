@@ -240,6 +240,59 @@ fmod FFVAL is
 
 endfm
 
+
+fmod VAL-COVER is
+  inc SOFT-AGENTS .
+  inc CONVERSION .
+
+  inc SOFT-AGENTS .
+  inc CONVERSION .
+  inc FFVAL .
+  inc MODEL-KNOWLEDGE .
+
+  vars kb kb' kb1 kb2 kb3 : KB .
+  vars id st : Id .
+  vars x y x1 y1 z1 x0 y0 z0 m n i : Nat .
+  var act : Action .
+  vars loc loc0 loc1 loc2 : Loc .
+  var locs locs0 locs1 : LocList .
+  vars dir dir1 : Dir .
+  vars t t0 t1 : Time .
+  vars st1 st2 v dt ff1 ff2 : FiniteFloat .
+  var times : TimesList .
+  vars ints1 ints2 : Intervals .
+  
+  op valueCS : Id KB -> FiniteFloat .
+  op benefit : Id KB Action -> FiniteFloat .
+  op cost : Id KB Action -> FiniteFloat .
+  op val-visits : Id KB Action  -> FF .
+
+  *** Notice that the greater the valueCS the worse
+  ceq benefit(id,kb,goTo(id,loc)) = st1 - st2
+   if kb1 := doActT(id,kb,goTo(id,loc))
+   /\ st1 := valueCS(id,kb)
+   /\ st2 := valueCS(id,kb1) .
+
+  op sumInt : Intervals -> FiniteFloat .
+  eq sumInt(< ff1, ff2 > ints1) = ff2 - ff1 + sumInt(ints1) .
+  eq sumInt(none) = 0.0 .
+
+  eq valueCS(id,(clock(t)) (notCovered(id,loc,ints1,ints2) @ t0) kb)
+   = valueCS(id,(clock(t)) kb) + sumInt(ints1 ints2) .
+  eq valueCS(id,kb) = 0.0 [owise] . *** not visited sites have 
+
+  ceq cost(id,kb,goTo(id,loc)) = cost2locT(loc0,loc,v,time2Loc(loc0,loc,v)) 
+   if v := getVel(id,kb) 
+   /\ loc0 := getLoc(id,kb) .
+
+  eq val-visits(id,kb,act) 
+   = {benefit(id,kb,act),cost(id,kb,act)} .
+
+  eq equivZero({ff1,ff2}) = ff1 == 0.0 .
+
+
+endfm
+
 ***(
 This valuatios is for just visiting a point once
 )

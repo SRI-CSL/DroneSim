@@ -174,6 +174,7 @@ op equiv : Loc Loc -> Bool .
 *** the second argument is a singleton or empty denoting whether a location is currently not being covered or not, 
 *** the third argument is the history of uncovered intervals.
   op notCovered : Loc Intervals Intervals -> Info . 
+  op notCovered : Id Loc Intervals Intervals -> Info .
 
   op rand : Nat -> Info .
   op getRand : Id KB -> KB .
@@ -282,6 +283,7 @@ op equiv : Loc Loc -> Bool .
   eq timeElapsed(dt0) @ t0 << timeElapsed(dt1) @ t1 = t0 < t1 .
   eq landFarFromHome(id,l0,ff0) @ t0 << landFarFromHome(id,l1,ff) @ t1 = t0 < t1 . *** it does not matter which one we keep.
   eq notCovered(l0,int0:Intervals,ints0:Intervals) @ t0 << notCovered(l0,int0:Intervals,ints1:Intervals) @ t1 = t0 < t1 .
+  eq notCovered(id,l0,int0:Intervals,ints0:Intervals) @ t0 << notCovered(id,l0,int0:Intervals,ints1:Intervals) @ t1 = t0 < t1 .
 
   op incCountVisit : Id Loc Time KB -> KB .
   eq incCountVisit(id,loc,t1,(countVisit(id,loc,n) @ t) kb) = (countVisit(id,loc,s n) @ t1) kb .
