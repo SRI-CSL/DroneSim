@@ -16,6 +16,7 @@ fmod MODEL-KNOWLEDGE is
   var acts : ActSet .
   vars n n0 n1 r j : Nat .
 	var times : TimesList .
+  vars int0 int1 : Intervals .
 
   op b : Nat -> Id .
   op st : Nat -> Id .
@@ -175,6 +176,7 @@ op equiv : Loc Loc -> Bool .
 *** the third argument is the history of uncovered intervals.
   op notCovered : Loc Intervals Intervals -> Info . 
   op notCovered : Id Loc Intervals Intervals -> Info .
+  eq hasId(id,notCovered(id,l0,int0,int1) @ t) = true .
 
   op rand : Nat -> Info .
   op getRand : Id KB -> KB .
@@ -302,17 +304,9 @@ op equiv : Loc Loc -> Bool .
   eq myActs(cl,id,lkb) = goTos(cl,id,lkb) .
 
   op goTos : Class Id KB -> ActSet .
-  op goTos$ : Class Id LocList -> ActSet .
-  eq goTos(cl,id,(targets(id,locs,locs1) @ t) kb) = 
-   goTos$(cl,id, locs ; locs1) .
-  eq goTos$(cl,id,loc ; locs) = goTo(id,loc) goTos$(cl,id,locs) .
-  eq goTos$(cl,id,nil) = none .
-
-
-***** 16dec25  avoiding repeated visits to current loc
-op myActsA : Class Id LocList KB -> ActSet .
-eq myActsA(cl,id,locs,(targets(id,locs0,locs1) @ t) kb) = 
-      goTos$(cl,id, locsdiff(locs0 ; locs1, locs)) .
+  eq goTos(Bot,id,(notCovered(id,l0,int0,int1) @ t0) kb) 
+   = goTo(id,l0) goTos(Bot,id,kb) .
+  eq goTos(Bot,id,kb) = none [owise] .
 
 op locsdiff : LocList LocList -> LocList .
 eq locsdiff(locs0 ; loc ; locs1,loc ; locs) = 
@@ -431,6 +425,10 @@ eq rest(times) = nil [owise] .
   eq incVisitTimes(id,loc,t1,kb) = kb [owise] .
 	
 
+  op updatedNotCovered : Id Loc Time KB -> KB .
+  eq updatedNotCovered(id,l0,t,(notCovered(id,l0,< ff0, ff1 >, int0:Intervals) @ t1) kb)
+   = (notCovered(id,l0,none,< ff0, ff1 > int0:Intervals) @ t) kb .
+
   op distanceDir : Loc Loc -> FiniteFloat .
   ceq distanceDir(pt(x0,y0,z0),pt(x1,y1,z1)) = ffn
    if fdx := float(x1 - x0) / gridStepX
@@ -462,7 +460,7 @@ eq rest(times) = nil [owise] .
 	 /\ t1 := round(dt1)
    /\ kb1 := addK((clock(t1)) (atloc(id,loc) @ t1) 
                   (energy(id,e0) @ t1),
-									incVisitTimes(id,loc,t1,kb) ).
+									updatedNotCovered(id,loc,t1,kb) ).
 
   op time2Loc : Loc Loc FiniteFloat -> FiniteFloat .
 	eq time2Loc(l0,loc,v) = distanceDir(l0,loc) / v .

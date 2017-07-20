@@ -2,7 +2,8 @@ fmod MODEL-TASKS is
   inc MODEL-KNOWLEDGE .
 	inc RANDOM .
   --- inc SOLVE-SCP{valuation2valpicsenergyconservative} . 
-  inc SOLVE-SCP{valuation2valvisit} . 
+  --- inc SOLVE-SCP{valuation2valvisit} . 
+  inc SOLVE-SCP{valuation2valcover} .
   
   vars id : Id .
 	var cl : Class .
@@ -194,7 +195,6 @@ ceq nextLocSimple(id,kb) =
 
 ceq nextLocSCP(id,kb) =
   {goToW(id,loc2,v),addK(pending(id,goToW(id,loc2,v)) @ s t,kb1)} 
-
 if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0) 
    (targetVel(id,v) @ t1) (timeElapsed(dt) @ t2) kb0 := kb
  /\ pact := getPending(id,kb0)
@@ -205,7 +205,7 @@ if class(id,cl) clock(t) myHome(id,home) (atloc(id,loc) @ t0)
 						      else kb fi)
             else kb fi)
  /\ locs := (if isGoTo(pact) then getLoc(pact) else nil fi)
- /\ acts := solveSCP(id,kb1,myActsA(cl,id,locs,kb1)) 
+ /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
 ***** /\ acts := solveSCP(id,kb1,myActs(cl,id,kb1)) 
  /\ goTo(id,loc2) := 
     (if acts == none then goTo(id,home) else pickOne(acts) fi) .
