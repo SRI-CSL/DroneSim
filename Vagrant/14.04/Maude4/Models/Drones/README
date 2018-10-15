@@ -101,7 +101,7 @@ You can also configure the parameters defined also in the lsp file:
 (define generic_num  "5")
 
   * clone_count specifies the number of parallel simulations. 
-  * generic_alpha and generic_beta are the levels of confidence. The greater the values the higher the confidence and more simulations are needed.
+  * generic_alpha and generic_beta are the levels of confidence. The greater the values the lower the confidence and more simulations are needed.
 
       For example, when generic_alpha = generic_beta = 0.25 then 17 simulations are needed. When generic_alpha = generic_beta = 0.5, then 738 simulations are needed.
 
