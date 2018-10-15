@@ -60,7 +60,7 @@ class SitlDrone(object):
     """
 
 
-    def __init__(self, name, instance_no=0, debug=True, speedup=1.0, binary=binary_path, params=params_path, home=home_default):
+    def __init__(self, name, instance_no=0, debug=True, speedup=5.0, binary=binary_path, params=params_path, home=home_default):
         """Creates a drone with given name and default state.
         """
         self.name = name
