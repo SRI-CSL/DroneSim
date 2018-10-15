@@ -29,6 +29,17 @@ Then should be able to launch via:
 
 sim_vehicle.py -v ArduCopter --map --console
 
+**** Fix to the error (timeout not correctly typed)
+
+sudo pip2 install pymavlink==2.2.7
+sudo pip2 install MAVProxy --no-deps
+cp /vagrant/patch/mavproxy.py /usr/local/bin/mavproxy.py
+
+For more details see:
+
+https://github.com/ArduPilot/MAVProxy/pull/544/commits/71dab4fb4f2c382ac97a0a4ff2172c4023fcfc8a
+
+
 
 
 

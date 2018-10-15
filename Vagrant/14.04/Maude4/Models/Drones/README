@@ -1,0 +1,108 @@
+The main folder contains the soft-agent framework files:
+
+  * knowledge.maude contains the definitions of the drone's specific knowledge base, e.g., loc, caution and the drones model of the actions do, e.g., doMv.
+
+  * tasks-wind.maude contains the machinery used by soft-agents to chose actions: getSensors, proSensors, act, doControl. These are called by doTask. Notice that there are two strategies implemented:  
+
+              - actSimple: Implements the waypoint flight strategy;
+              - actSCP: Implements the closest point flight strategy.
+
+  Finally, it also implements random wind effects. 
+
+  * scp.maude contains a number of soft-constraint algebras. 
+
+  * actions.maude contains definitions used mostly by the Maude Physics. 
+
+
+These files are used in common by the files in the following folders:
+
+   * maudePhysics -> Implements the drone model using a discrete approximation in Maude. 
+                     No SITL is required.
+
+   * sitlPhysics -> Implements the drone model using as model of the physics (motion, etc) 
+                    provided by SITL. 
+
+Inside each one of these directories, there are directories with particular scenarios. Currently, the following are implemented:
+
+      * 2d-8p -> two drones and 8 points
+      * tile-scenario -> can build arbritrarly big scenarion by simply clonning and justapositioning 2d-8p scenarios.
+
+------------------------------
+
+Running the Simulation with SITL: 
+
+* go to an example directory, e.g., 2d-8p
+
+  run: 
+
+     iop -i startup-simple-sitl.txt 
+ 
+  for the simple strategy and 
+
+     iop -i startup-scp-sitl.txt
+
+  for the closest point strategy.
+
+Three windows will open: 
+
+   * iop
+   * map
+   * console
+
+In the iop console, you can start the drone by selecting 
+(doSimRound plambda 100)
+and clicking Line
+
+The drone(s) shall starts moving.
+
+-----------------------------------
+Running the Statistical Model Checker with SITL: 
+
+* go to an example directory, e.g., 2d-8p
+
+  run: 
+
+     iop -i startup-simple-concurrent.txt 
+ 
+  for the simple strategy and 
+
+     iop -i startup-scp-concurrent.txt
+
+  for the closest point strategy.
+
+Only an iop window will be open. 
+It will carry out a number of simulations. 
+(It can take a while.)
+
+At the end, it returns tuple of the form:
+
+    [ home, minEnergy, laps, visited, lates]
+
+These are defined in analysis-stat.maude.
+    
+-----------------------------------------
+Configuring the statistical model checker:
+
+Open controller-simple.lsp or controller-scp.lsp, depending whether 
+you are using, respectively, the simple or the closest point strategy. 
+
+In the expression:
+
+"(seq\n (initAgentEset maude{0} g2d g2d plambda{0} ANALYSIS asysVVHighWind50 false)\n (augAgentEsetConcurrentStats Patrol 400))"
+
+Replace asysVVHighWind50 by the definition in maude with the scenario to be tested. 
+(asysVVHighWind50 is defined in simple-2d-8d-simple.maude, for example.)
+
+You can also configure the parameters defined also in the lsp file:
+
+(define clone_count (int 2))
+(define generic_alpha "0.25")
+(define generic_beta "0.25")
+(define generic_num  "5")
+
+  * clone_count specifies the number of parallel simulations. 
+  * generic_alpha and generic_beta are the levels of confidence. The greater the values the lower the confidence and more simulations are needed.
+
+      For example, when generic_alpha = generic_beta = 0.25 then 17 simulations are needed. When generic_alpha = generic_beta = 0.5, then 738 simulations are needed.
+
+  * generic_num is the number of parameters being measured, that is, the size of the tuple to be returned. Currently it returns 5 parameters.

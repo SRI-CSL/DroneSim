@@ -1,9 +1,0 @@
-start g2d iop_graphics2d_wrapper $IOPBINDIR -Xms256m -Xmx1024m
-start plambda0 pyactor plambda0
-start plambda1 pyactor plambda1
-start maude0 iop_maude_wrapper basura load0
-start maude1 iop_maude_wrapper basura load1
-select g2d
-
-
-
