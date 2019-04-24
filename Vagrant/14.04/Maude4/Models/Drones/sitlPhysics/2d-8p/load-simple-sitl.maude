@@ -24,6 +24,6 @@ loop init .
  (pyexe plambda (define b1 (apply mkdrone "b1" (int 1) (int 10) (int 10) (boolean true) (boolean true) "log-hor.txt" )))
  (pyexe plambda (apply setStartTime))
  ****     maude local remote plambda module conf maudephyscs?
- (initAgentEset maude g2d g2d plambda SCENARIO asysVVHighWind20 false)
+ (initAgentEset maude g2d g2d plambda SCENARIO asysNoWind20 false)
 ****  (initAgentEset maude g2d g2d plambda SCENARIO asysHighWind20 false)
 )
