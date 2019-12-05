@@ -1,17 +1,32 @@
-Install vagrant:
+On Mac OSX. before you start you need to be sure you have installed
+Virtual box, Vagrant, and XQuartz≥
 
->wget https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5.dmg
+virtual box can be found at
+https://www.virtualbox.org/wiki/Download_Old_Builds_5_2
+OSX hosts
+19dec04 the version is 5.2.34
+
+vagrant can be found at
+https://www.vagrantup.com/downloads.html
+macOs 64bit
+19dec04 the version is  2.2.6
+
+XQuartz can be found at
+https://dl.bintray.com/xquartz/downloads/XQuartz-2.7.11.dmg
+
 
 Be in this directory:
 
 >vagrant up
+
+this will do some configuring, then run the script in bootstrap.sh
 
 The first time you do this, expect this to take 5-10 minutes.
 It should end up saying
 
 "Time to build/testing ardupilot"
 
-Once up for the first time do:
+When up for the first time do:
 
 >vagrant ssh-config > key.cfg
 
@@ -30,6 +45,7 @@ Then should be able to launch via:
 sim_vehicle.py -v ArduCopter --map --console
 
 **** Fix to the error (timeout not correctly typed)
+**** 19dec04 -- need to check if this needs to be done?
 
 sudo pip2 install pymavlink==2.2.7
 sudo pip2 install MAVProxy --no-deps
