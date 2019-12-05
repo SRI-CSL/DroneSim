@@ -12,24 +12,19 @@ sudo apt-get install -y libtool automake autoconf libexpat1-dev
 sudo apt-get install -y software-properties-common python-software-properties
 sudo apt-get install -y pkg-config
 sudo apt-get install -y zip
+sudo apt-get install -y cmake
+sudo apt-get install -y java-common
 
+echo "Installing Corretto Java 8"
 
+wget -q  https://d3pxv6yz143wms.cloudfront.net/8.232.09.1/java-1.8.0-amazon-corretto-jdk_8.232.09-1_amd64.deb
 
-echo "Installing Oracle's Java 8"
-
-echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-sudo apt-add-repository ppa:webupd8team/java -y
-sudo apt-get update
-sudo apt-get install -y oracle-java8-installer
-
-echo "Setting environment variables for Java 8"
-
-sudo apt-get install -y oracle-java8-set-default
+sudo dpkg --install ./java-1.8.0-amazon-corretto-jdk_8.232.09-1_amd64.deb
 
 
 echo "Taking ownership of /usr/local"
 
-sudo chown -R vagrant:staff /usr/local/
+sudo chown -R vagrant:vagrant /usr/local/
 
 echo "Silencing libdc1394 complaints."
 
@@ -40,7 +35,7 @@ mkdir -p /home/vagrant/Repositories
 echo "Installing Maude"
 cd /home/vagrant/Repositories
 mkdir -p /home/vagrant/bin/Maude
-wget http://maude.cs.illinois.edu/w/images/5/5d/Maude-2.7.1-linux.zip
+wget -q http://maude.cs.illinois.edu/w/images/5/5d/Maude-2.7.1-linux.zip
 unzip Maude-2.7.1-linux.zip -d /home/vagrant/bin/Maude
 chmod a+x /home/vagrant/bin/Maude/maude.linux64
 ln -s /home/vagrant/bin/Maude/maude.linux64 /home/vagrant/bin/Maude/maude
@@ -50,26 +45,25 @@ rm Maude-2.7.1-linux.zip
 echo "Installing PLambda"
 cd /home/vagrant/Repositories
 pip install antlr4-python2-runtime
-git clone https://github.com/SRI-CSL/PLambda
+git clone -q https://github.com/SRI-CSL/PLambda
 cd PLambda
 make clean
 make antlr4_7
 make develop
 
 
-
 echo "Installing IOP"
 cd /home/vagrant/Repositories
 export IOPBINDIR=/home/vagrant/bin/IOP
 mkdir -p /home/vagrant/bin/IOP
-git clone https://github.com/SRI-CSL/iopc
+git clone -q https://github.com/SRI-CSL/iopc
 cd iopc
 make
 make install
 
 echo "Installing IMaude"
 cd /home/vagrant/Repositories
-git clone https://github.com/SRI-CSL/imaude
+git clone -q https://github.com/SRI-CSL/imaude
 
 
 echo "Installing SITL"
@@ -81,7 +75,7 @@ sudo apt-get install  -y  python-dev python-numpy python-opencv python-pyparsing
 echo "Installing dronekit-sitl"
 
 cd /home/vagrant/Repositories
-git clone https://github.com/dronekit/dronekit-sitl.git
+git clone -q https://github.com/dronekit/dronekit-sitl.git
 cd dronekit-sitl
 pip install -e .
 
@@ -103,14 +97,27 @@ echo "Installing MAVProxy"
 
 pip install pymavlink MAVProxy
 
-echo "Cloning jsbsim"
+# echo "Cloning jsbsim"
+# cd /home/vagrant/Repositories
+# git clone git://github.com/tridge/jsbsim.git
+
+# echo "Building jsbsim"
+
+# cd jsbsim
+# ./autogen.sh --enable-libraries
+# make
+
+# new simulator
+
+# not sure is necessary
+# pip install Cython
+
 cd /home/vagrant/Repositories
-git clone git://github.com/tridge/jsbsim.git
-
-echo "Building jsbsim"
-
+git clone -q git://github.com/JSBSim-Team/jsbsim.git
 cd jsbsim
-./autogen.sh --enable-libraries
+mkdir build
+cd build
+cmake -DCMAKE_CXX_FLAGS_RELEASE="-O3 -march=native -mtune=native" -DCMAKE_C_FLAGS_RELEASE="-O3 -march=native -mtune=native" -DCMAKE_BUILD_TYPE=Release ..
 make
 
 
@@ -124,22 +131,23 @@ make
 #
 echo "Cloning ardupilot"
 
-pip install future
-
 cd /home/vagrant/Repositories
-git clone git://github.com/ArduPilot/ardupilot.git
+git clone -q git://github.com/ArduPilot/ardupilot.git
 
 
 echo "Prepping the ardupilot build"
 
-export PATH=${PATH}:/home/vagrant/jsbsim/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
+export PATH=${PATH}:/home/vagrant/jsbsim/build/src:/home/vagrant/ardupilot/Tools/autotest:/usr/lib/ccache
 
 
 echo "Configuring ardupilot"
 cd ardupilot
 # readme says run once. but we have to run twice.
-./waf configure --board minlure
-./waf configure --board minlure
+# ./waf configure --board minlure
+# ./waf configure --board minlure
+
+./waf configure --board SITL_x86_64_linux_gnu
+./waf configure --board SITL_x86_64_linux_gnu
 
 echo "Building arducopter"
 ./waf copter
